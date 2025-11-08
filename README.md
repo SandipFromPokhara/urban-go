@@ -43,10 +43,10 @@ urban-go/
 │
 ├── frontend/
 │ ├── index.html
-│ ├── events.html
-│ ├── transport.html
-│ ├── login.html
-│ ├── signup.html
+│ ├── events.jsx
+│ ├── transport.jsx
+│ ├── login.jsx
+│ ├── signup.jsx
 │ └── styles/
 │ ├── main.css
 │ └── tailwind.config.js
@@ -71,8 +71,8 @@ urban-go/
 | Sprint | Focus | Deliverables |
 |:--------|:-------|:-------------|
 | **Sprint 1** | Design & Planning | Figma prototype, Trello backlog, presentation |
-| **Sprint 2** | Frontend Development | Static pages with navigation and basic interactivity |
-| **Sprint 3** | Backend & Integration | HSL API setup, user login system, database, and final presentation |
+| **Sprint 2** | Frontend & Backend Development | Static pages with navigation and basic interactivity |
+| **Sprint 3** | Frontend, Backend & Integration | HSL API setup, user login system, database, and final presentation |
 
 ---
 
@@ -80,11 +80,11 @@ urban-go/
 
 | Member | Role |
 |:--------|:------|
-| **Sandip** | Scrum Master / Frontend Lead |
-| **Olga** | Frontend Developer |
-| **Gam** | Backend Developer | 
-| **Dinal** | Backend Developer |
-| **Sailesh** | UI/UX Designer |
+| **Sandip** | Product Owner | Frontend + Backend Developer|
+| **Sailesh** | Scrum Master | Frontend + Backend Developer |
+| **Olga** | Frontend + Backend Developer |
+| **Gam** | Frontend + Backend Developer | 
+| **Dinal** | Frontend + Backend Developer |
 
 ---
 
