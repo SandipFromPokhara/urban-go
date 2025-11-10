@@ -310,8 +310,8 @@ urban-go/
 
 | Member | Role |
 |:--------|:------|
-| **Sandip** | Product Owner | Frontend + Backend Developer|
-| **Sailesh** | Scrum Master | Frontend + Backend Developer |
+| **Sandip** | Product Owner + Frontend + Backend Developer|
+| **Sailesh** | Scrum Master + Frontend + Backend Developer |
 | **Olga** | Frontend + Backend Developer |
 | **Gam** | Frontend + Backend Developer | 
 | **Dinal** | Frontend + Backend Developer |
