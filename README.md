@@ -267,31 +267,42 @@ External APIs:
 ```
 ---
 
-## 📁 Repository Structure
+## 📁 Folder Structure Overview
 ```
 urban-go/
 │
-├── frontend/
-│ ├── index.html
-│ ├── events.jsx
-│ ├── transport.jsx
-│ ├── login.jsx
-│ ├── signup.jsx
-│ └── styles/
-│ ├── main.css
-│ └── tailwind.config.js
+├── frontend/                 # React + Vite app (client-side)
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── context/
+│   │   ├── assets/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── vite.config.js
+│   └── package.json
 │
-├── backend/
-│ ├── app.js
-│ ├── routes/
-│ ├── controllers/
-│ └── services/
-│
-├── assets/
-│ └── images/
-│
-├── README.md
-└── package.json
+├── backend/                  # Node + Express server (API + DB)
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── db.js         # MongoDB connection
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── middlewares/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   └── server.js
+│   ├── .env.example
+│   └── package.json    
+|
+└── README.md
+
 ```
 
 ---
@@ -343,17 +354,29 @@ It benefits both users (by offering convenience and personalization) and city st
 
 ```bash
 # Clone the repository
-git clone https://github.com/SandipFromPokhara/urban-go
+git clone https://github.com/SandipFromPokhara/urban-go.git
 
 # Navigate into the folder
 cd urban-go
 
-# Install dependencies
-npm install
+# Replace <your-feature-branch> with your branch name
+git switch -c <your-feature-branch>
+# Runs Node/Express server
+# Make sure you are in your feature branch
+git pull origin main
 
-# Run the project
-npm start
-Then open http://localhost:3000 in your browser.
+# Install frontend dependencies (React + Vite + Tailwind)
+cd frontend && npm install
+
+# Install backend dependencies (Node + Express + MongoDB)
+cd ../backend && npm install
+
+# Run backend locally
+npm run dev    # Runs Node/Express server
+
+# In new terminal: run frontend locally
+cd ../frontend
+npm run dev    # Runs Vite dev server
 
 📜 License
 This project is developed for academic purposes as part of Metropolia University of Applied Science course on Web Development.
