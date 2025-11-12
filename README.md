@@ -42,7 +42,7 @@ The platform aims to enhance city life by combining **event discovery** with **l
 |:--------------------|:--------------|
 | **Frontend**        | HTML, CSS, Tailwind CSS, JavaScript, React |
 | **Backend**         | Node.js, Express.js     |
-| **Database**        | MongoDB (Mongoose ORM)  |
+| **Database**        | MongoDB (Mongoose ODM)  |
 | **API Integration** | HSL API (public transport data), Linked Events API (event data), OpenWeather API |
 | **Version Control** | Git & GitHub |
 | **Design Tools**    | Figma (for prototype and presentation) |
