@@ -1,13 +1,20 @@
+# =============================
+# Global Node / JavaScript / TypeScript
+# =============================
+
 # Dependencies
 node_modules/
 frontend/node_modules/
 backend/node_modules/
 
-# Build outputs
+# Build and output directories
 dist/
 build/
 .next/
 out/
+.cache/
+temp/
+tmp/
 frontend/dist/
 frontend/build/
 backend/dist/
@@ -21,27 +28,82 @@ yarn-debug.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Environment files
+# Coverage directories
+coverage/
+frontend/coverage/
+backend/coverage/
+
+# =============================
+# Environment and config files
+# =============================
 .env
 .env.*
 !.env.example
+.env.local
+.env.development
+.env.production
+.env.test
 
-# Cache and temp
-.cache/
-*.tmp
-*.temp
+# Local environment overrides
+*.local
 
-# Editor & OS files
+# =============================
+# Editor & OS specific
+# =============================
+
+# VSCode
 .vscode/
 !.vscode/extensions.json
+
+# IDEs
 .idea/
-.DS_Store
-Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Coverage
-coverage/
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# =============================
+# Framework specific
+# =============================
+
+# Next.js
+.next/
+out/
+
+# Vite
+vite.config.js.timestamp*
+vite.config.ts.timestamp*
+
+# React (CRA)
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+
+# Express / Backend
+logs/
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional runtime files
+*.tgz
+*.bak
+*.tmp
+
+# =============================
+# Misc
+# =============================
+*.tsbuildinfo
+*.map
+.npm/
+.yarn/
+.pnp.*
+eslintcache
