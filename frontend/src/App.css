@@ -1,4 +1,3 @@
-/* Your Original Styles */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -42,17 +41,12 @@
   color: #888;
 }
 
-/* ========================================== */
-/* FIXES FOR TEXT VISIBILITY */
-/* ========================================== */
 
-/* Fix for search input text */
 input[type="text"],
 input[type="search"] {
   color: #111827 !important;
 }
 
-/* Fix for placeholder text */
 input::placeholder {
   color: #9ca3af !important;
   opacity: 1;
@@ -66,12 +60,10 @@ input::placeholder {
   color: #9ca3af !important;
 }
 
-/* Fix for button text visibility */
 button {
   color: inherit;
 }
 
-/* Ensure proper text colors in event details */
 .text-gray-900 {
   color: #111827 !important;
 }
@@ -84,7 +76,6 @@ button {
   color: #4b5563 !important;
 }
 
-/* Override #root text-align for event pages */
 #root > div {
   text-align: left;
 }

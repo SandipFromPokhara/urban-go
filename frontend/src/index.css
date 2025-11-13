@@ -11,7 +11,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Force light mode for UrbanGo */
 :root {
   color-scheme: light;
   color: #213547;
@@ -40,7 +39,6 @@ h1 {
   line-height: 1.1;
 }
 
-/* Reset button styles - let components handle their own styling */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -48,5 +46,3 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-
-/* Remove the dark mode media query to prevent conflicts */
