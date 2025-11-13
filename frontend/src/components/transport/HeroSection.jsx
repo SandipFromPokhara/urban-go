@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 function HeroSection() {
   return (
     <section //className="relative bg-gradient-to-b from-cyan-400 via-blue-400 to-indigo-500 text-white py-20 overflow-hidden"
-      className="relative bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 text-white py-20 overflow-hidden"
+      className="relative bg-linear-to-br from-blue-500 via-purple-600 to-pink-500 text-white py-20 overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-6 text-center">
         <motion.h1
@@ -28,7 +28,7 @@ function HeroSection() {
 
         <motion.a
           href="#search"
-          className="mt-6 inline-block bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600  py-3 px-6 rounded-lg shadow-xl/30"
+          className="mt-6 inline-block bg-linear-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600  py-3 px-6 rounded-lg shadow-xl/30"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
