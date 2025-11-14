@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import heroVideo from "/Users/olga/Documents/GitHub/urban-go/frontend/src/assets/vids/Hero2.mp4";
+import heroVideo from "../../assets/vids/Hero2.mp4";
 
 export default function Hero() {
   const { scrollY } = useScroll();
