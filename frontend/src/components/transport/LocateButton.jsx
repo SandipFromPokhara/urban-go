@@ -12,6 +12,7 @@ function LocateButton() {
         (pos) => {
           const { latitude, longitude } = pos.coords;
           map.flyTo([latitude, longitude], 14);
+
           L.marker([latitude, longitude])
             .addTo(map)
             .bindPopup("📍 You are here!")
@@ -24,14 +25,14 @@ function LocateButton() {
     }
   };
 
-  return (
-    <div className="absolute bottom-[27%] right-3 z-1000 flex flex-col items-center space-y-2">
+ return (
+    <div className="absolute bottom-30 right-3 z-1000">
       <button
         onClick={handleLocate}
-        className="bg-white hover:bg-blue-100 text-blue-600 p-2 rounded-full shadow-md transition-all duration-200"
+        className="bg-white hover:bg-blue-100 text-blue-600 w-8 h-8 flex items-center justify-center rounded-sm shadow-lg transition-all duration-200"
         title="Locate Me"
       >
-        <FaLocationArrow className="text-lg" />
+        <FaLocationArrow className="text-sm" />
       </button>
     </div>
   );
