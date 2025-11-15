@@ -29,7 +29,12 @@ export default function WhySection() {
         }}
         className="mt-24 max-w-6xl mx-auto rounded-2xl p-0.5 bg-transparent"
       >
-        <motion.div className="flex flex-col justify-center text-center rounded-2xl px-6 py-8 bg-[#1B1036]/80 backdrop-blur-md text-gray-100 shadow-inner">
+        <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            className="flex flex-col justify-center text-center rounded-2xl px-6 py-8 bg-[#1B1036]/80 backdrop-blur-md text-gray-100 shadow-inner">
           <motion.h1
             variants={fadeUp}
             className="text-5xl font-extrabold mb-6 bg-linear-to-r from-[#00AEEF] via-[#C084FC] to-[#00E5C2] bg-clip-text text-transparent drop-shadow-lg"
