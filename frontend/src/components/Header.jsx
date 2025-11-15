@@ -40,8 +40,11 @@ function Header() {
           className="h-auto w-28 select-none"
         />
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Navbar />
+        </div>
+
+        <div className="hidden md:flex items-center gap-4">
           <motion.button
             whileHover={{ scale: 1.05, opacity: 0.9 }}
             whileTap={{ scale: 0.95 }}
@@ -68,7 +71,7 @@ function Header() {
           closed: { opacity: 0, y: "-100%", pointerEvents: "none" },
         }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className="md:hidden absolute top-20 left-0 w-full bg-gradient-end text-white flex flex-col items-center gap-6 py-8 shadow-lg rounded-b-2xl z-40"
+        className="md:hidden absolute top-20 left-0 w-full bg-linear-to-t from-gradient-start via-gradient-via to-gradient-end backdrop-blur-sm text-white flex flex-col items-center gap-6 py-8 shadow-lg rounded-b-2xl z-40"
       >
         <Navbar />
         <motion.button

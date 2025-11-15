@@ -25,14 +25,14 @@ const SeeAlsoSection = () => {
 
       <button
         onClick={() => scroll("left")}
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow-md rounded-full p-2 hover:bg-gray-100 z-10"
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white text-black shadow-md rounded-full p-2 hover:bg-gray-100 z-10"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
 
       <button
         onClick={() => scroll("right")}
-        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow-md rounded-full p-2 hover:bg-gray-100 z-10"
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white text-black shadow-md rounded-full p-2 hover:bg-gray-100 z-10"
       >
         <ChevronRight className="w-6 h-6" />
       </button>
@@ -40,7 +40,7 @@ const SeeAlsoSection = () => {
       <motion.div
         ref={scrollRef}
         className="flex space-x-6 overflow-x-auto pb-4 scroll-smooth scrollbar-hide"
-        whileTap={{ cursor: "grabbing" }}
+        whileTap={{ cursor: "pointer" }}
       >
         {seeAlsoData.map((item) => (
           <motion.div

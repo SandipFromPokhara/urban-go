@@ -83,7 +83,7 @@ export default function CategoryGrid() {
                  bg-clip-text text-transparent drop-shadow-lg
                  max-lg:text-4xl"
           >
-            Getting Started
+            Getting Started?
           </motion.h2>
 
           <motion.p

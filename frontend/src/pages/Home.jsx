@@ -4,7 +4,7 @@ import WhySection from "../components/homeComponents/WhySection";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-cover bg-center bg-fixed bg-background-color">
+    <div className="relative min-h-screen bg-cover bg-center bg-fixed bg-background-color josefin-sans-regular">
       <div className="relative z-10">
         <Hero />
         <CategoryGrid />
