@@ -4,6 +4,7 @@ export const events = [
     id: 1,
     city: "Helsinki",
     title: "Helsinki Christmas Market – Senate Square",
+    category: "Family",
     description:
       "Finland’s oldest outdoor Christmas market with artisan stalls, festive food and a vintage carousel under Helsinki Cathedral.",
     date: "1 Dec – 22 Dec 2025",
@@ -16,6 +17,7 @@ export const events = [
     id: 2,
     city: "Helsinki",
     title: "World Village Festival",
+    category: "Art & Culture",
     description:
       "A free, vibrant multicultural festival in Helsinki showcasing music, theatre, dance and food from around the world.",
     date: "May 2026 (TBA)",
@@ -28,6 +30,7 @@ export const events = [
     id: 3,
     city: "Espoo",
     title: "PianoEspoo Festival",
+    category: "Art & Culture",
     description:
       "Renowned piano music festival in Espoo featuring top international pianists and young Finnish talents.",
     date: "19 Sept – 5 Oct 2025",
@@ -40,6 +43,7 @@ export const events = [
     id: 4,
     city: "Espoo",
     title: "Weekend Festival Espoo",
+    category: "Music",
     description:
       "One of the summer’s biggest electronic-music festivals held at Vermo Arena in Espoo – top DJs, festival vibes, fun outdoors.",
     date: "1-2 Aug 2025",
@@ -52,6 +56,7 @@ export const events = [
     id: 5,
     city: "Vantaa",
     title: "BRQ Vantaa Festival",
+    category: "Music",
     description:
       "Classical and baroque music festival in Vantaa, with concerts in historic churches and modern venues.",
     date: "8–14 Aug 2026",
@@ -64,6 +69,7 @@ export const events = [
     id: 6,
     city: "Vantaa",
     title: "Arctic Open Badminton Tournament",
+    category: "Sports",
     description:
       "Top-level international badminton tournament held at Energia Areena, Vantaa – world-tour level players compete.",
     date: "7–12 Oct 2025",
