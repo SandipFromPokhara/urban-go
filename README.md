@@ -52,31 +52,74 @@ The platform aims to enhance city life by combining **event discovery** with **l
 ## 🧩 System Components / Scope
 
 The **Minimum Viable Product (MVP)** will include:
-1. **User Panel (Frontend – React)**  
-   - Registration, login, and authentication  
-   - Browse and search events from Linked Events API  
-   - Save and manage favorite events  
-   - View personalized event recommendations (basic logic-based version)  
+1. **User & Admin Panel (Frontend – React)**
 
-2. **Admin Panel (Backend + React Dashboard)**  
-   - Admin authentication and role-based access  
-   - Manage user accounts and moderate reviews   
-   - View analytics and user activity summary
-   - Admins have read-only access to Linked Events data (cannot edit or delete external events) 
+   - Single React frontend for both roles
 
-3. **Backend (Node.js + Express)**  
-   - RESTful API handling for CRUD operations  
-   - MongoDB integration for persistent data storage  
-   - Secure JWT authentication and role management  
-   - Integration with Linked Events, HSL and OpenWeather APIs  
+   - User functionality: registration/login, browse/search events, save favorites, write reviews, subscribe to categories/venues, view basic recommendations
 
-4. **Database (MongoDB)**  
-   - Collections: `users`, `favorites`, `events`, `reviews`  
-   - Data persistence for user profiles, saved items, and admin data  
+   - Admin functionality (conditionally rendered): view all users, moderate reviews, monitor subscriptions, view analytics
 
-5. **Future Extension (AI Component)**  
-   - Smart Recommendation Engine using user behavior and event metadata  
+   - Admins cannot edit Linked Events API data (read-only)
 
+2. **Backend (Node.js + Express)**
+
+   - RESTful API handling for CRUD operations on internal data (users, favorites, reviews, subscriptions)
+
+   - MongoDB integration for persistent storage
+
+   - Secure JWT authentication and role-based access control
+
+   - Integration with Linked Events, HSL, and OpenWeather APIs
+
+3. **Database (MongoDB)**
+
+   - Collections: users, favorites, events, reviews, subscriptions
+
+   - Data persistence for user profiles, saved items, reviews, subscriptions, and admin data
+
+4. **Future Extension (AI Component)**
+
+   - Smart Recommendation Engine using user behavior and event metadata 
+
+```
+                           ┌───────────────────────────────┐
+                           │          USER / ADMIN         │
+                           │ (Single React Frontend UI)    │
+                           └───────────────┬───────────────┘
+                                           │
+                                           │ 1️⃣ User/Admin interacts with UI
+                                           ▼
+                     ┌─────────────────────────────────────────┐
+                     │          AUTHENTICATION & ROLE CHECK    │
+                     │  - Login/register with JWT token        │
+                     │  - Determine role: user or admin        │
+                     └─────────────────────┬───────────────────┘
+                                           │
+                           ┌───────────────┴───────────────┐
+                           │                               │
+                           ▼                               ▼
+            ┌───────────────────────────┐       ┌───────────────────────────┐
+            │         USER PANEL        │       │       ADMIN CONTROLS      │
+            │ (Visible for all users)   │       │ (Visible only to admins)  │
+            └──────────────┬────────────┘       └──────────────┬────────────┘
+                           │                                   │
+                           ▼                                   ▼
+ ┌────────────────────────────────────┐         ┌──────────────────────────────────┐
+ │          USER CRUD ACTIONS         │         │         ADMIN CRUD ACTIONS       │
+ │ - Browse events                    │         │ - View all users                 │
+ │ - Add/remove favorites             │         │ - Moderate reviews               │
+ │ - Post/edit/delete own reviews     │         │ - Monitor subscriptions          │
+ │ - Subscribe/unsubscribe categories │         │ - Read-only external events      │
+ └────────────────────────────────────┘         └──────────────────────────────────┘
+                  │                              
+                  ▼                       
+      ┌─────────────────────────┐
+      │       MongoDB           │               
+      │ (users, favorites,      │                  
+      │ reviews, subscriptions) │                         
+      └─────────────────────────┘       
+```
 ---
 
 ## 💡 Why UrbanGo?
