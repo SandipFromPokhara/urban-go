@@ -4,7 +4,15 @@ const Schema = mongoose.Schema;
 
 const eventsSchema = new Schema(
   {
+    city: {
+      type: String,
+      required: true,
+    },
     title: {
+      type: String,
+      required: true,
+    },
+    publisher: {
       type: String,
       required: true,
     },
@@ -26,6 +34,10 @@ const eventsSchema = new Schema(
     },
     image: {
       type: String,
+      required: false,
+    },
+    tags: {
+      type: [String],
       required: false,
     },
   },

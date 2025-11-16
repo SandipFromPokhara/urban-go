@@ -13,14 +13,32 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    age: {
-      type: Number,
+    password: {
+      type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["registered", "unregistered"],
-      default: "unregistered",
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
+    favouriteEvents: {
+      type: [Schema.Types.ObjectId],
+      ref: "Event",
+      required: false,
+    },
+    preferences: {
+      categories: {
+        type: [String],
+        required: false,
+      },
+      tags: {
+        type: [String],
+        required: false,
+      },
+      cities: {
+        type: [String],
+        required: false,
+      },
     },
   },
 );
