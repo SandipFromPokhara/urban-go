@@ -216,25 +216,33 @@ const EventDetails = () => {
             onClick={handleFavorite}
             className="p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
             style={{
-              backgroundColor: isFavorite ? '#ef4444' : '#ffffff'
+              backgroundColor: isFavorite ? '#ef4444' : '#ffffff',
+              border: 'none'
             }}
           >
             <Heart
-              className="w-5 h-5"
               style={{
                 color: isFavorite ? '#ffffff' : '#374151',
-                fill: isFavorite ? '#ffffff' : 'none'
+                fill: isFavorite ? '#ffffff' : 'none',
+                width: '20px',
+                height: '20px'
               }}
             />
           </button>
           <button
             onClick={handleShare}
             className="p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
-            style={{ backgroundColor: '#ffffff' }}
+            style={{ 
+              backgroundColor: '#ffffff',
+              border: 'none'
+            }}
           >
             <Share2 
-              className="w-5 h-5"
-              style={{ color: '#374151' }}
+              style={{ 
+                color: '#374151',
+                width: '20px',
+                height: '20px'
+              }}
             />
           </button>
         </div>
@@ -347,10 +355,32 @@ const EventDetails = () => {
 
               {/* Action Buttons */}
               <div className="mt-6 space-y-3">
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <button 
+                  className="w-full py-3 rounded-lg transition-colors font-medium"
+                  style={{
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                    border: 'none'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+                >
                   Get Tickets
                 </button>
-                <button className="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+                <button 
+                  className="w-full py-3 rounded-lg transition-colors font-medium"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#2563eb',
+                    border: '2px solid #2563eb'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#eff6ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                  }}
+                >
                   Plan Route
                 </button>
               </div>
