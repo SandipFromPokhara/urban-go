@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import PageHeader from '../components/PageHeader';
-import SearchBar from '../components/SearchBar';
-import EventsGrid from '../components/EventsGrid';
+import SearchBar from '../components/events/SearchBar';
+import EventsGrid from '../components/events/EventsGrid';
 import LoadingSpinner from '../components/LoadingSpinner';
-import Pagination from '../components/Pagination';
+import Pagination from '../components/events/Pagination';
 import { getMockEvents } from '../utils/mockEventsData';
+import '../styles/events.css';
 
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
 
