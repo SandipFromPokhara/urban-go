@@ -364,11 +364,25 @@ urban-go/
 
 | Member | Role |
 |:--------|:------|
-| **Sandip** | Product Owner + Frontend + Backend Developer|
-| **Sailesh** | Scrum Master + Frontend + Backend Developer |
-| **Olga** | Frontend + Backend Developer |
-| **Gam** | Frontend + Backend Developer | 
-| **Dinal** | Frontend + Backend Developer |
+| **Sandip Ranjit** | Product Owner + Frontend + Backend Developer |
+| **Sailesh Karki** | Scrum Master (Sprint 2) + Frontend + Backend Developer |
+| **Olga Chitembo** | Frontend + Backend Developer |
+| **Twe He Gam Aung** | Frontend + Backend Developer |
+| **Dinal Maha Vidanelage** | Frontend + Backend Developer |
+
+---
+
+## 👥 Team Members & Feature Branches
+Below is the list of team members and the feature branches they are responsible for:
+
+| Member | GitHub | Assigned Branch |
+|--------|--------|-----------------|
+| Sandip Ranjit | @sandip | `feature-transportation` |
+| Sailesh Karki | @sailesh | `feature-user-schema-model` |
+| Olga Chitembo | @olga | `feature-home` |
+| Twe He Gam Aung | @gam | `feature-registration` |
+| Dinal Maha Vidanelage | @dinal | `feature-eventlist` |
+
 
 ---
 
