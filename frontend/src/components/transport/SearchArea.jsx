@@ -4,38 +4,46 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
 
 function SearchArea({
-  from,
-  setFrom,
-  to,
-  setTo,
-  date,
-  setDate,
-  time,
-  setTime,
-  routes,
-  setRoutes,
+  from, setFrom, to, setTo,
+  date, setDate, time, setTime,
+  routes, setRoutes, isDarkMode
 }) {
   const [showInfo, setShowInfo] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSearch = () => {
-    console.log("Searching routes for:", { from, to, date, time });
+    if (!from || !to) {
+      setError("Please enter both From and To locations");
+      return;
+    }
+    setError("");
 
-    // Example: generate mock routes for demo
+    // Mock routes for demo
     const mockRoutes = [
       {
         name: "Route 1",
-        position: [60.1699, 24.9384],
-        info: "Duration: 35 min, 0g CO₂",
+        duration: 35,
+        co2: 0,
+        modes: ["bus", "metro"],
+        steps: [
+          "🚶 Walk 5 min to Asematori stop",
+          "🚌 Take Bus 510 to Tapiola",
+          "🚇 Transfer to Metro Line M1 to Central Station",
+        ],
+        fromPosition: [60.1699, 24.9384],
+        toPosition: [60.1921, 24.9458],
       },
       {
         name: "Route 2",
-        position: [60.1720, 24.9410],
-        info: "Duration: 40 min, 0g CO₂",
-      },
-      {
-        name: "Route 3",
-        position: [60.1660, 24.9300],
-        info: "Duration: 38 min, 0g CO₂",
+        duration: 40,
+        co2: 0,
+        modes: ["walk", "tram"],
+        steps: [
+          "🚶 Walk 7 min to Töölö stop",
+          "🚋 Take Tram 6 to Central Station",
+        ],
+        fromPosition: [60.1699, 24.9384],
+        toPosition: [60.1921, 24.9458],
       },
     ];
 
@@ -44,10 +52,14 @@ function SearchArea({
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 h-full flex flex-col">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        Plan Your Route
-      </h2>
+    <div className={`p-6 rounded-2xl shadow-lg border flex flex-col gap-4 ${
+        isDarkMode ? "bg-gray-800 text-white border-gray-700" : "bg-white text-gray-900"
+      }`}>
+      <h2 className="text-2xl font-semibold mb-2">Plan Your Route</h2>
+
+      {error && (
+        <p className="text-red-500 text-sm">{error}</p>
+      )}
 
       {/* Inputs */}
       <div className="flex flex-col gap-3">
@@ -56,14 +68,22 @@ function SearchArea({
           placeholder="From"
           value={from}
           onChange={(e) => setFrom(e.target.value)}
-          className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 outline-none"
+          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
+            isDarkMode
+              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
+              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+          }`}
         />
         <input
           type="text"
           placeholder="To"
           value={to}
           onChange={(e) => setTo(e.target.value)}
-          className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 outline-none"
+          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
+            isDarkMode
+              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
+              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+          }`}
         />
 
         {/* Date & Time horizontal */}
@@ -72,13 +92,21 @@ function SearchArea({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="grow px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 outline-none"
+            className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
+            isDarkMode
+              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
+              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+          }`}
           />
           <input
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="w-1/3 px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 outline-none"
+            className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
+            isDarkMode
+              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
+              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+          }`}
           />
         </div>
 
@@ -86,7 +114,7 @@ function SearchArea({
         <button
           onClick={handleSearch}
           className="flex items-center justify-center gap-2
-                     bg-gradient-to-r from-blue-500 to-indigo-500
+                     bg-linear-to-r from-blue-500 to-indigo-500
                      hover:from-blue-600 hover:to-indigo-600
                      transform hover:-translate-y-1
                      text-white font-semibold py-2 px-5 rounded-md mt-2
