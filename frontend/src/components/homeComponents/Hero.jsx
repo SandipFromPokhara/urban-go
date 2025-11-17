@@ -38,7 +38,7 @@ export default function Hero() {
         </motion.h1>
 
         <motion.p
-          className="text-textSecondary"
+          className="text-white"
           style={{
             fontSize: "clamp(1rem, 3vw, 24px)",
             maxWidth: "clamp(60%, 40vw, 20%)",

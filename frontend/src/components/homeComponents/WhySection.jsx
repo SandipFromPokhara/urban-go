@@ -1,7 +1,7 @@
 import SeeAlsoSection from "./Trending";
 import { motion } from "framer-motion";
 
-export default function WhySection() {
+export default function WhySection({ isDarkMode }) {
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -44,7 +44,7 @@ export default function WhySection() {
 
           <motion.p
             variants={fadeUp}
-            className="text-lg text-secondary mb-10 max-w-2xl mx-auto"
+            className="text-lg mb-10 max-w-2xl text-white mx-auto"
           >
             City Companion connects you with the pulse of your city — from live
             music to art fairs, from cozy food spots to exciting sports events.
@@ -59,7 +59,7 @@ export default function WhySection() {
         viewport={{ once: true, amount: 0.2 }}
         className="mt-20 px-6"
       >
-        <SeeAlsoSection />
+        <SeeAlsoSection isDarkMode={isDarkMode} />
       </motion.div>
     </div>
   );

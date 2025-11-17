@@ -7,7 +7,7 @@ import family from "../../assets/images/Family.avif";
 import art from "../../assets/images/Art.jpg";
 import food from "../../assets/images/Food.jpg";
 
-export default function CategoryGrid() {
+export default function CategoryGrid({ isDarkMode }) {
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -88,8 +88,9 @@ export default function CategoryGrid() {
 
           <motion.p
             variants={fadeUp}
-            className="text-lg mb-20 text-secondary max-w-xl
+            className="text-lg mb-20 max-w-xl
                  max-lg:mx-auto max-lg:mb-10"
+            style={{ color: isDarkMode ? 'white' : 'black' }}
           >
             Explore events tailored to your interests. Choose from a variety of
             categories to find what excites you most!

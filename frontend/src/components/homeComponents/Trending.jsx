@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Card from "./TrendingCard";
 import { seeAlsoData } from "../../data";
 
-const SeeAlsoSection = () => {
+const SeeAlsoSection = ({ isDarkMode }) => {
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
@@ -21,7 +21,7 @@ const SeeAlsoSection = () => {
 
   return (
     <section className="relative px-8 py-10">
-      <h2 className="text-2xl text-white font-bold mb-6">See also</h2>
+      <h2 className="text-2xl font-bold mb-6" style={{color: isDarkMode ? 'white' : 'black' }}>See also</h2>
 
       <button
         onClick={() => scroll("left")}
