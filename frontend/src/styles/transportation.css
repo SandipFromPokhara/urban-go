@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Zoom buttons: lifted above OSM attribution */
+.leaflet-bottom.leaflet-right > .leaflet-control-zoom {
+  margin-bottom: 15%; /* moves zoom buttons up */
+}
+
+/* Keep attribution at bottom */
+.leaflet-control-attribution.leaflet-bottom.leaflet-right {
+  bottom: 0;
+  right: 0;
+}
+
+/* Global body styling */
+body {
+  @apply bg-gray-50 text-gray-800 antialiased;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
