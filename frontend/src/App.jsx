@@ -24,18 +24,15 @@ function App() {
     }
   }, [isDarkMode]);
   return (
-    <Router>
+      <Router>
         <Header />
         <Routes className="grow">
-          {/* add routes to your pages here */}
-          <Route path="/" element={<Home isDarkMode={isDarkMode} />} />
-          <Route path="/eventslist" element={<EventsList isDarkMode={isDarkMode} />} />
-          <Route path="/eventsdetails" element={<EventDetails isDarkMode={isDarkMode} />} />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
+         <Route path="/" element={<Home />} />
+         <Route path="/events" element={<EventsList isDarkMode={isDarkMode} />} />
+         <Route path="/transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
         </Routes>
-        <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-    </Router>
+        <Footer />
+      </Router>
   );
 }
 
