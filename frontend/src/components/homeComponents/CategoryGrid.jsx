@@ -103,6 +103,7 @@ export default function CategoryGrid({ isDarkMode }) {
                  text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-xl 
                  transition duration-300
                  max-lg:mx-auto"
+            onClick={() => { window.location.href = '/eventslist'; }}
           >
             Explore Categories
           </motion.button>

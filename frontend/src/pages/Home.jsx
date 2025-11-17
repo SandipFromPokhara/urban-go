@@ -1,6 +1,7 @@
 import Hero from "../components/homeComponents/Hero";
 import CategoryGrid from "../components/homeComponents/CategoryGrid";
 import WhySection from "../components/homeComponents/WhySection";
+import '../styles/home.css';
 
 export default function Home({ isDarkMode }) {
   return (
