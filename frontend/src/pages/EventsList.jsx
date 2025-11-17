@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import PageHeader from '../components/PageHeader';
 import SearchBar from '../components/events/SearchBar';
 import EventsGrid from '../components/events/EventsGrid';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -86,43 +85,58 @@ const EventsList = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <PageHeader 
-        title="Discover Events"
-        subtitle="Explore exciting events happening in Helsinki region"
-      />
-
-      {/* Search and Filter Section */}
-      <SearchBar 
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-      />
-
-      {/* Events Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <EventsGrid events={currentEvents} />
-      </div>
-
-      {/* Pagination */}
-      {filteredEvents.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-          <Pagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+    <>
+      <div className="min-h-screen bg-gray-50" style={{ marginTop: '0', paddingTop: '0' }}>
+        {/* Page Header Section */}
+        <div style={{ 
+          background: 'linear-gradient(175deg, #5A8CFF 0%, #8A4FF6 30%, #B33EF0 65%, #FF4CA8 100%)',
+          color: 'white',
+          marginTop: '2rem', 
+          marginBottom: '0', 
+          paddingTop: '4rem', 
+          paddingBottom: '3rem' 
+        }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
+              Discover Events
+            </h1>
+            <p className="text-xl" style={{ color: '#e0e7ff' }}>
+              Explore exciting events happening in Helsinki region
+            </p>
+          </div>
         </div>
-      )}
 
-      {/* Results Count */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
-        <p className="text-center text-gray-600" style={{ color: '#4b5563' }}>
-          Showing {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} of {filteredEvents.length} events
-          {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
-        </p>
+        {/* Search and Filter Section */}
+        <SearchBar 
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+        />
+
+        {/* Events Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <EventsGrid events={currentEvents} />
+        </div>
+
+        {/* Pagination */}
+        {filteredEvents.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
+
+        {/* Results Count */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
+          <p className="text-center text-gray-600" style={{ color: '#4b5563' }}>
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} of {filteredEvents.length} events
+            {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
