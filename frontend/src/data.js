@@ -78,7 +78,8 @@ export const events = [
     category: "Family",
     description:
       "Finland’s oldest outdoor Christmas market with artisan stalls, festive food and a vintage carousel under Helsinki Cathedral.",
-    date: "1 Dec – 22 Dec 2025",
+    date: "2025-12-01",
+    endDate: "2025-12-22",
     location: "Senate Square, Helsinki",
     image:
       "https://tuomaanmarkkinat.fi/app/uploads/sites/2/2024/04/2023_Tuomaan_Markkinat_Print-78-1024x683.jpg",
@@ -91,7 +92,7 @@ export const events = [
     category: "Art & Culture",
     description:
       "A free, vibrant multicultural festival in Helsinki showcasing music, theatre, dance and food from around the world.",
-    date: "May 2026",
+    date: "2026-05",
     location: "Helsinki",
     image:
       "https://www.helsinki.com/media/public/ketki/World%20Village%20Festival.jpg",
@@ -99,16 +100,16 @@ export const events = [
   },
   {
     id: 3,
-    city: "Espoo",
-    name: "PianoEspoo Festival",
+    city: "Espoo / Helsinki",
+    name: "Organ Night & Aria Festival",
     category: "Art & Culture",
     description:
-      "Renowned piano music festival in Espoo featuring top international pianists and young Finnish talents.",
-    date: "19 Sept – 5 Oct 2025",
-    location: "Espoo",
-    image:
-      "https://www.visitespoo.fi/sites/default/files/styles/1_1_s/public/2025-09/550660845_18519453604053277_8756413863435097288_n%20%281%29.jpg?h=8296598c&itok=71pWqMkS",
-    tags: "Classical Music, Indoor",
+      "Atmospheric summer evening concerts featuring organ, choir, chamber, and orchestral music.",
+    date: "2026-06-04",
+    endDate: "2026-08-27",
+    location: "Espoo (and some concerts in Helsinki)",
+    image: "https://images.squarespace-cdn.com/content/v1/67bc6aa395526e524b9113fd/1f896d7a-04c9-4520-a746-8d576668432f/urkuyo-ja-aaria-hero-video-placeholder-01.jpg?format=2500w",
+    tags: ["Classical Music", "Outdoor", "Festival"],
   },
   {
     id: 4,
@@ -117,7 +118,8 @@ export const events = [
     category: "Music",
     description:
       "One of the summer’s biggest electronic-music festivals held at Vermo Arena in Espoo – top DJs, festival vibes, fun outdoors.",
-    date: "1-2 Aug 2025",
+    date: "2026-07-31",
+    endDate: "2026-08-01",
     location: "Vermo Arena, Espoo",
     image:
       "https://www.visitespoo.fi/sites/default/files/styles/1_1_s/public/2025-04/WKND_Day1_221249_HenriJuvonen_6403-768x512%20%281%29.jpg?h=8296598c&itok=fYHkM3of",
@@ -130,7 +132,8 @@ export const events = [
     category: "Music",
     description:
       "Classical and baroque music festival in Vantaa, with concerts in historic churches and modern venues.",
-    date: "8–14 Aug 2026",
+    date: "2026-08-08",
+    endDate: "2026-08-14",
     location: "Vantaa",
     image:
       "https://festivals.fi/wp-content/uploads/2013/04/BRQ-Vantaa-Festival-photo-Vantaan-Fotokerho-Eero-Kukkonen-1-913x515.jpeg",
@@ -138,16 +141,16 @@ export const events = [
   },
   {
     id: 6,
-    city: "Vantaa",
-    name: "Arctic Open Badminton Tournament",
+    city: "Espoo",
+    name: "TeamGym European Championships",
     category: "Sports",
     description:
-      "Top-level international badminton tournament held at Energia Areena, Vantaa – world-tour level players compete.",
-    date: "7–12 Oct 2025",
-    location: "Energia Areena, Vantaa",
-    image:
-      "https://www.arcticopen.fi/site/assets/files/1173/20210924_1912_sudirmancup2021_bprs1949-2.2000x700-u1i0s1q90f1t450l748z0.jpg",
-    tags: ["Badminton", "Indoor"],
+      "European TeamGym (gymnastics) Championships with junior and senior teams competing.",
+    date: "2026-10-14",
+    endDate: "2026-10-17",
+    location: "Espoo Metro Areena, Espoo",
+    image: "https://evermade-voimistelu-website.s3.eu-north-1.amazonaws.com/wp-content/uploads/2024/10/19182720/TeamGymEM_FilippoTomasi.jpg",
+    tags: ["Gymnastics", "Indoor", "Competition"],
   },
   {
     id: 7,
