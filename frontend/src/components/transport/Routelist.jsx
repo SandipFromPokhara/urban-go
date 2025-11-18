@@ -21,7 +21,8 @@ function RouteList({ routes, isDarkMode }) {
           transition={{ duration: 0.25 }}
           onClick={() => toggleExpand(index)}
           className={`p-4 border rounded-lg shadow-sm cursor-pointer transition-all hover:shadow-md ${
-            isDarkMode ? "bg-gray-800 border-gray-700 hover:bg-gray-700" : "bg-gray-50 border-gray-200 hover:bg-blue-50"
+            isDarkMode ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
+                       : "bg-gray-50 border-gray-200 hover:bg-blue-50"
           }`}
         >
           <div className="flex items-center justify-between">

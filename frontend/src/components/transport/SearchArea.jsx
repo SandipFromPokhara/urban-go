@@ -6,83 +6,66 @@ import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
 function SearchArea({
   from, setFrom, to, setTo,
   date, setDate, time, setTime,
-  routes, setRoutes, isDarkMode
+  routes, setRoutes, isDarkMode,
+  formInputRef, setLoading
 }) {
   const [showInfo, setShowInfo] = useState(false);
   const [error, setError] = useState("");
 
   const handleSearch = () => {
     if (!from || !to) {
-      setError("Please enter both From and To locations");
+      setError("Please enter both origin and destination");
       return;
     }
+    
     setError("");
+    setLoading(true);
+    setShowInfo(false);
 
     // Mock routes for demo
-    const mockRoutes = [
-      {
-        name: "Route 1",
-        duration: 35,
-        co2: 0,
-        modes: ["bus", "metro"],
-        steps: [
-          "🚶 Walk 5 min to Asematori stop",
-          "🚌 Take Bus 510 to Tapiola",
-          "🚇 Transfer to Metro Line M1 to Central Station",
-        ],
-        fromPosition: [60.1699, 24.9384],
-        toPosition: [60.1921, 24.9458],
-      },
-      {
-        name: "Route 2",
-        duration: 40,
-        co2: 0,
-        modes: ["walk", "tram"],
-        steps: [
-          "🚶 Walk 7 min to Töölö stop",
-          "🚋 Take Tram 6 to Central Station",
-        ],
-        fromPosition: [60.1699, 24.9384],
-        toPosition: [60.1921, 24.9458],
-      },
-    ];
-
-    setRoutes(mockRoutes);   // Update map markers
-    setShowInfo(true);       // Show weather/CO₂/distance info
+    setTimeout(() => {
+      // Mock routes for demo
+      const mockRoutes = [
+        { name: "Route 1", duration: 35, co2: 0, modes: ["bus", "metro"], info: "🚶 5 min, 🚌 510, 🚇 M1", position: [60.1699, 24.9384] },
+        { name: "Route 2", duration: 40, co2: 0, modes: ["walk", "tram"], info: "🚶 7 min, 🚋 6", position: [60.1921, 24.9458] },
+        { name: "Route 3", duration: 40, co2: 0, modes: ["bus", "walk"], info: "🚶 10 min, 🚋 41", position: [60.1746, 24.9678] }
+      ];
+      setRoutes(mockRoutes);    // Update map markers
+      setShowInfo(true);        // Show weather/CO₂/distance info
+      setLoading(false);
+    }, 800); // simulate network
   };
 
   return (
-    <div className={`p-6 rounded-2xl shadow-lg border flex flex-col gap-4 ${
-        isDarkMode ? "bg-gray-800 text-white border-gray-700" : "bg-white text-gray-900"
+    <div className={`p-6 rounded-2xl shadow-lg/30  flex flex-col gap-5
+      ${isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
       }`}>
-      <h2 className="text-2xl font-semibold mb-2">Plan Your Route</h2>
 
-      {error && (
-        <p className="text-red-500 text-sm">{error}</p>
-      )}
+      <h2 className="text-2xl font-bold mb-2">Plan Your Route</h2>
+
+      {error && (<p className="text-red-500 text-sm">{error}</p>)}
 
       {/* Inputs */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         <input
+          ref={formInputRef}
           type="text"
-          placeholder="From"
+          placeholder="Enter origin"
           value={from}
           onChange={(e) => setFrom(e.target.value)}
-          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
-            isDarkMode
-              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
-              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2
+            ${isDarkMode? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-gray-400 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
           }`}
         />
         <input
           type="text"
-          placeholder="To"
+          placeholder="Enter destination"
           value={to}
           onChange={(e) => setTo(e.target.value)}
-          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
-            isDarkMode
-              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
-              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2
+            ${isDarkMode? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-gray-400 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
           }`}
         />
 
@@ -92,10 +75,9 @@ function SearchArea({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
-            isDarkMode
-              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
-              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+            className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2
+              ${isDarkMode? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white"
+                          : "bg-gray-50 border-gray-300 focus:ring-blue-500 text-gray-900"
           }`}
           />
           <input
@@ -104,8 +86,8 @@ function SearchArea({
             onChange={(e) => setTime(e.target.value)}
             className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${
             isDarkMode
-              ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-white"
-              : "bg-white border-gray-300 focus:ring-blue-500 text-gray-900"
+              ? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white"
+              : "bg-gray-50 border-gray-300 focus:ring-blue-500 text-gray-900"
           }`}
           />
         </div>
@@ -135,25 +117,23 @@ function SearchArea({
             className="grid grid-cols-3 gap-3 mt-4"
           >
             {/* Weather */}
-            <div className="flex flex-col items-center bg-blue-50 p-3 rounded-xl shadow-sm border border-blue-100 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md">
+            <motion.div whileHover={{ scale: 1.05 }} className="flex flex-col items-center bg-blue-50 p-3 rounded-xl shadow-sm border border-blue-100">
               <FaCloudSun className="text-2xl text-blue-500 mb-1" />
               <p className="text-sm font-semibold text-gray-800">9°C</p>
               <p className="text-xs text-gray-500">Cloudy</p>
-            </div>
+            </motion.div>
 
-            {/* CO2 */}
-            <div className="flex flex-col items-center bg-green-50 p-3 rounded-xl shadow-sm border border-green-100 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md">
+            <motion.div whileHover={{ scale: 1.05 }} className="flex flex-col items-center bg-green-50 p-3 rounded-xl shadow-sm border border-green-100">
               <FaLeaf className="text-2xl text-green-600 mb-1" />
               <p className="text-sm font-semibold text-gray-800">0g CO₂</p>
               <p className="text-xs text-gray-500">Eco-friendly</p>
-            </div>
+            </motion.div>
 
-            {/* Distance */}
-            <div className="flex flex-col items-center bg-yellow-50 p-3 rounded-xl shadow-sm border border-yellow-100 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md">
+            <motion.div whileHover={{ scale: 1.05 }} className="flex flex-col items-center bg-yellow-50 p-3 rounded-xl shadow-sm border border-yellow-100">
               <FaRoute className="text-2xl text-yellow-600 mb-1" />
               <p className="text-sm font-semibold text-gray-800">11 km</p>
               <p className="text-xs text-gray-500">Distance</p>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -164,7 +144,7 @@ function SearchArea({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="mt-6 flex-1 overflow-y-auto space-y-3"
+          className="mt-4 flex-1 overflow-y-auto space-y-3 max-h-64 pt-1"
         >
           {routes.map((route, index) => (
             <div
