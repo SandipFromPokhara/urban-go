@@ -1,13 +1,20 @@
-require('dotenv').config();
+import express from "express";
+import dotenv from "dotenv";
 
-const express = require("express");
+dotenv.config();
+
 const app = express();
-const port = process.env.PORT || 4000;
 
-const connectDB = require("./config/db")
+// Middleware (optional for now)
+app.use(express.json());
 
-connectDB();
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
+// Simple test route
+app.get("/", (req, res) => {
+  res.send("Backend server is running ✅");
+});
+
+// Port setup
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
