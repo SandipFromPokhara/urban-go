@@ -8,11 +8,15 @@ const eventsSchema = new Schema(
       type: String,
       required: true,
     },
-    title: {
+    name: {
       type: String,
       required: true,
     },
     publisher: {
+      type: String,
+      required: false,
+    },
+    category: {
       type: String,
       required: true,
     },
@@ -24,9 +28,9 @@ const eventsSchema = new Schema(
       type: Date,
       required: true,
     },
-    category: {
-      type: String,
-      required: true,
+    endDate: {
+      type: Date,
+      required: false,
     },
     location: {
       type: String,
