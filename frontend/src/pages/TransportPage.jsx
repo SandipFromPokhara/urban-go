@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import MapSection from "../components/transport/MapSection";
 import HeroSection from "../components/transport/HeroSection";
 import SearchArea from "../components/transport/SearchArea";
-import RouteList from "../components/transport/Routelist";
+import RouteList from "../components/transport/RouteList";
 import "leaflet/dist/leaflet.css";
 
 function TransportPage({ isDarkMode }) {
@@ -14,46 +14,41 @@ function TransportPage({ isDarkMode }) {
   const [routes, setRoutes] = useState([]);
   const [mapStyle, setMapStyle] = useState("street");
   const [loading, setLoading] = useState(false);
+  const [activeRouteIndex, setActiveRouteIndex] = useState(null);     // Track active route
   const formRef = useRef(null);
   const formInputRef = useRef(null);
 
-  const handleScrollToForm = () => {
-    if (formRef.current) {
-      formRef.current?.scrollIntoView({ behavior: "smooth" });
+  // Swap logic
+  const swapLocations = () => {
+    const temp = from;
+    setFrom(to);
+    setTo(temp);
+  };
 
-      // Focus after the next paint
-      const focusInput = () => {
-        formInputRef.current?.focus();
-      };
-
-      // Use requestAnimationFrame to ensure the input exists and is visible
-      requestAnimationFrame(() => {
-        setTimeout(focusInput, 200); // small delay for smooth scroll
-      });
-  }
-};
+  // Geolocation fill
+  const fillCurrentLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFrom(`${pos.coords.latitude}, ${pos.coords.longitude}`);
+      },
+      (err) => {
+        alert("Failed to get location");
+      }
+    );
+  };
 
   return (
     <main className={`min-h-screen ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
 
       {/* Hero Section */}
-      <HeroSection />
-
-      {/* Optional top CTA scroll button */}
-      <div className="text-center mt-4">
-        <button
-          onClick={handleScrollToForm}
-          className="bg-linear-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 
-                     font-semibold py-2 px-4 rounded-lg transition-all ease-in-out hover:shadow-lg"
-        >
-          Plan Your Route
-        </button>
+      <div className="pt-20"> {/* 80px header height */}
+        <HeroSection formRef={formRef} formInputRef={formInputRef} />
       </div>
 
       {/* Body */}
       <section
         ref={formRef}
-        className="max-w-6xl mx-auto px-6 mt-10 flex flex-col md:flex-row gap-6 items-stretch"
+        className="max-w-6xl mx-auto px-4 sm:px-6 mt-6 flex flex-col md:flex-row gap-6"
       >
         {/* Left Column: Search Area */}
         <div className="w-full md:w-2/5 flex flex-col gap-6">
@@ -65,23 +60,47 @@ function TransportPage({ isDarkMode }) {
             routes={routes} setRoutes={setRoutes}
             isDarkMode={isDarkMode}
             formInputRef={formInputRef}
-            setLoading={setLoading}
+            loading={loading} setLoading={setLoading}
+            activeRouteIndex={activeRouteIndex} setActiveRouteIndex={setActiveRouteIndex}
+            swapLocations={swapLocations}           
+            fillCurrentLocation={fillCurrentLocation}                    
           />
-          {routes.length > 0 && <RouteList routes={routes} isDarkMode={isDarkMode} />}
         </div>
           
           {/* Right Column: Map */}
-        <div className="w-full md:w-3/5 relative">
-          {loading && (
-            <div className="absolute inset-0 bg-black/20 z-50 flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-full md:w-3/5 h-[400px] md:h-[500px] lg:h-[600px]">
+            {loading && (
+            <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 z-50 flex items-center justify-center">
+              <svg
+                className="animate-spin h-12 w-12 text-blue-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                ></path>
+              </svg>
             </div>
           )}
+
           <MapSection
             routes={routes}
             isDarkMode={isDarkMode}
             mapStyle={mapStyle}
             setMapStyle={setMapStyle}
+            activeRouteIndex={activeRouteIndex}
+            setActiveRouteIndex={setActiveRouteIndex}     // Map updates active route on marker click
           />
           </div>
       </section>
