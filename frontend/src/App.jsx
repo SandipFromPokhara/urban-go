@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import EventsList from "./pages/EventsList";
+import EventDetails from "./pages/EventDetails";
 import Footer from "./components/Footer";
 import { useEffect, useState } from "react";
 import TransportPage from "./pages/TransportPage";
@@ -25,6 +26,7 @@ function App() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDarkMode]);
+
   return (
     <Router>
         <Header />
@@ -33,6 +35,7 @@ function App() {
           {/* add routes to your pages here */}
           <Route path="/" element={<Home isDarkMode={isDarkMode} />} />
           <Route path="/events" element={<EventsList isDarkMode={isDarkMode} />} />
+          <Route path="/events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
           <Route path="/transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -141,6 +141,11 @@ const EventDetails = () => {
     navigate('/events');
   };
 
+  const handlePlanRoute = () => {
+    console.log('Plan Route clicked'); // Debug log
+    navigate('/transportation');
+  };
+
   const handleFavorite = () => {
     setIsFavorite(!isFavorite);
   };
@@ -182,25 +187,7 @@ const EventDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Back Button */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 transition-colors"
-            style={{ 
-              color: '#4b5563',
-              backgroundColor: 'transparent',
-              border: 'none'
-            }}
-          >
-            <ArrowLeft className="w-5 h-5" style={{ color: '#4b5563' }} />
-            <span style={{ color: '#4b5563' }}>Back to Events</span>
-          </button>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gray-50" style={{ paddingTop: '5rem' }}>
       {/* Event Header Image */}
       <div className="relative h-96 overflow-hidden">
         <img
@@ -208,16 +195,17 @@ const EventDetails = () => {
           alt={event.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         
         {/* Action Buttons */}
-        <div className="absolute top-4 right-4 flex gap-2">
+        <div className="absolute top-4 right-4 flex gap-2" style={{ zIndex: 10 }}>
           <button
             onClick={handleFavorite}
             className="p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
             style={{
               backgroundColor: isFavorite ? '#ef4444' : '#ffffff',
-              border: 'none'
+              border: 'none',
+              cursor: 'pointer'
             }}
           >
             <Heart
@@ -234,7 +222,8 @@ const EventDetails = () => {
             className="p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
             style={{ 
               backgroundColor: '#ffffff',
-              border: 'none'
+              border: 'none',
+              cursor: 'pointer'
             }}
           >
             <Share2 
@@ -261,17 +250,17 @@ const EventDetails = () => {
                 </span>
               )}
 
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4" style={{ color: '#111827' }}>
                 {event.name}
               </h1>
 
-              <p className="text-lg text-gray-600 mb-6">
+              <p className="text-lg text-gray-600 mb-6" style={{ color: '#4b5563' }}>
                 {event.description}
               </p>
 
               <div className="border-t border-gray-200 pt-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Event</h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ color: '#111827' }}>About This Event</h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line" style={{ color: '#374151' }}>
                   {event.longDescription}
                 </p>
               </div>
@@ -279,12 +268,13 @@ const EventDetails = () => {
               {/* Tags */}
               {event.tags && event.tags.length > 0 && (
                 <div className="border-t border-gray-200 pt-6 mt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Tags</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3" style={{ color: '#111827' }}>Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {event.tags.map((tag, index) => (
                       <span
                         key={index}
                         className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                        style={{ color: '#374151' }}
                       >
                         #{tag}
                       </span>
@@ -295,40 +285,40 @@ const EventDetails = () => {
             </div>
           </div>
 
-          {/* Sidebar - FIXED LAYOUT */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Event Information</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6" style={{ color: '#111827' }}>Event Information</h3>
 
               <div className="space-y-5">
                 {/* Date */}
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                  <Calendar className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-gray-900 mb-1">Date</p>
-                    <p className="text-gray-700 text-sm">{formatDate(event.date)}</p>
+                    <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Date</p>
+                    <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{formatDate(event.date)}</p>
                   </div>
                 </div>
 
                 {/* Time */}
                 {event.time && (
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                    <Clock className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-gray-900 mb-1">Time</p>
-                      <p className="text-gray-700 text-sm">{event.time}</p>
+                      <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Time</p>
+                      <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{event.time}</p>
                     </div>
                   </div>
                 )}
 
                 {/* Location */}
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                  <MapPin className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-gray-900 mb-1">Location</p>
-                    <p className="text-gray-700 text-sm">{event.location}</p>
+                    <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Location</p>
+                    <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{event.location}</p>
                     {event.address && (
-                      <p className="text-gray-600 text-sm mt-1">{event.address}</p>
+                      <p className="text-gray-600 text-sm mt-1" style={{ color: '#4b5563' }}>{event.address}</p>
                     )}
                   </div>
                 </div>
@@ -336,10 +326,10 @@ const EventDetails = () => {
                 {/* Organizer */}
                 {event.organizer && (
                   <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                    <Users className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-gray-900 mb-1">Organizer</p>
-                      <p className="text-gray-700 text-sm">{event.organizer}</p>
+                      <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Organizer</p>
+                      <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{event.organizer}</p>
                     </div>
                   </div>
                 )}
@@ -348,8 +338,8 @@ const EventDetails = () => {
               {/* Ticket Price */}
               {event.ticketPrice && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <p className="text-sm text-gray-600 mb-2">Ticket Price</p>
-                  <p className="text-2xl font-bold text-blue-600">{event.ticketPrice}</p>
+                  <p className="text-sm text-gray-600 mb-2" style={{ color: '#4b5563' }}>Ticket Price</p>
+                  <p className="text-2xl font-bold text-blue-600" style={{ color: '#2563eb' }}>{event.ticketPrice}</p>
                 </div>
               )}
 
@@ -368,11 +358,13 @@ const EventDetails = () => {
                   Get Tickets
                 </button>
                 <button 
+                  onClick={handlePlanRoute}
                   className="w-full py-3 rounded-lg transition-colors font-medium"
                   style={{
                     backgroundColor: 'transparent',
                     color: '#2563eb',
-                    border: '2px solid #2563eb'
+                    border: '2px solid #2563eb',
+                    cursor: 'pointer'
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.backgroundColor = '#eff6ff';
@@ -385,6 +377,34 @@ const EventDetails = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Back to Events Button */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 transition-colors"
+              style={{ 
+                color: '#ffffff',
+                backgroundColor: '#6366f1',
+                border: 'none',
+                padding: '0.75rem 2rem',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                marginTop: '0'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4f46e5'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#6366f1'}
+            >
+              <ArrowLeft style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+              <span style={{ color: '#ffffff' }}>Back to Events</span>
+            </button>
           </div>
         </div>
       </div>
