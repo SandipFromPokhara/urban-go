@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import EventsList from "./pages/EventsList";
 import Footer from "./components/Footer";
 import { useEffect, useState } from "react";
-import TransportPage from "./components/transport/TransportPage";
+import TransportPage from "./pages/TransportPage";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -36,7 +36,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-      <Footer />
+      <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
     </Router>
   );
 }
