@@ -4,22 +4,15 @@ import "../../styles/transportation.css"; // import separate CSS for grid & vehi
 function HeroSection({ formRef, formInputRef }) {
 
   const handleScrollToForm = () => {
-    if (formRef.current) {
-      const headerOffset = 80; // height of fixed header
-      const elementPosition = formRef.current.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-
-      formInputRef.current?.focus();
-    }
-  };
+  if (formInputRef.current) {
+    formInputRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    formInputRef.current.focus();
+  }
+};
 
   return (
-    <section className="hero relative w-full h-[400px] md:h-[500px] text-white overflow-hidden">
+    <section className="hero relative w-full py-20 sm:py-24 text-white overflow-hidden">
+
       {/* Grid Background */}
       <div className="grid-background absolute inset-0"></div>
 
@@ -34,12 +27,12 @@ function HeroSection({ formRef, formInputRef }) {
       </div>
 
       {/* Hero Text */}
-      <div className="relative z-10 max-w-4xl mx-auto text-center px-4 pt-24 md:pt-24 shadow-xl/20">
+      <div className="relative z-10 w-full mx-auto text-center px-4 pt-24 md:pt-24 shadow-xl">
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-4"
+          className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-4 shadow-amber-200"
         >
           Find Your Event. Plan Your Ride.
         </motion.h1>
@@ -53,7 +46,7 @@ function HeroSection({ formRef, formInputRef }) {
         </motion.p>
         <button
           onClick={handleScrollToForm}
-          className="px-6 sm:px-8 py-2 sm:py-3 bg-white text-blue-600 font-bold rounded-xl shadow-2xl
+          className="px-6 sm:px-8 py-2 sm:py-3 mt-12 sm:mt-5 bg-white text-blue-600 font-bold rounded-xl shadow-2xl
                      hover:bg-gray-100 transition duration-300 transform hover:scale-105 cursor-pointer ring-indigo-700"
         >
           Plan Your Route

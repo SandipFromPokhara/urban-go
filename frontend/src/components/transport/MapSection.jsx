@@ -2,28 +2,29 @@ import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Polyline } from "r
 import L from "leaflet";
 import LocateButton from "./LocateButton";
 import MapControl from "./MapControl";
+import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
-import { useState, useEffect, useRef } from "react";
 
 function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteIndex, setActiveRouteIndex }) {
   const mapRef = useRef(null);
 
-  // Calculate the active polyline from the props (Derived State)
-  const activeRoutePolyline = activeRouteIndex !== null
-    ? routes[activeRouteIndex]?.polyline || []
-    : [];
+  const activeRoutePolyline = activeRouteIndex !== null ? routes[activeRouteIndex]?.polyline || [] : [];
 
   // Center map on active route
   useEffect(() => {
-    if (!mapRef.current) return;
-    if (activeRouteIndex === null) return;
-
-    const map = mapRef.current;
+    if (!mapRef.current || activeRouteIndex === null) return;
     const route = routes[activeRouteIndex];
     if (!route) return;
-
-    map.setView(route.position, 14, { animate: true });
+    mapRef.current.setView(route.position, 14, { animate: true });
   }, [activeRouteIndex, routes]);
+
+  // Fix map resizing when RouteList appears
+  useEffect(() => {
+    if (!mapRef.current) return;
+    setTimeout(() => {
+      mapRef.current.invalidateSize();
+    }, 300);
+  }, [routes]);
 
   // Tile URLs
   const tiles = {
@@ -38,45 +39,25 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
     dark: "&copy; OpenStreetMap &copy; Carto",
   };
 
-  // HSL-style custom icons
-  const metroIcon = new L.Icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-  });
-
-  const tramIcon = new L.Icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-  });
-
-  const busIcon = new L.Icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-  });
-
-  const walkIcon = new L.Icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-  });
-
+  // Custom icons
   const getTransportIcon = (route) => {
-    if (route.modes.includes("metro")) return metroIcon;
-    if (route.modes.includes("tram")) return tramIcon;
-    if (route.modes.includes("bus")) return busIcon;
-    return walkIcon;
+    const icons = {
+      metro: "blue",
+      tram: "orange",
+      bus: "green",
+      walk: "yellow",
+    };
+    const color = icons[route.modes[0]] || "yellow";
+    return new L.Icon({
+      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
+      shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+    });
   };
 
   return (
-    <div className={`relative w-full h-[500px] overflow-hidden rounded-lg shadow-xl/30
-                    ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
+    <div className={`relative w-full flex-1 h-full overflow-hidden rounded-lg shadow-xl/30 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
       <MapContainer
         ref={mapRef}
         center={[60.1699, 24.9384]}
@@ -93,34 +74,25 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
 
         <ZoomControl position="bottomright" />
 
-        {routes.map((route, index) => (
+        {routes.map((route, idx) => (
           <Marker
-            key={index}
+            key={idx}
             position={route.position}
             icon={getTransportIcon(route)}
-            eventHandlers={{
-              click: () => {
-                setActiveRouteIndex(index);
-              },
-            }}
+            eventHandlers={{ click: () => setActiveRouteIndex(idx) }}
           >
-            <Popup>
-              {route.name} <br /> {route.info}
-            </Popup>
+            <Popup>{route.name} <br /> {route.info}</Popup>
           </Marker>
         ))}
 
-        {activeRoutePolyline.length > 0 
-        && (<Polyline positions={activeRoutePolyline}
-        color="#007bff" // Added color for visibility
-          weight={5}
-          />
-          )}
+        {activeRoutePolyline.length > 0 && (
+          <Polyline positions={activeRoutePolyline} color="#007bff" weight={5} />
+        )}
 
         <LocateButton />
       </MapContainer>
 
-      <div className="absolute top-4 right-4 z-1000 pointer-events-auto translate-x-5">
+      <div className="absolute top-4 right-4 z-50 pointer-events-auto translate-x-5">
         <MapControl mapStyle={mapStyle} setMapStyle={setMapStyle} isDarkMode={isDarkMode} />
       </div>
     </div>
