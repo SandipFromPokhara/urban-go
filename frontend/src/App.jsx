@@ -30,7 +30,6 @@ function App() {
   return (
     <Router>
         <Header />
-        <div className="pt-20">
         <Routes className="grow">
           {/* add routes to your pages here */}
           <Route path="/" element={<Home isDarkMode={isDarkMode} />} />
@@ -39,7 +38,6 @@ function App() {
           <Route path="/transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        </div>
         <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
     </Router>
   );
