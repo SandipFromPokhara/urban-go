@@ -87,30 +87,48 @@ const EventsList = () => {
   return (
     <>
       <div className="min-h-screen bg-gray-50" style={{ marginTop: '0', paddingTop: '0' }}>
-        {/* Page Header Section */}
-        <div style={{ 
-          background: 'linear-gradient(175deg, #5A8CFF 0%, #8A4FF6 30%, #B33EF0 65%, #FF4CA8 100%)',
-          color: 'white',
-          marginTop: '2rem', 
-          marginBottom: '0', 
-          paddingTop: '4rem', 
-          paddingBottom: '3rem' 
-        }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
-              Discover Events
-            </h1>
-            <p className="text-xl" style={{ color: '#e0e7ff' }}>
-              Explore exciting events happening in Helsinki region
-            </p>
+        {/* Animated Hero Section */}
+        <div className="hero-section">
+          {/* Grid Background */}
+          <div className="hero-grid-background"></div>
+
+          {/* 15 Floating Bubbles */}
+          <div className="bubble bubble-1"></div>
+          <div className="bubble bubble-2"></div>
+          <div className="bubble bubble-3"></div>
+          <div className="bubble bubble-4"></div>
+          <div className="bubble bubble-5"></div>
+          <div className="bubble bubble-6"></div>
+          <div className="bubble bubble-7"></div>
+          <div className="bubble bubble-8"></div>
+          <div className="bubble bubble-9"></div>
+          <div className="bubble bubble-10"></div>
+          <div className="bubble bubble-11"></div>
+          <div className="bubble bubble-12"></div>
+          <div className="bubble bubble-13"></div>
+          <div className="bubble bubble-14"></div>
+          <div className="bubble bubble-15"></div>
+
+          {/* Content */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hero-content">
+            <div className="hero-content-wrapper">
+              <h1 className="hero-title text-6xl md:text-7xl font-bold mb-6">
+                Discover Events
+              </h1>
+              <p className="hero-subtitle text-2xl md:text-3xl">
+                Explore exciting events happening in Helsinki region
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Search and Filter Section */}
-        <SearchBar 
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-        />
+        <div className="search-section">
+          <SearchBar 
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+          />
+        </div>
 
         {/* Events Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
