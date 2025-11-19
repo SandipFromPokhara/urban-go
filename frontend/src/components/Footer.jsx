@@ -23,7 +23,7 @@ function Footer({ isDarkMode, setIsDarkMode }) {
 
   return (
     <footer
-      className="text-white mb-0 bg-cover bg-center"
+      className="text-white mb-0 bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${footer})` }}
     >
       <div className="flex flex-col items-center px-6 py-6 space-y-6 sm:space-y-8">
@@ -32,7 +32,7 @@ function Footer({ isDarkMode, setIsDarkMode }) {
             <li key={key}>
               <button
                 onClick={() => toggleSection(key)}
-                className="hover:underline capitalize focus:outline-none"
+                className="hover:underline capitalize focus:outline-none px-2 py-1"
               >
                 {key}
               </button>
@@ -48,8 +48,10 @@ function Footer({ isDarkMode, setIsDarkMode }) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="max-w-2xl text-center text-sm sm:text-base bg-black/50 rounded-2xl px-4 py-3"
+              transition={{ duration: 0.35, ease: [0.25, 0.8, 0.25, 1] }}
+              className={`max-w-2xl text-center text-sm sm:text-base 
+                        ${isDarkMode ? "bg-white/10" : "bg-black/50"} 
+                        rounded-2xl px-4 py-3`}
             >
               {activeSection === "theme" ? (
                 <div className="flex flex-col items-center space-y-3">
