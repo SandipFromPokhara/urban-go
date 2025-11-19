@@ -3,6 +3,7 @@ import { motion, useAnimation, useScroll } from "framer-motion";
 import Navbar from "./Navbar";
 import { CircleUserRound, Menu, X } from "lucide-react";
 import logo from "../assets/images/Logo.png";
+import logo2 from "../assets/images/Logo2.png";
 
 function Header() {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -35,9 +36,9 @@ function Header() {
 
       <div className="flex items-center justify-between h-20 px-6 py-4 text-white shadow-md rounded-b-2xl">
         <img
-          src={logo}
+          src={logo2}
           alt="Helsinki Companion Logo"
-          className="h-auto w-28 select-none"
+          className="h-auto w-50 select-none ml-6"
         />
 
         <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">

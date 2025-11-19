@@ -1,10 +1,9 @@
-// SearchArea.jsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
 import FloatingInput from "./ui/FloatingInput";
 import SwapButton from "./ui/SwapButton";
-import RouteList from "./RouteList"; // ✅ Correct import
+import RouteList from "./RouteList";
 
 function SearchArea({
   from, setFrom, to, setTo,
@@ -15,23 +14,45 @@ function SearchArea({
   swapLocations, fillCurrentLocation
 }) {
   const [showInfo, setShowInfo] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({ from: "", to: "" });
 
   const inputClass = isDarkMode
     ? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400"
     : "bg-gray-50 border-gray-400 focus:ring-blue-500 text-gray-900 placeholder-gray-500";
 
-  const handleSearch = () => {
-    if (!from || !to) {
-      setError("Please enter both origin and destination");
-      return;
-    }
+  const validateInput = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Field cannot be empty";
+    if (trimmed.length < 3) return "Address is too short";
+    // Must contain letters and at least one space (mock basic realism)
+    if (!/[a-zA-Z]/.test(trimmed)) return "Must contain letters";
+    if (!/\s/.test(trimmed)) return "Enter a full address with space";
 
-    setError("");
+    if (!/^[a-zA-Z0-9\s,.'-]+$/.test(trimmed)) return "Invalid characters";
+    return "";
+  };
+
+  const handleFromChange = (value) => {
+    setFrom(value);
+    setErrors((prev) => ({ ...prev, from: validateInput(value) }));
+  };
+
+  const handleToChange = (value) => {
+    setTo(value);
+    setErrors((prev) => ({ ...prev, to: validateInput(value) }));
+  };
+
+  const handleSearch = () => {
+    const fromError = validateInput(from);
+    const toError = validateInput(to);
+    setErrors({ from: fromError, to: toError });
+
+    if (fromError || toError) return;
+
     setLoading(true);
     setShowInfo(false);
 
-    // Mock routes for demo
+    // Mock routes
     setTimeout(() => {
       const mockRoutes = [
         { name: "Route 1", duration: 35, co2: 0, modes: ["bus", "metro"], info: "🚶 5 min, 🚌 510, 🚇 M1", steps: ["Walk 5 min to bus stop", "Take bus 510", "Transfer to metro M1"], position: [60.1699, 24.9384] },
@@ -44,89 +65,84 @@ function SearchArea({
     }, 800);
   };
 
+  const isSearchDisabled = !!validateInput(from) || !!validateInput(to) || loading;
+
   return (
     <div className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-5 ${isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}>
+      {/* Origin */}
+      <FloatingInput
+        ref={formInputRef}
+        type="text"
+        icon="start"
+        placeholder="Enter origin"
+        value={from}
+        onChange={(e) => handleFromChange(e.target.value)}
+        onUseLocation={fillCurrentLocation}
+        className={inputClass}
+      />
+      {errors.from && <p className="text-red-500 text-sm">{errors.from}</p>}
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-
-      {/* Inputs */}
-      <div className="flex flex-col gap-4">
-        <FloatingInput
-          ref={formInputRef}
-          type="text"
-          icon="start"
-          placeholder="Enter origin"
-          value={from}
-          onChange={(e) => setFrom(e.target.value)}
-          onUseLocation={fillCurrentLocation}
-          className={inputClass}
-        />
-
-        {/* Swap button */}
-        <div className="flex justify-center">
-          <motion.div
-            whileHover={{ scale: 1.1, rotate: 15 }}
-            whileTap={{ scale: 0.9, rotate: -15 }}
-            className="cursor-pointer"
-            onClick={swapLocations}
-          >
-            <SwapButton />
-          </motion.div>
-        </div>
-
-        <FloatingInput
-          type="text"
-          icon="end"
-          placeholder="Enter destination"
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-          className={inputClass}
-        />
-
-        {/* Date & Time */}
-        <div className="flex gap-4">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
-          />
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
-          />
-        </div>
-
-        {/* Search Button */}
-        <button
-          type="button"
-          onClick={handleSearch}
-          disabled={loading}
-          className={`flex items-center justify-center gap-2 px-5 py-2 rounded-md font-semibold
-              transition-all duration-200 ease-in-out cursor-pointer hover:-translate-y-1
-              ${loading ? 'bg-blue-700 cursor-wait' : 'bg-blue-500 hover:bg-blue-600'}
-              text-white`}
+      {/* Swap button */}
+      <div className="flex justify-center">
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 15 }}
+          whileTap={{ scale: 0.9, rotate: -15 }}
+          className="cursor-pointer"
+          onClick={swapLocations}
         >
-          {loading ? (
-            <svg
-              className="animate-spin h-5 w-5 text-yellow-400"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-            </svg>
-          ) : (
-            <>
-              <FaSearchLocation />
-              Search Routes
-            </>
-          )}
-        </button>
+          <SwapButton />
+        </motion.div>
       </div>
+
+      {/* Destination */}
+      <FloatingInput
+        type="text"
+        icon="end"
+        placeholder="Enter destination"
+        value={to}
+        onChange={(e) => handleToChange(e.target.value)}
+        className={inputClass}
+      />
+      {errors.to && <p className="text-red-500 text-sm">{errors.to}</p>}
+
+      {/* Date & Time */}
+      <div className="flex gap-4">
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
+        />
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
+        />
+      </div>
+
+      {/* Search Button */}
+      <button
+        type="button"
+        onClick={handleSearch}
+        disabled={isSearchDisabled}
+        className={`flex items-center justify-center gap-2 px-5 py-2 rounded-md font-semibold
+            transition-all duration-200 ease-in-out cursor-pointer hover:-translate-y-1
+            ${isSearchDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}
+            text-white`}
+      >
+        {loading ? (
+          <svg className="animate-spin h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+        ) : (
+          <>
+            <FaSearchLocation />
+            Search Routes
+          </>
+        )}
+      </button>
 
       {/* Quick Info */}
       <AnimatePresence>

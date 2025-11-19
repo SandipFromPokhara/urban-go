@@ -27,7 +27,7 @@ function RouteList({ routes, isDarkMode, activeRouteIndex, setActiveRouteIndex }
   if (!routes || routes.length === 0) return null;
 
   return (
-    <div className="space-y-3 overflow-y-auto max-h-[500px]">
+    <div className="space-y-3 overflow-y-auto max-h-[500px] pb-6">
       {routes.map((route, index) => (
         <motion.div
           key={index}
