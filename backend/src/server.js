@@ -4,9 +4,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 // Import routes
+const connectDB = require("./config/db")
 const eventRoutes = require("./routes/eventRouter");
 const transportRoutes = require("./routes/transportRouter");
 const userRoutes = require("./routes/userRouter");
+const authMiddleware = require("./middlewares/authMiddleware");
 
 // Load environment variables
 dotenv.config();
@@ -17,35 +19,34 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Connect to database
+connectDB();
+
 // Simple test route
 app.get("/", (req, res) => {
   res.send("Backend server is running ✅");
+});
+
+// Protected route: requires a valid JWT token
+app.get("/api/protectedroute", authMiddleware, (req, res) => {
+  res.json({
+    message: "Access granted to protected route!",
+    user: req.user
+  });
 });
 
 // API Routes
 app.use("/api/events", eventRoutes);
 app.use("/api/transports", transportRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// Local MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/urbango";
-
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    console.log("✅ Connected to MongoDB (Local)");
-    
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error("MongoDB connection error:", error.message);
-    console.log("Make sure MongoDB service is running");
-  });
+const PORT = process.env.TEST_PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Test server listening on port ${PORT}`);
+});
