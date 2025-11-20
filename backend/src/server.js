@@ -9,7 +9,9 @@ const eventRoutes = require("./routes/eventRouter");
 const transportRoutes = require("./routes/transportRouter");
 const userRoutes = require("./routes/userRouter");
 const authMiddleware = require("./middlewares/authMiddleware");
+const authRoutes = require("./routes/authRoutes");
 
+console.log("AUTH ROUTES:", authRoutes); 
 // Load environment variables
 dotenv.config();
 
