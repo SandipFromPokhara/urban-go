@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import { CircleUserRound, Menu, X } from "lucide-react";
 import logo from "../assets/images/Logo.png";
 import logo2 from "../assets/images/Logo2.png";
+import { Link } from "react-router-dom";
 
 function Header() {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -46,15 +47,16 @@ function Header() {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
+          <Link to="login">
           <motion.button
             whileHover={{ scale: 1.05, opacity: 0.9 }}
             whileTap={{ scale: 0.95 }}
             className="text-white border border-white w-24 px-2 py-2 rounded-md transition duration-100"
-            onClick={() => { window.location.href = '/login'; }}
           >
             <CircleUserRound className="w-5 h-5 inline-block mr-2" />
             Log in
           </motion.button>
+          </Link>
         </div>
 
         <button
