@@ -1,4 +1,5 @@
-const Transport = require("../../src/models/transportModel");
+const mongoose = require("mongoose"); 
+const Transport = require("../models/transportModel");
 
 // GET /transports
 const getAllTransports = async (req, res) => {
@@ -9,6 +10,7 @@ const getAllTransports = async (req, res) => {
         res.status(500).json({ message: "Failed to retrieve transports" });
     }
 };
+
 // POST /transports
 const createTransport = async (req, res) => {
   try {
@@ -19,7 +21,7 @@ const createTransport = async (req, res) => {
   }
 };
 
-// GET /blogs/:blogId
+// GET /transports/:transportId
 const getTransportById = async (req, res) => {
   const { transportId } = req.params;
 
@@ -48,7 +50,7 @@ const updateTransport = async (req, res) => {
 
   try {
     const updatedTransport = await Transport.findOneAndUpdate(
-      { _id: blogId },
+      { _id: transportId }, // 
       { ...req.body },
       { new: true }
   );

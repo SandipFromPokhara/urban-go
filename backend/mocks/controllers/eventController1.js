@@ -1,4 +1,5 @@
-const { find, create, findById, findOneAndUpdate, findOneAndDelete } = require("../../src/models/eventModel");
+const mongoose = require("mongoose"); 
+const Event = require("../models/eventModel");
 
 // GET /events
 const getAllEvents = async (req, res) => {

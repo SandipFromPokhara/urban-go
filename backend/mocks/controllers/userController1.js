@@ -1,4 +1,5 @@
-const User = require("../../src/models/userModel").default;
+const mongoose = require("mongoose"); 
+const User = require("../models/userModel");
 
 // GET /users
 const getAllUsers = async (req, res) => {
