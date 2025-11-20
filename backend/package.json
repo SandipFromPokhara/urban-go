@@ -4,8 +4,8 @@
   "description": "UrbanGobackend",
   "main": "AIserver.js",
   "scripts": {
-    "start": "node AIserver.js",
-    "dev": "nodemon AIserver.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
