@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import PageHeader from '../components/PageHeader';
-import SearchBar from '../components/SearchBar';
-import EventsGrid from '../components/EventsGrid';
+import SearchBar from '../components/events/SearchBar';
+import EventsGrid from '../components/events/EventsGrid';
 import LoadingSpinner from '../components/LoadingSpinner';
-import Pagination from '../components/Pagination';
+import Pagination from '../components/events/Pagination';
 import { getMockEvents } from '../utils/mockEventsData';
+import '../styles/events.css';
 
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
 
@@ -85,43 +85,76 @@ const EventsList = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <PageHeader 
-        title="Discover Events"
-        subtitle="Explore exciting events happening in Helsinki region"
-      />
+    <>
+      <div className="min-h-screen bg-gray-50" style={{ marginTop: '0', paddingTop: '0' }}>
+        {/* Animated Hero Section */}
+        <div className="hero-section">
+          {/* Grid Background */}
+          <div className="hero-grid-background"></div>
 
-      {/* Search and Filter Section */}
-      <SearchBar 
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-      />
+          {/* 15 Floating Bubbles */}
+          <div className="bubble bubble-1"></div>
+          <div className="bubble bubble-2"></div>
+          <div className="bubble bubble-3"></div>
+          <div className="bubble bubble-4"></div>
+          <div className="bubble bubble-5"></div>
+          <div className="bubble bubble-6"></div>
+          <div className="bubble bubble-7"></div>
+          <div className="bubble bubble-8"></div>
+          <div className="bubble bubble-9"></div>
+          <div className="bubble bubble-10"></div>
+          <div className="bubble bubble-11"></div>
+          <div className="bubble bubble-12"></div>
+          <div className="bubble bubble-13"></div>
+          <div className="bubble bubble-14"></div>
+          <div className="bubble bubble-15"></div>
 
-      {/* Events Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <EventsGrid events={currentEvents} />
-      </div>
+          {/* Content */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hero-content">
+            <div className="hero-content-wrapper">
+              <h1 className="hero-title text-6xl md:text-7xl font-bold mb-6">
+                Discover Events
+              </h1>
+              <p className="hero-subtitle text-2xl md:text-3xl">
+                Explore exciting events happening in Helsinki region
+              </p>
+            </div>
+          </div>
+        </div>
 
-      {/* Pagination */}
-      {filteredEvents.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-          <Pagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
+        {/* Search and Filter Section */}
+        <div className="search-section">
+          <SearchBar 
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
           />
         </div>
-      )}
 
-      {/* Results Count */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
-        <p className="text-center text-gray-600" style={{ color: '#4b5563' }}>
-          Showing {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} of {filteredEvents.length} events
-          {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
-        </p>
+        {/* Events Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <EventsGrid events={currentEvents} />
+        </div>
+
+        {/* Pagination */}
+        {filteredEvents.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
+
+        {/* Results Count */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
+          <p className="text-center text-gray-600" style={{ color: '#4b5563' }}>
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} of {filteredEvents.length} events
+            {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

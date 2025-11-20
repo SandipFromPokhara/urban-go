@@ -16,32 +16,36 @@ const eventsSchema = new Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
       required: true,
     },
     date: {
-      type: Date,
-      required: true,
-    },
-    category: {
-      type: String,
+      type: String,  
       required: true,
     },
     location: {
       type: String,
       required: true,
     },
+    link: {
+      type: String,
+      required: false,
+    },
     image: {
       type: String,
       required: false,
     },
     tags: {
-      type: [String],
+      type: String,  
       required: false,
     },
   },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Event", eventsSchema);
-

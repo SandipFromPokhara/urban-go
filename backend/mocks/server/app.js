@@ -3,7 +3,7 @@ const express = require("express");
 const { events, users, transports } = require("./data");
 
 const app = express();
-app.use(express.json());
+app.use(json());
 
 app.get("/", (req, res) => {
   res.send("API Running with local data.js");
