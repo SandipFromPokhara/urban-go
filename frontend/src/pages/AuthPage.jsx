@@ -8,7 +8,7 @@ const AuthPage = () => {
 
   return (
     <div className="auth-outer-wrapper">
-      <div className="auth-inner-content">
+      <div className="auth-inner-content scroll-wrapper">
         {page === "login" ? <Login /> : <Signup />}
         {/* Switch links */}
         <div

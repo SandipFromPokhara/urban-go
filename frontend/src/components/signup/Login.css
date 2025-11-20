@@ -1,71 +1,110 @@
-.container {
+/* Shared page background */
+body {
+  background: #f6faff;
+  min-height: 100vh;
+}
+
+/* Auth page wrapper for vertical centering */
+.auth-outer-wrapper {
+  min-height: calc(100vh - 140px); /* adjust for header/footer */
   display: flex;
   flex-direction: column;
-  margin: auto;
-  background: #f6faff;
-  width: 420px;
-  border-radius: 16px;
-  box-shadow: 0 6px 32px rgba(45, 117, 255, 0.1);
-  padding-bottom: 40px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Inner content for form centering */
+.auth-inner-content {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 0;
+}
+
+/* Container for both login and signup forms */
+.container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(45,117,255,0.12);
+  width: 100%;
+  max-width: 380px;
+  padding: 36px 28px 32px 28px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Responsive for mobile */
+@media (max-width: 520px) {
+  .container {
+    padding: 26px 8px 24px 8px;
+    max-width: 97vw;
+  }
+  .auth-inner-content {
+    padding: 18px 0;
+  }
 }
 
 .header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin-bottom: 36px;
+  gap: 10px;
+  margin-bottom: 30px;
 }
 
 .text {
-  color: #244276;
-  font-size: 38px;
+  color: #2261cc;
+  font-size: 2.25rem;
   font-weight: 800;
-  letter-spacing: 1px;
+  margin-top: 4px;
+  letter-spacing: 1.3px;
 }
 
 .underline {
-  width: 54px;
+  width: 52px;
   height: 4px;
   background-color: #1764ff;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
+/* Inputs styling */
 .inputs {
-  margin-top: 45px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 17px;
+  margin-bottom: 18px; /* improve form spacing */
 }
 
 .input {
   display: flex;
   align-items: center;
-  margin: auto;
-  width: 360px;
-  height: 60px;
-  background: #e5eeff;
+  width: 100%;
+  height: 50px;
+  background: #edf4ff;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(23, 100, 255, 0.04);
+  box-shadow: 0 2px 12px rgba(23,100,255,0.04);
 }
 
 .input input {
-  height: 45px;
-  width: 320px;
+  flex: 1;
   background: transparent;
   border: none;
   outline: none;
-  color: #32325d;
-  font-size: 18px;
+  color: #244276;
+  font-size: 17px;
   padding: 0 12px;
 }
 
 .forgot-password {
-  padding-left: 24px;
-  margin-top: 21px;
-  color: #586082;
-  font-size: 18px;
+  font-size: 16px;
+  color: #606d91;
+  margin-top: 14px;
+  margin-bottom: 8px;
+  padding-left: 4px;
 }
 
 .forgot-password span {
@@ -73,70 +112,58 @@
   cursor: pointer;
   font-weight: 600;
 }
-.password-strength {
-  text-align: center;
-  font-weight: 600;
-  margin-top: 5px;
-  margin-bottom: 10px;
-}
 
-.strength-weak {
-  color: #d9534f;
-}
-
-.strength-medium {
-  color: #f0ad4e;
-}
-
-.strength-strong {
-  color: #5cb85c;
-}
-
-.error-text {
-  text-align: center;
-  color: #d9534f;
-  font-size: 18px;
-  margin-top: -5px;
-  margin-bottom: 10px;
-}
-
+/* Button styling */
 .submit-container {
   display: flex;
-  gap: 22px;
-  margin: 44px auto;
+  justify-content: center;
+  margin: 24px 0 0 0;
 }
 
 .submit {
-  background: linear-gradient(90deg, #1a73e8 0%, #1558b0 100%);
+  background: linear-gradient(90deg,#1764ff 0%,#2261cc 100%);
   color: #fff;
-  box-shadow: 0 2px 12px rgba(26, 115, 232, 0.2);
-  width: 160px;
-  height: 45px;
+  font-weight: 700;
+  width: 152px;
+  height: 43px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 6px;
   font-size: 16px;
-  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(23,100,255,0.13);
   cursor: pointer;
 }
 
 .submit:hover {
-  background: linear-gradient(90deg, #1669d8 0%, #104c97 100%);
+  background: linear-gradient(90deg,#1558b0 0%,#1764ff 100%);
 }
 
-.auth-outer-wrapper {
-  min-height: calc(100vh - 140px); /* Subtract header+footer combined height */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #f6faff; /* Optional: matches your forms */
+/* Password strength styles for signup only */
+.password-strength {
+  text-align: center;
+  font-weight: 600;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+.strength-weak { color: #d9534f; }
+.strength-medium { color: #f0ad4e; }
+.strength-strong { color: #27b26b; }
+
+.error-text {
+  text-align: center;
+  color: #d9534f;
+  font-size: 16px;
+  margin-top: -5px;
+  margin-bottom: 8px;
 }
 
-.auth-inner-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Signup specific colors/overrides (optional) */
+.signup-container .text {
+  color: #2563eb;
+}
+
+/* Login specific colors/overrides (optional) */
+.login-container .text {
+  color: #244276;
 }
