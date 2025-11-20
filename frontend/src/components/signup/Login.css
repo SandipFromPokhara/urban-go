@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   margin: auto;
-  margin-top: 40px;
   background: #f6faff;
   width: 420px;
   border-radius: 16px;
@@ -21,6 +20,7 @@
 
 .text {
   color: #244276;
+  margin-top: 60px;
   font-size: 38px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -120,9 +120,24 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .submit:hover {
   background: linear-gradient(90deg, #1669d8 0%, #104c97 100%);
+}
+
+.auth-outer-wrapper {
+  min-height: calc(100vh - 140px); /* Subtract header+footer combined height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f6faff; /* Optional: matches your forms */
+}
+
+.auth-inner-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
