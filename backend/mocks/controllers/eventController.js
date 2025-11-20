@@ -1,9 +1,9 @@
-const Event = require("../models/eventModel");
+const { find, create, findById, findOneAndUpdate, findOneAndDelete } = require("../../src/models/eventModel");
 
 // GET /events
 const getAllEvents = async (req, res) => {
     try {
-        const events = await Event.find({}).sort({ createdAt: -1 });
+        const events = await find({}).sort({ createdAt: -1 });
         res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ message: "Failed to retrieve events" });
@@ -13,7 +13,7 @@ const getAllEvents = async (req, res) => {
 // POST /events
 const createEvent = async (req, res) => {
   try {
-      const newEvent = await Event.create({ ...req.body });
+      const newEvent = await create({ ...req.body });
       res.status(201).json(newEvent);
   } catch (error) {
       res.status(400).json({ message: "Failed to create event", error: error.message });
@@ -29,7 +29,7 @@ const getEventById = async (req, res) => {
   }
 
   try {
-    const event = await Event.findById(eventId);
+    const event = await findById(eventId);
     if (event) {
       res.status(200).json(event);
     } else {
@@ -48,7 +48,7 @@ const updateEvent = async (req, res) => {
   }
 
   try {
-    const updatedEvent = await Event.findOneAndUpdate(
+    const updatedEvent = await findOneAndUpdate(
       { _id: eventId },
       { ...req.body },
       { new: true }
@@ -72,7 +72,7 @@ const deleteEvent = async (req, res) => {
   }
 
   try {
-    const deletedEvent = await Event.findOneAndDelete({ _id: eventId });
+    const deletedEvent = await findOneAndDelete({ _id: eventId });
     if (deletedEvent) {
       res.status(200).json({ message: "Event deleted successfully" });
     } else {

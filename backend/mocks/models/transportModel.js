@@ -15,4 +15,4 @@ const transportOptionsSchema = new Schema(
   },
 );
 
-module.exports = mongoose.model("TransportOptions", transportOptionsSchema);
+module.exports = model("TransportOptions", transportOptionsSchema);

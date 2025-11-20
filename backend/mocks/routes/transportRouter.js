@@ -1,12 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getAllTransports,
-  getTransportById,
-  createTransport,
-  updateTransport,
-  deleteTransport,
-} = require("../controllers/transportControllers");
+const { getAllTransports, getTransportById, createTransport, updateTransport, deleteTransport } = require("../controllers/transportControllers");
 
 // GET /transports
 router.get("/", getAllTransports);

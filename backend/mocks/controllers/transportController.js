@@ -1,4 +1,4 @@
-const Transport = require("../models/transportModel");
+const Transport = require("../../src/models/transportModel");
 
 // GET /transports
 const getAllTransports = async (req, res) => {
@@ -21,7 +21,7 @@ const createTransport = async (req, res) => {
 
 // GET /blogs/:blogId
 const getTransportById = async (req, res) => {
-  const { blogId } = req.params;
+  const { transportId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(transportId)) {
     return res.status(400).json({ message: "Invalid transport ID" });
