@@ -6,6 +6,7 @@ import EventDetails from "./pages/EventDetails";
 import Footer from "./components/Footer";
 import { useEffect, useState } from "react";
 import TransportPage from "./pages/TransportPage";
+import AuthPage from "./pages/AuthPage";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -36,6 +37,7 @@ function App() {
           <Route path="/events" element={<EventsList isDarkMode={isDarkMode} />} />
           <Route path="/events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
           <Route path="/transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
+          <Route path="/login" element={<AuthPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />

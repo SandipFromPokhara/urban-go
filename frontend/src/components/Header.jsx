@@ -50,6 +50,7 @@ function Header() {
             whileHover={{ scale: 1.05, opacity: 0.9 }}
             whileTap={{ scale: 0.95 }}
             className="text-white border border-white w-24 px-2 py-2 rounded-md transition duration-100"
+            onClick={() => { window.location.href = '/login'; }}
           >
             <CircleUserRound className="w-5 h-5 inline-block mr-2" />
             Log in
