@@ -6,7 +6,7 @@ const {
   createEvent,
   updateEvent,
   deleteEvent,
-} = require("../controllers/eventControllers");
+} = require("../controllers/eventController");
 
 // GET /events
 router.get("/", getAllEvents);

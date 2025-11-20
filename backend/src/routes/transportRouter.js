@@ -6,7 +6,7 @@ const {
   createTransport,
   updateTransport,
   deleteTransport,
-} = require("../controllers/transportControllers");
+} = require("../controllers/transportController");
 
 // GET /transports
 router.get("/", getAllTransports);
