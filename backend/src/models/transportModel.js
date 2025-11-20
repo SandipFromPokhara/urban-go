@@ -13,6 +13,7 @@ const transportOptionsSchema = new Schema(
       required: true,
     },
   },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("TransportOptions", transportOptionsSchema);
