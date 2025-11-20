@@ -92,7 +92,7 @@ pids/
 *.pid
 *.seed
 *.pid.lock
-
+backend/src/testServer.js 
 # Optional runtime files
 *.tgz
 *.bak
