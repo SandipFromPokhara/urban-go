@@ -7,50 +7,52 @@ const AuthPage = () => {
   const [page, setPage] = useState("login");
 
   return (
-    <div className="auth-outer-wrapper">
-      <div className="auth-inner-content scroll-wrapper">
-        {page === "login" ? <Login /> : <Signup />}
-        {/* Switch links */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "20px",
-            fontSize: "16px",
-          }}
-        >
-          {page === "login" ? (
-            <span>
-              Don't have an account?{" "}
-              <span
-                style={{
-                  color: "#2563eb",
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                }}
-                onClick={() => setPage("signup")}
-              >
-                Press here to register
+    <section className="hero-section">
+      <div className="auth-outer-wrapper">
+        <div className="auth-inner-content scroll-wrapper">
+          {page === "login" ? <Login /> : <Signup />}
+          {/* Switch links */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "20px",
+              fontSize: "16px",
+            }}
+          >
+            {page === "login" ? (
+              <span>
+                Don't have an account?{" "}
+                <span
+                  style={{
+                    color: "#2563eb",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                  }}
+                  onClick={() => setPage("signup")}
+                >
+                  Press here to register
+                </span>
               </span>
-            </span>
-          ) : (
-            <span>
-              Already have an account?{" "}
-              <span
-                style={{
-                  color: "#2563eb",
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                }}
-                onClick={() => setPage("login")}
-              >
-                Press here to login
+            ) : (
+              <span>
+                Already have an account?{" "}
+                <span
+                  style={{
+                    color: "#2563eb",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                  }}
+                  onClick={() => setPage("login")}
+                >
+                  Press here to login
+                </span>
               </span>
-            </span>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
