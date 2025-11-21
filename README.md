@@ -9,7 +9,7 @@ This branch contains all Sprint 2 deliverables merged from individual team membe
 [Main project repo](https://github.com/SandipFromPokhara/urban-go/tree/main)
 
 ## Development repo
-[development](https://github.com/SandipFromPokhara/urban-go/tree/development)
+Branch [development](https://github.com/SandipFromPokhara/urban-go/tree/development)
 
 ## 1. Front-End Code
 All front-end code for the UrbanGo application.  
