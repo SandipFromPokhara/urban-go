@@ -1,7 +1,7 @@
 # Self-Assessment  
 
 - **Member name:** *Twe He Gam Aung*  
-- **Contribution area:** *briefly describe what part of the project you worked on (e.g., frontend component, backend route, database schema, etc.)*
+- **Contribution area:** *I implemented frontend UI for registration page (LogIn and SignUp)*
 
 ---
 

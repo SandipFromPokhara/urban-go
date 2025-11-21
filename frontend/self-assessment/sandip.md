@@ -2,7 +2,7 @@
 
 - **Member name:** *Sandip Ranjit*
 
-- **Contribution area:** *I implemented Transport Page for frontend, AI integration for backend for event recommendation with mock datas. For the Ai integration purpose, I created a separate folder named **AI** that includes `aiController.js`, `aiRoutes.js`, `normalizeAiOutput.js`, `eventService.js`, `gemini.js` and `AIserver.js` files. The purpose for creating a separate folder was to isolate my tasks so as not to create conflicts during GitHub branch merging. `AIserver.js` also connects to MongoDB, and I tested AI endpoints with /api/gemini creating event recommendation and it was verified using Postman. As a responsible member of the group, I took the charge of merging branches, reviewing the codes and communicating frequently with the related member during merging process. This saved everyone's time and effort in the group, which in turn helped members to focus on debugging, and careful examination of their own tasks.* 
+- **Contribution area:** *I implemented Transport Page for frontend and AI integration for backend for event recommendation with mock datas. For the Ai integration purpose, I created a separate folder named **AI** that includes `aiController.js`, `aiRoutes.js`, `normalizeAiOutput.js`, `eventService.js`, `gemini.js` and `AIserver.js` files. The purpose for creating a separate folder was to isolate my tasks so as not to create conflicts during GitHub branch merging. `AIserver.js` also connects to MongoDB, and I tested AI endpoints with /api/gemini creating event recommendation and it was verified using Postman. As a responsible member of the group, I took the charge of merging branches, reviewing the codes and communicating frequently with the related member during merging process. This saved everyone's time and effort in the group, which in turn helped members to focus on debugging, and careful examination of their own tasks.* 
 
 ---
 
@@ -224,7 +224,7 @@ src/
 ## Usage Instructions
 
 **1. Install dependencies:**
-```
+```bash
 npm install react react-dom react-icons framer-motion leaflet react-leaflet
 ```
 
