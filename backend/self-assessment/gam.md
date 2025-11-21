@@ -7,57 +7,63 @@
 
 ### 1. Functionality
 - **Does the code meet the requirements?**
-  - [Y] Does it implement all specified features you were responsible for?  
-  - [Y] Are edge cases handled (e.g., invalid data, duplicates)?  
-  - [N] Are there any bugs or unexpected behaviors?  
+  - [ ] Does it implement all specified features you were responsible for?  
+  - [ ] Are edge cases handled (e.g., invalid data, duplicates)?  
+  - [ ] Are there any bugs or unexpected behaviors?
+No backend code was developed or modified during this sprint by me. 
 
 - **Integration**
-  - [Y] Does your code work correctly with other parts of the application?  
-  - [Y] Are inputs and outputs managed appropriately?  
+  - [ ] Does your code work correctly with other parts of the application?  
+  - [ ] Are inputs and outputs managed appropriately?  
+
 
 ---
 
 ### 2. Code Quality
 - **Readability**
-  - [Y] Is your code easy to understand for other developers?  
-  - [Y] Are variable and function names descriptive and meaningful?  
+  - [ ] Is your code easy to understand for other developers?  
+  - [ ] Are variable and function names descriptive and meaningful?  
+
 
 - **Reusability**
-  - [Y] Can your code or parts of it be reused elsewhere in the application?  
-  - [Y] Is logic modular and separated from unrelated concerns?  
+  - [ ] Can your code or parts of it be reused elsewhere in the application?  
+  - [ ] Is logic modular and separated from unrelated concerns?  
 
 - **Comments and Documentation**
-  - [Y] Are there comments explaining complex logic?  
-  - [Y] Is there documentation for how to use your code unit?  
+  - [ ] Are there comments explaining complex logic?  
+  - [ ] Is there documentation for how to use your code unit?  
+Not applicable this sprint as no backend code contribution was made.
 
 ---
 
 ### 3. Performance
 - **Efficiency**
-  - [N] Are there any unnecessary operations or performance bottlenecks?  
-  - [N] Is the code optimized for larger datasets or high traffic (if applicable)?  
+  - [ ] Are there any unnecessary operations or performance bottlenecks?  
+  - [ ] Is the code optimized for larger datasets or high traffic (if applicable)?  
+Not applicable this sprint as no backend code contribution was made.
 
 ---
 
 ### 4. Overall Assessment
 - **Strengths**  
   - List the strengths of your contribution.  
-    - Clear and consistent component structure with separation of concerns for Login, Signup, and main AuthPage components in React.
-    - Effective use of React useState hooks for managing form state and conditional rendering between login and signup views.
-    - Good user experience enhancements like password strength meter, error messages for password mismatch, and validation prompts for required fields.
-    - Clean and modern CSS styling with flexible layout using flexbox, custom colors, shadows, and hover effects to create a visually appealing UI.
-    - Reusable and modular CSS classes applied consistently across inputs and buttons.
+    - Actively collaborated with the backend developer during this sprint, contributing to understanding and planning backend features.
+    - Maintained strong frontend development contributions while aligning closely with backend workflows.
+    - Demonstrated good communication and teamwork skills by working alongside backend developers to ensure alignment.
 
 - **Areas for Improvement**  
-  - List areas where your code could be improved. 
-    -  Form submission currently only triggers alert or console log; lacks real backend integration or API calls for actual authentication.
+  - List areas where your code could be improved.  
+    - Increase involvement in backend tasks to contribute more evenly across full-stack development.
+    - Need to deepen technical skills in backend development to contribute more independently.
 
 - **Action Plan**  
   - Outline specific steps to address the areas for improvement.  
-    - Integrate form submissions with backend authentication APIs.
-
+    - Focus on backend tasks, especially on the user panel and user authentication in the upcoming sprint.
+    - Develop efficient code for filtering events based on user profiles and user interests to achieve optimal performance.
+    - Study the backend authentication system further to provide a secure environment for users.
 ---
 
 ### 5. Additional Notes
-- Add any other relevant observations or feedback about your contribution.  
-  - Future improvements could include features like "Remember Me" functionality, password reset flow, and social login integration to enhance user experience.
+- Add any other relevant observations or feedback about your contribution.
+  - Although I did not contribute backend code during this sprint, close collaboration with the backend developer Sailesh significantly enhanced my understanding of backend processes and improved overall team integration. This teamwork experience not only enriched my technical perspective but also strengthened communication within the group. In the upcoming sprint, I plan to take on more backend responsibilities—particularly focusing on developing the user panel—to expand my skills and contribute more fully across both frontend and backend areas.
+  
