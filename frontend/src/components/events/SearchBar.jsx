@@ -36,7 +36,7 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
           
           {/* Filter Button - Fixed width on larger screens */}
           <button 
-            className="flex items-center justify-center gap-2 px-6 py-2 rounded-lg transition-all duration-200 sm:flex-shrink-0 sm:w-auto w-full"
+            className="flex items-center justify-center gap-2 px-6 py-2 rounded-lg transition-all duration-200 sm:shrink-0 sm:w-auto w-full"
             style={{
               backgroundColor: '#ffffff',
               color: '#374151',
@@ -52,7 +52,7 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
             onMouseLeave={() => setIsButtonHovered(false)}
           >
             <Filter 
-              className="w-5 h-5 transition-colors duration-200 flex-shrink-0" 
+              className="w-5 h-5 transition-colors duration-200 shrink-0" 
               style={{ color: isButtonHovered ? '#574199' : '#3b82f6' }} 
             />
             <span style={{ color: '#1e40af', fontWeight: '600', whiteSpace: 'nowrap' }}>Filters</span>

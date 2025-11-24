@@ -195,7 +195,7 @@ const EventDetails = () => {
           alt={event.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
         
         {/* Action Buttons */}
         <div className="absolute top-4 right-4 flex gap-2" style={{ zIndex: 10 }}>
@@ -293,7 +293,7 @@ const EventDetails = () => {
               <div className="space-y-5">
                 {/* Date */}
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
+                  <Calendar className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" style={{ color: '#2563eb' }} />
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Date</p>
                     <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{formatDate(event.date)}</p>
@@ -303,7 +303,7 @@ const EventDetails = () => {
                 {/* Time */}
                 {event.time && (
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
+                    <Clock className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" style={{ color: '#2563eb' }} />
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Time</p>
                       <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{event.time}</p>
@@ -313,7 +313,7 @@ const EventDetails = () => {
 
                 {/* Location */}
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
+                  <MapPin className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" style={{ color: '#2563eb' }} />
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Location</p>
                     <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{event.location}</p>
@@ -326,7 +326,7 @@ const EventDetails = () => {
                 {/* Organizer */}
                 {event.organizer && (
                   <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" style={{ color: '#2563eb' }} />
+                    <Users className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" style={{ color: '#2563eb' }} />
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-gray-900 mb-1" style={{ color: '#111827' }}>Organizer</p>
                       <p className="text-gray-700 text-sm" style={{ color: '#374151' }}>{event.organizer}</p>
