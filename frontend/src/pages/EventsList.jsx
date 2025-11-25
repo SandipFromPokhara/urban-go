@@ -8,7 +8,7 @@ import '../styles/events.css';
 
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
 
-const EventsList = () => {
+const EventsList = ({ isDarkMode }) => {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,7 +86,7 @@ const EventsList = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50" style={{ marginTop: '0', paddingTop: '0' }}>
+      <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ marginTop: '0', paddingTop: '0' }}>
         {/* Animated Hero Section */}
         <div className="hero-section">
           {/* Grid Background */}
@@ -127,12 +127,13 @@ const EventsList = () => {
           <SearchBar 
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
+            isDarkMode={isDarkMode}
           />
         </div>
 
         {/* Events Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <EventsGrid events={currentEvents} />
+          <EventsGrid events={currentEvents} isDarkMode={isDarkMode} />
         </div>
 
         {/* Pagination */}
@@ -142,13 +143,14 @@ const EventsList = () => {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
+              isDarkMode={isDarkMode}
             />
           </div>
         )}
 
         {/* Results Count */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
-          <p className="text-center text-gray-600" style={{ color: '#4b5563' }}>
+          <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             Showing {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} of {filteredEvents.length} events
             {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
           </p>
