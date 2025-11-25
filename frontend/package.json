@@ -9,7 +9,8 @@
     "deploy": "gh-pages -d dist",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
