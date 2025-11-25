@@ -4,14 +4,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 // Import routes
-const connectDB = require("./config/db")
-const eventRoutes = require("./routes/eventRouter");
-const transportRoutes = require("./routes/transportRouter");
-const userRoutes = require("./routes/userRouter");
-const authMiddleware = require("./middlewares/authMiddleware");
-const authRoutes = require("./routes/authRoutes");
+const connectDB = require("./src/config/db");
+const authMiddleware = require("./src/middlewares/authMiddleware");
+const authRoutes = require("./src/routes/authRoutes");
 
-console.log("AUTH ROUTES:", authRoutes); 
+//console.log("AUTH ROUTES:", authRoutes); 
 // Load environment variables
 dotenv.config();
 
@@ -38,9 +35,6 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
 });
 
 // API Routes
-app.use("/api/events", eventRoutes);
-app.use("/api/transports", transportRoutes);
-app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 
 // 404 Handler
