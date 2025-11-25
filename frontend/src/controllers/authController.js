@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
  * User Registration Controller
  * Handles user signup for new accounts.
  *
- * Steps:
  * - Validates required input fields for registration (username, email, password, dateOfBirth).
  * - Checks if the email is already registered (unique user check).
  * - Hashes user password securely before saving.

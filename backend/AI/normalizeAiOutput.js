@@ -16,3 +16,4 @@ function normalizeAiOutput(output) {
 }
 
 module.exports = normalizeAiOutput;
+
