@@ -48,7 +48,7 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-const PORT =  4000;
+const PORT = process.env.TEST_PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Test server listening on port ${PORT}`);
 });

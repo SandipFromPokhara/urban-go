@@ -117,4 +117,3 @@ const login = async (req, res) => {
 
 // Export controller functions for router use.
 module.exports = { register, login };
-
