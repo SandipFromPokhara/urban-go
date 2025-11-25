@@ -107,3 +107,10 @@ pids/
 .yarn/
 .pnp.*
 eslintcache
+
+# Extra folders
+backend/AI2/
+backend/mocks/
+backend/self-assessment/
+frontend/self-assessment/
+frontend/src/components/SignupPage/
