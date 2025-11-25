@@ -1,7 +1,7 @@
 import { Calendar, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const EventCard = ({ event }) => {
+const EventCard = ({ event, isDarkMode }) => {
   const navigate = useNavigate();
 
   const handleEventClick = () => {
@@ -16,10 +16,10 @@ const EventCard = ({ event }) => {
   return (
     <div
       onClick={handleEventClick}
-      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+      className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl`}
     >
       {/* Event Image */}
-      <div className="relative h-48 overflow-hidden bg-gray-200">
+      <div className={`relative h-48 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
         <img
           src={event.image}
           alt={event.name}
@@ -37,21 +37,21 @@ const EventCard = ({ event }) => {
 
       {/* Event Details */}
       <div className="p-4">
-        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+        <h3 className={`text-xl font-bold mb-2 line-clamp-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
           {event.name}
         </h3>
         
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+        <p className={`text-sm mb-3 line-clamp-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           {event.description}
         </p>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-gray-700">
+          <div className={`flex items-center gap-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
             <Calendar className="w-4 h-4 text-blue-600" />
             <span className="text-sm">{formatDate(event.date)}</span>
           </div>
           
-          <div className="flex items-center gap-2 text-gray-700">
+          <div className={`flex items-center gap-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
             <MapPin className="w-4 h-4 text-blue-600" />
             <span className="text-sm">{event.location}</span>
           </div>
@@ -65,7 +65,8 @@ const EventCard = ({ event }) => {
           style={{
             backgroundColor: '#2563eb',
             color: '#ffffff',
-            border: 'none'
+            border: 'none',
+            cursor: 'pointer'
           }}
           onClick={(e) => {
             e.stopPropagation();
