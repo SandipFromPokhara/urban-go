@@ -115,7 +115,6 @@ backend/self-assessment/
 backend/controllers/authController.js
 backend/src/controllers/
 backend/server.js
-backend/src/models/
 
 frontend/self-assessment/
 frontend/src/components/SignupPage/
