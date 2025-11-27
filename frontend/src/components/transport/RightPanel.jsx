@@ -1,3 +1,5 @@
+// src/components/transport/RightPanel.jsx
+
 import location from "../../assets/icons/location.svg";
 import map from "../../assets/icons/map.svg";
 import cloud from "../../assets/icons/cloud.svg";
