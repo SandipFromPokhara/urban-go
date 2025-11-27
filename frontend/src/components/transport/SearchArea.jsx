@@ -1,6 +1,5 @@
 // src/components/transport/SearchArea.jsx
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
 import FloatingInput from "./ui/FloatingInput";
