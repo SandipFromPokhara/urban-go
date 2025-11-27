@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, isDarkMode }) => {
   const pages = [];
   
   // Generate page numbers
@@ -19,18 +19,24 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === 1}
         className="p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         style={{
-          backgroundColor: currentPage === 1 ? '#f3f4f6' : '#ffffff',
-          color: '#374151',
-          border: '1px solid #d1d5db'
+          backgroundColor: currentPage === 1 
+            ? (isDarkMode ? '#374151' : '#f3f4f6') 
+            : (isDarkMode ? '#1f2937' : '#ffffff'),
+          color: isDarkMode ? '#d1d5db' : '#374151',
+          border: `1px solid ${isDarkMode ? '#4b5563' : '#d1d5db'}`
         }}
         onMouseEnter={(e) => {
-          if (currentPage !== 1) e.target.style.backgroundColor = '#f9fafb';
+          if (currentPage !== 1) {
+            e.target.style.backgroundColor = isDarkMode ? '#374151' : '#f9fafb';
+          }
         }}
         onMouseLeave={(e) => {
-          if (currentPage !== 1) e.target.style.backgroundColor = '#ffffff';
+          if (currentPage !== 1) {
+            e.target.style.backgroundColor = isDarkMode ? '#1f2937' : '#ffffff';
+          }
         }}
       >
-        <ChevronLeft className="w-5 h-5" style={{ color: '#374151' }} />
+        <ChevronLeft className="w-5 h-5" style={{ color: isDarkMode ? '#d1d5db' : '#374151' }} />
       </button>
 
       {/* Page Numbers */}
@@ -40,15 +46,23 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           onClick={() => onPageChange(page)}
           className="px-4 py-2 rounded-lg font-medium transition-colors"
           style={{
-            backgroundColor: currentPage === page ? '#2563eb' : '#ffffff',
-            color: currentPage === page ? '#ffffff' : '#374151',
-            border: '1px solid #d1d5db'
+            backgroundColor: currentPage === page 
+              ? '#2563eb' 
+              : (isDarkMode ? '#1f2937' : '#ffffff'),
+            color: currentPage === page 
+              ? '#ffffff' 
+              : (isDarkMode ? '#d1d5db' : '#374151'),
+            border: `1px solid ${isDarkMode ? '#4b5563' : '#d1d5db'}`
           }}
           onMouseEnter={(e) => {
-            if (currentPage !== page) e.target.style.backgroundColor = '#f9fafb';
+            if (currentPage !== page) {
+              e.target.style.backgroundColor = isDarkMode ? '#374151' : '#f9fafb';
+            }
           }}
           onMouseLeave={(e) => {
-            if (currentPage !== page) e.target.style.backgroundColor = '#ffffff';
+            if (currentPage !== page) {
+              e.target.style.backgroundColor = isDarkMode ? '#1f2937' : '#ffffff';
+            }
           }}
         >
           {page}
@@ -61,18 +75,24 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === totalPages}
         className="p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         style={{
-          backgroundColor: currentPage === totalPages ? '#f3f4f6' : '#ffffff',
-          color: '#374151',
-          border: '1px solid #d1d5db'
+          backgroundColor: currentPage === totalPages 
+            ? (isDarkMode ? '#374151' : '#f3f4f6') 
+            : (isDarkMode ? '#1f2937' : '#ffffff'),
+          color: isDarkMode ? '#d1d5db' : '#374151',
+          border: `1px solid ${isDarkMode ? '#4b5563' : '#d1d5db'}`
         }}
         onMouseEnter={(e) => {
-          if (currentPage !== totalPages) e.target.style.backgroundColor = '#f9fafb';
+          if (currentPage !== totalPages) {
+            e.target.style.backgroundColor = isDarkMode ? '#374151' : '#f9fafb';
+          }
         }}
         onMouseLeave={(e) => {
-          if (currentPage !== totalPages) e.target.style.backgroundColor = '#ffffff';
+          if (currentPage !== totalPages) {
+            e.target.style.backgroundColor = isDarkMode ? '#1f2937' : '#ffffff';
+          }
         }}
       >
-        <ChevronRight className="w-5 h-5" style={{ color: '#374151' }} />
+        <ChevronRight className="w-5 h-5" style={{ color: isDarkMode ? '#d1d5db' : '#374151' }} />
       </button>
     </div>
   );
