@@ -8,6 +8,7 @@ const connectDB = require("./src/config/db");
 const authMiddleware = require("./src/middlewares/authMiddleware");
 const authRoutes = require("./src/routes/authRoutes");
 const favoritesRoutes = require("./src/routes/favoritesRoutes");
+const commentsRoutes = require("./src/routes/commentsRoutes");
 
 console.log("AUTH ROUTES:", authRoutes); 
 // Load environment variables
@@ -38,6 +39,7 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/favorites", favoritesRoutes);
+app.use("/api/comments", commentsRoutes);
 
 // 404 Handler
 app.use((req, res) => {

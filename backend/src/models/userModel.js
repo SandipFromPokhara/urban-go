@@ -83,9 +83,14 @@ const userSchema = mongoose.Schema(
     reviews: [
       {
         eventId: { type: String, required: true },
-        comment: { type: String, required: true },
         rating: { type: Number, min: 1, max: 5 },
         createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
       },
     ],
   },
