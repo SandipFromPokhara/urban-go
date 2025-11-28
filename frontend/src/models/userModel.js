@@ -1,8 +1,7 @@
 // backend/models/userModel.js
-
 const mongoose = require("mongoose");
 
-const { Schema, model } = mongoose;
+const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
@@ -32,7 +31,7 @@ const userSchema = new Schema(
       required: true,
     },
 
-    address: {
+    address: { 
       street: { type: String, required: true },
       city: { type: String, required: true },
       postalCode: { type: String, required: true },

@@ -2,7 +2,7 @@ require("dotenv").config();            // Loading env variable first
 const express = require('express');
 const cors = require("cors");
 const mongoose = require("mongoose");
-const generateText = require("./AI/aiController");
+const generateText = require("./aiController");
 
 const app = express();
 
@@ -18,10 +18,7 @@ app.get("/", (req, res) => {
 
 app.post("/api/gemini", generateText)
 
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log("MongoDB connected");
     app.listen(PORT, () => {
