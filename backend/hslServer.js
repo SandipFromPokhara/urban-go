@@ -76,7 +76,7 @@ app.post("/api/search-route", async (req, res) => {
             }
         }`;
 
-        const HSLUrl = "https://api.digitransit.fi/routing/v2/hsl/gtfs/v1";
+        const HSLUrl = process.env.HSLUrl;
         const hslResponse = await fetch(HSLUrl, {
             method: "POST",
             headers: { 
