@@ -46,10 +46,10 @@ function TransportPage({ isDarkMode }) {
       </div>
 
       {/* Main content section */}
-      <section className="relative w-full flex flex-col md:flex-row mt-6 pb-8 gap-6 items-stretch px-4 sm:px-6">
+      <section className="relative w-full flex flex-col md:flex-row mt-10 pb-8 gap-14 items-stretch px-4 sm:px-6">
         
         {/* Left Column: SearchArea + RouteList */}
-        <div className="flex-1 flex flex-col gap-6">
+        <div className="md:w-1/2 flex flex-col gap-6">
           <SearchArea
             from={from} setFrom={setFrom}
             to={to} setTo={setTo}
@@ -66,8 +66,8 @@ function TransportPage({ isDarkMode }) {
         </div>
 
         {/* Middle Column: Map */}
-        <div className="flex-1 flex flex-col gap-4">
-          <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] rounded-lg overflow-hidden shadow-xl/30">
+        <div className="md:w-1/2 flex flex-col gap-4">
+          <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] rounded-lg overflow-hidden shadow-xl/15">
             {loading && (
               <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 z-50 flex items-center justify-center">
                 <svg className="animate-spin h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
