@@ -16,7 +16,7 @@ const EventCard = ({ event, isDarkMode }) => {
   return (
     <div
       onClick={handleEventClick}
-      className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl`}
+      className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex flex-col h-full`}
     >
       {/* Event Image */}
       <div className={`relative h-48 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
@@ -36,7 +36,7 @@ const EventCard = ({ event, isDarkMode }) => {
       </div>
 
       {/* Event Details */}
-      <div className="p-4">
+      <div className="p-4 flex-grow flex flex-col">
         <h3 className={`text-xl font-bold mb-2 line-clamp-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
           {event.name}
         </h3>
@@ -45,7 +45,7 @@ const EventCard = ({ event, isDarkMode }) => {
           {event.description}
         </p>
 
-        <div className="space-y-2">
+        <div className="space-y-2 mb-4">
           <div className={`flex items-center gap-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
             <Calendar className="w-4 h-4 text-blue-600" />
             <span className="text-sm">{formatDate(event.date)}</span>
@@ -56,27 +56,27 @@ const EventCard = ({ event, isDarkMode }) => {
             <span className="text-sm">{event.location}</span>
           </div>
         </div>
-      </div>
 
-      {/* Card Footer */}
-      <div className="px-4 pb-4">
-        <button 
-          className="w-full py-2 rounded-lg font-medium transition-colors"
-          style={{
-            backgroundColor: '#2563eb',
-            color: '#ffffff',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleEventClick();
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
-        >
-          View Details
-        </button>
+        {/* Card Footer - Pushed to bottom */}
+        <div className="mt-auto">
+          <button 
+            className="w-full py-2 rounded-lg font-medium transition-colors"
+            style={{
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEventClick();
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+          >
+            View Details
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,22 +1,31 @@
-// src/hooks/useField.js
+// frontend/src/hooks/useField.js
 
 import { useState } from "react";
 
-export default function useField(initialValue = "", validator = (v) => "") {
-    const [value, setValue] = useState(initialValue);
-    const [error, setError] = useState("");
+export default function useField(
+  type = "text",
+  initialValue = "",
+  validator = () => ""
+) {
+  const [value, setValue] = useState(initialValue);
+  const [error, setError] = useState("");
 
-    const onChange =(e) => {
-        const value = e.target.value;
-        setValue(value);
-        setError(validator(value));
-    };
+  const onChange = (e) => {
+    const val = e.target.value;
+    setValue(val);
+    setError(validator(val));
+  };
 
-    const validate = () => {
-        const err = validator(value);
-        setError(err);
-        return !err;
-    }
+  const validate = () => {
+    const err = validator(value);
+    setError(err);
+    return !err;
+  };
 
-    return { value, setValue, onChange, error, validate };
+  const reset = () => {
+    setValue("");
+    setError("");
+  };
+
+  return { type, value, onChange, reset, error, validate };
 }
