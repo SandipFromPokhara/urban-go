@@ -44,10 +44,11 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
   // Custom icons
   const getTransportIcon = (route) => {
     const icons = {
-      metro: "blue",
-      tram: "orange",
-      bus: "green",
+      metro: "orange",
+      tram: "green",
+      bus: "blue",
       walk: "yellow",
+      train: "purple",
     };
     const color = icons[route.modes[0]] || "yellow";
     return new L.Icon({
@@ -83,7 +84,12 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
             icon={getTransportIcon(route)}
             eventHandlers={{ click: () => setActiveRouteIndex(idx) }}
           >
-            <Popup>{route.name} <br /> {route.info}</Popup>
+            <Popup>
+              <strong>{route.name}</strong><br/>
+              Duration: {route.duration} min<br/>
+              Modes: {route.modes.join(" → ")}
+            </Popup>
+
           </Marker>
         ))}
 

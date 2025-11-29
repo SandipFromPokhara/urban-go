@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaBus, FaWalking, FaTrain, FaClock } from "react-icons/fa";
+import { FaBus, FaWalking, FaTrain, FaClock, FaSubway, FaRoute } from "react-icons/fa";
 
 function RouteList({ routes, isDarkMode, activeRouteIndex, setActiveRouteIndex }) {
    const [expandedIndex, setExpandedIndex] = useState(null);
@@ -61,6 +61,8 @@ function RouteList({ routes, isDarkMode, activeRouteIndex, setActiveRouteIndex }
                 {mode === "bus" && <FaBus />}
                 {mode === "walk" && <FaWalking />}
                 {mode === "train" && <FaTrain />}
+                {mode === "metro" && <FaSubway />}
+                {mode === "tram" && <FaRoute />}
                 {mode}
               </div>
             ))}

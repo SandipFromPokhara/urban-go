@@ -132,44 +132,8 @@ function SearchArea({
         )}
       </button>
 
-      {/* Quick Info */}
-      <AnimatePresence>
-        {routes.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 15 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-3 gap-3 mt-4"
-          >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex flex-col items-center bg-blue-50 p-3 rounded-xl shadow-sm border border-blue-100"
-            >
-              <FaCloudSun className="text-2xl text-blue-500 mb-1" />
-              <p className="text-sm font-semibold text-gray-800">9°C</p>
-              <p className="text-xs text-gray-500">Cloudy</p>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex flex-col items-center bg-green-50 p-3 rounded-xl shadow-sm border border-green-100"
-            >
-              <FaLeaf className="text-2xl text-green-600 mb-1" />
-              <p className="text-sm font-semibold text-gray-800">0g CO₂</p>
-              <p className="text-xs text-gray-500">Eco-friendly</p>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex flex-col items-center bg-yellow-50 p-3 rounded-xl shadow-sm border border-yellow-100"
-            >
-              <FaRoute className="text-2xl text-yellow-600 mb-1" />
-              <p className="text-sm font-semibold text-gray-800">11 km</p>
-              <p className="text-xs text-gray-500">Distance</p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* Placeholder for API-driven info (weather, CO2, distance) */}
+      
       {/* Route List */}
       {routes.length > 0 && (
         <RouteList
