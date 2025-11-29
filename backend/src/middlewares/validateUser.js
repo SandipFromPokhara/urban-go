@@ -10,16 +10,20 @@ const validateSignup = (req, res, next) => {
             throw new Error("Please provide all fields");
         }
 
+        if (!address.street || !address.city || !address.postalCode) {
+            throw new Error("Incomplete address");
+        }
+
         firstName = firstName.trim();
         lastName = lastName.trim();
         email = email.trim().toLowerCase();
-        address.street = address.stree.trim();
+        address.street = address.street.trim();
         address.city = address.city.trim();
         address.postalCode = address.postalCode.trim();
 
-        const nameValidator = /^[a-zA-ZäöåÄÖÅ\s'-]+$/;
-        if (!nameValidator.test(firstName)) throw new Error("Invalid name format");
-        if (!nameValidator.test(lastName)) throw new Error("Invalid name format");
+        const nameValidator = /^[a-zA-ZäöåÄÖÅ]+(?:[ '-][a-zA-ZäöåÄÖÅ]+)*$/;
+        if (!nameValidator.test(firstName)) throw new Error("Invalid first name format");
+        if (!nameValidator.test(lastName)) throw new Error("Invalid last name format");
 
         if (!validator.isEmail(email)) throw new Error("Invalid email format");
 
@@ -47,14 +51,14 @@ const validateSignup = (req, res, next) => {
 const validateLogin = (req, res, next) => {
     try {
         let { email, password } = req.body;
-        if (!email || ! password ) throw new Error("All fields must be filled");
+        if (!email || !password ) throw new Error("Both fields must be filled");
 
         email = email.trim().toLowerCase();
         req.body.email = email;
 
         next();
     } catch (err) {
-        res.status(400).json({ error: err.mesage });
+        res.status(400).json({ error: err.message });
     }
 }
 
