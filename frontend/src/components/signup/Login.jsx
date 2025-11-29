@@ -1,28 +1,15 @@
-import React, { useState } from "react";
+import useLogin from "../../hooks/useLogin";
+import useField from "../../hooks/useField";
 import "./Login.css";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const emailField = useField("email");
+  const passwordField = useField("password");
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = () => {
-    if (!formData.email || !formData.password) {
-      alert("Email and Password are required");
-      return;
-    }
-
-    console.log("Login:", formData);
-    alert("Login success (demo)");
-  };
+  const { error, loading, handleLogin } = useLogin(
+    emailField.value,
+    passwordField.value
+  );
 
   return (
     <div className="container">
@@ -34,21 +21,17 @@ const Login = () => {
       <div className="inputs">
         <div className="input">
           <input 
-            type="email"
+            {...emailField}
             name="email"
             placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
           />
         </div>
 
         <div className="input">
           <input 
-            type="password"
+            {...passwordField}
             name="password"
             placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
           />
         </div>
 
@@ -56,9 +39,15 @@ const Login = () => {
           Forgot Password? <span>Click Here!</span>
         </div>
 
+        {error && <div className="error-text">{error}</div>}
+
         <div className="submit-container">
-          <div className="submit" onClick={handleSubmit}>
-            Login
+          <div 
+            className="submit" 
+            onClick={handleLogin}
+            style={{ opacity: loading ? 0.6 : 1, cursor: loading ? "not-allowed" : "pointer" }}
+          >
+            {loading ? "Logging in..." : "Login"}
           </div>
         </div>
       </div>

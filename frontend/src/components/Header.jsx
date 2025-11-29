@@ -78,14 +78,16 @@ function Header() {
         className="md:hidden absolute top-20 left-0 w-full bg-linear-to-t from-gradient-start via-gradient-via to-gradient-end backdrop-blur-sm text-white flex flex-col items-center gap-6 py-8 shadow-lg rounded-b-2xl z-40"
       >
         <Navbar />
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="text-white border border-white w-32 px-3 py-2 rounded-md"
-        >
-          <CircleUserRound className="w-5 h-5 inline-block mr-2" />
-          Log in
-        </motion.button>
+        <Link to="login" onClick={() => setMenuOpen(false)}>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-white border border-white w-32 px-3 py-2 rounded-md"
+          >
+            <CircleUserRound className="w-5 h-5 inline-block mr-2" />
+            Log in
+          </motion.button>
+        </Link>
       </motion.div>
     </motion.header>
   );

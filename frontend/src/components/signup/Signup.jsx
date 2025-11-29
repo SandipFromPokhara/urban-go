@@ -1,25 +1,34 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import useSignup from "../../hooks/useSignup";
+import useField from "../../hooks/useField";
 import "./Login.css";
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    dob: "",
-  });
+  const usernameField = useField("text");
+  const emailField = useField("email");
+  const passwordField = useField("password");
+  const confirmPasswordField = useField("password");
+  const dateOfBirthField = useField("date");
+  const streetField = useField("text");
+  const cityField = useField("text");
+  const postalCodeField = useField("text");
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const formData = {
+    username: usernameField.value,
+    email: emailField.value,
+    password: passwordField.value,
+    confirmPassword: confirmPasswordField.value,
+    dateOfBirth: dateOfBirthField.value,
+    street: streetField.value,
+    city: cityField.value,
+    postalCode: postalCodeField.value,
   };
+
+  const { error, loading, handleSignup } = useSignup(formData);
 
   // Returns strength key strings for class and display text
   const getPasswordStrength = () => {
-    const pass = formData.password;
+    const pass = passwordField.value;
     if (!pass) return "";
     if (pass.length < 6) return "too-weak";
     if (pass.length < 8) return "weak";
@@ -28,21 +37,6 @@ const Signup = () => {
   };
 
   const strength = getPasswordStrength();
-
-  const handleSubmit = () => {
-    if (!formData.username || !formData.email || !formData.password) {
-      alert("Please fill all required fields");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    console.log("Signup:", formData);
-    alert("Signup success (demo)");
-  };
 
   return (
     <div className="container">
@@ -54,36 +48,30 @@ const Signup = () => {
       <div className="inputs">
         <div className="input">
           <input
-            type="text"
+            {...usernameField}
             name="username"
             placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
           />
         </div>
 
         <div className="input">
           <input
-            type="email"
+            {...emailField}
             name="email"
             placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
           />
         </div>
 
         <div className="input">
           <input
-            type="password"
+            {...passwordField}
             name="password"
             placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
           />
         </div>
 
         {/* Password Strength Text and Class */}
-        {formData.password && (
+        {passwordField.value && (
           <div
             className={`password-strength ${
               strength === "strong"
@@ -105,32 +93,63 @@ const Signup = () => {
 
         <div className="input">
           <input
-            type="password"
+            {...confirmPasswordField}
             name="confirmPassword"
             placeholder="Retype Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
           />
         </div>
 
         {/* Password mismatch warning */}
-        {formData.confirmPassword &&
-          formData.password !== formData.confirmPassword && (
+        {confirmPasswordField.value &&
+          passwordField.value !== confirmPasswordField.value && (
             <div className="error-text">Passwords do not match</div>
           )}
 
-        <div className="input">
+        <div className="input date-input">
           <input
             type="date"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
+            value={dateOfBirthField.value}
+            onChange={dateOfBirthField.onChange}
+            name="dateOfBirth"
+            onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+          />
+          {!dateOfBirthField.value && <span className="date-placeholder">Date of Birth</span>}
+        </div>
+
+        {/* Address fields */}
+        <div className="input">
+          <input
+            {...streetField}
+            name="street"
+            placeholder="Street address"
           />
         </div>
 
+        <div className="input">
+          <input
+            {...cityField}
+            name="city"
+            placeholder="City"
+          />
+        </div>
+
+        <div className="input">
+          <input
+            {...postalCodeField}
+            name="postalCode"
+            placeholder="Postal Code"
+          />
+        </div>
+
+        {error && <div className="error-text">{error}</div>}
+
         <div className="submit-container">
-          <div className="submit" onClick={handleSubmit}>
-            Sign Up
+          <div 
+            className="submit" 
+            onClick={handleSignup}
+            style={{ opacity: loading ? 0.6 : 1, cursor: loading ? "not-allowed" : "pointer" }}
+          >
+            {loading ? "Signing up..." : "Sign Up"}
           </div>
         </div>
       </div>
