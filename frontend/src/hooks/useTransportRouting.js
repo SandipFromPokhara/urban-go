@@ -1,10 +1,9 @@
-// src/hooks/useHSLRouting.js
+// src/hooks/useTransportRouting.js
 
 import { useState } from "react";
 const API_URL = import.meta.env.VITE_API  || "http://localhost:5001";
-console.log("API_URL:", API_URL);
 
-export default function useHSLRouting() {
+export default function useTransportRouting() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -29,6 +28,7 @@ export default function useHSLRouting() {
             body: JSON.stringify({ from, to }),
         });
 
+        console.log("API_URL:", API_URL);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Unknown error");
 

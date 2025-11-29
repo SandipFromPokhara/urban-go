@@ -1,4 +1,4 @@
-// backend/src/routes/hslRoutes.js
+// backend/src/routes/transportRoutes.js
 
 const express = require("express");
 const router = express.Router();
@@ -21,15 +21,15 @@ router.post("/search-route", async (req, res) => {
     }
 
     // Geocode function
-    const NOMINATIM_BASE_URL = (process.env.NOMINATIM_BASE_URL || "").trim();
-    if (!NOMINATIM_BASE_URL) return res.status(500).json({ error: "Nominatim base URL not configured" });
+    const GEOCODE_BASE_URL = (process.env.GEOCODE_BASE_URL || "").trim();
+    if (!GEOCODE_BASE_URL) return res.status(500).json({ error: "Geocode base URL not configured" });
 
     const geoCode = async (address) => {
         try {
             const cleaned = address.trim();
             const urls = [
-                `${NOMINATIM_BASE_URL}?q=${encodeURIComponent(cleaned)}&format=json&limit=1&countrycodes=fi`,
-                `${NOMINATIM_BASE_URL}?q=${encodeURIComponent(cleaned + ", Finland")}&format=json&limit=1&countrycodes=fi`
+                `${GEOCODE_BASE_URL}?q=${encodeURIComponent(cleaned)}&format=json&limit=1&countrycodes=fi`,
+                `${GEOCODE_BASE_URL}?q=${encodeURIComponent(cleaned + ", Finland")}&format=json&limit=1&countrycodes=fi`
             ];
             for (const url of urls) {
                 console.log("Fetching geo for:", address, "URL:", url);
@@ -74,33 +74,33 @@ router.post("/search-route", async (req, res) => {
             }
         }`;
 
-        const HSLUrl = process.env.HSL_URL;
-        const hslResponse = await fetch(HSLUrl, {
+        const transportUrl = process.env.TRANSPORT_URL;
+        const transportUrlResponse = await fetch(transportUrl, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
-                "digitransit-subscription-key": process.env.HSL_KEY
+                "digitransit-subscription-key": process.env.TRANSPORT_KEY
             },
             body: JSON.stringify({ query }),
         });
 
-        if (!hslResponse.ok) {
-            const text = await hslResponse.text();
-            console.error("HSL API HTTP error:", hslResponse.status, text);
-            return res.status(hslResponse.status).json({ error: text });
+        if (!transportUrlResponse.ok) {
+            const text = await transportUrlResponse.text();
+            console.error("Transportation API HTTP error:", transportUrlResponse.status, text);
+            return res.status(transportUrlResponse.status).json({ error: text });
         }
 
         let result;
         try {
-            result = await hslResponse.json();
+            result = await transportUrlResponse.json();
         } catch {
-            const text = await hslResponse.text();
-            console.error("HSL API invalid JSON:", text);
-            return res.status(500).json({ error: "Invalid JSON from HSL API" });
+            const text = await transportUrlResponse.text();
+            console.error("Transportation API invalid JSON:", text);
+            return res.status(500).json({ error: "Invalid JSON from Transportation API" });
         }
 
         if (!result?.data?.plan?.itineraries) {
-            console.warn("HSL API returned no routes:", result);
+            console.warn("Transportation API returned no routes:", result);
             return res.status(404).json({ error: "No routes found" });
         }
 

@@ -3,7 +3,7 @@ import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
 import FloatingInput from "./ui/FloatingInput";
 import SwapButton from "./ui/SwapButton";
 import RouteList from "./RouteList";
-import useHSLRouting from "../../hooks/useHSLRouting";
+import useTransportRouting from "../../hooks/useTransportRouting";
 import useField from "../../hooks/useField";
 
 // Safe validator for inputs
@@ -17,7 +17,7 @@ function SearchArea({
   date, setDate, time, setTime, routes, setRoutes, isDarkMode,
   formInputRef, activeRouteIndex, setActiveRouteIndex
 }) {
-  const { loading: routeLoading, searchRoute } = useHSLRouting();
+  const { loading: routeLoading, searchRoute } = useTransportRouting();
 
   const fromField = useField("text", "", validateInput);
   const toField = useField("text", "", validateInput);

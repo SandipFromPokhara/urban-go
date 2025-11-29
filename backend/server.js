@@ -1,16 +1,12 @@
+require("dotenv").config();
 const express = require("express");
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
 const cors = require("cors");
 
 // Import routes
 const connectDB = require("./src/config/db");
 const authMiddleware = require("./src/middlewares/authMiddleware");
 const authRoutes = require("./src/routes/authRoutes");
-const hslRoutes = require("./src/routes/hslRoutes");
-//console.log("AUTH ROUTES:", authRoutes); 
-// Load environment variables
-dotenv.config();
+const transportRoutes = require("./src/routes/transportRoutes");
 
 const app = express();
 
@@ -19,14 +15,7 @@ app.use(express.json());
 app.use(cors());
 
 // Route for transportation
-app.use("/api", hslRoutes);
-// Connect to database
-connectDB();
-
-// Simple test route
-app.get("/", (req, res) => {
-  res.send("Backend server is running ✅");
-});
+app.use("/api", transportRoutes);
 
 // Protected route: requires a valid JWT token
 app.get("/api/protectedroute", authMiddleware, (req, res) => {
@@ -38,6 +27,9 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
 
 // API Routes
 app.use("/api/auth", authRoutes);
+
+// Connect to database
+connectDB();
 
 // 404 Handler
 app.use((req, res) => {
