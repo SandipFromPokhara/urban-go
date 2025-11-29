@@ -10,13 +10,16 @@ import TransportPage from "./pages/TransportPage";
 import AuthPage from "./pages/AuthPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { useEffect, useState } from "react";
+import { FavoritesProvider } from "./context/favoritesContext";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Detect system dark mode
   useEffect(() => {
-    const darkModePref = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const darkModePref = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
     setIsDarkMode(darkModePref);
   }, []);
 
@@ -27,19 +30,30 @@ function App() {
   }, [isDarkMode]);
 
   return (
-    <HashRouter>
+    <FavoritesProvider>
+      <HashRouter>
         <Header />
-          <Routes>
-            {/* Use relative paths (no leading /) */}
-            <Route path="" element={<Home isDarkMode={isDarkMode} />} />
-            <Route path="events" element={<EventsList isDarkMode={isDarkMode} />} />
-            <Route path="events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
-            <Route path="transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
-            <Route path="login" element={<AuthPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+        <Routes>
+          {/* Use relative paths (no leading /) */}
+          <Route path="" element={<Home isDarkMode={isDarkMode} />} />
+          <Route
+            path="events"
+            element={<EventsList isDarkMode={isDarkMode} />}
+          />
+          <Route
+            path="events/:id"
+            element={<EventDetails isDarkMode={isDarkMode} />}
+          />
+          <Route
+            path="transportation"
+            element={<TransportPage isDarkMode={isDarkMode} />}
+          />
+          <Route path="login" element={<AuthPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
         <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-    </HashRouter>
+      </HashRouter>
+    </FavoritesProvider>
   );
 }
 

@@ -11,7 +11,6 @@ const commentsRoutes = require("./src/routes/commentsRoutes");
 
 console.log("AUTH ROUTES:", authRoutes); 
 // Load environment variables
-dotenv.config();
 const transportRoutes = require("./src/routes/transportRoutes");
 
 const app = express();
