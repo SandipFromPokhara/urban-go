@@ -1,5 +1,5 @@
 // AuthPage.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import Login from "../components/signup/Login.jsx";
 import Signup from "../components/signup/Signup.jsx";
 

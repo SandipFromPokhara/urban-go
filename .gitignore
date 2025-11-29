@@ -112,5 +112,14 @@ eslintcache
 backend/AI2/
 backend/mocks/
 backend/self-assessment/
+backend/controllers/authController.js
+backend/src/controllers/
+backend/server.js
+
 frontend/self-assessment/
 frontend/src/components/SignupPage/
+frontend/src/components/signup/
+frontend/src/pages/AuthPage.jsx/
+frontend/src/api/
+
+

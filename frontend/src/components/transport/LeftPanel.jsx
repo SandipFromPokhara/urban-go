@@ -1,3 +1,5 @@
+// src/components/transport/LeftPanel.jsx
+
 import bus from "../../assets/icons/bus.svg";
 import tram from "../../assets/icons/tram.svg";
 import train from "../../assets/icons/train.svg";
