@@ -2,22 +2,18 @@
 
 import { useState } from "react";
 
-export default function useField(
-  type = "text",
-  initialValue = "",
-  validator = () => ""
-) {
-  const [value, setValue] = useState(initialValue);
+export default function useField(type = "text", initialValue = "", validator = () => "") {
+  const [value, setValue] = useState(initialValue || ""); // always a string
   const [error, setError] = useState("");
 
   const onChange = (e) => {
-    const val = e.target.value;
+    const val = (e.target.value || "").toString();
     setValue(val);
     setError(validator(val));
   };
 
   const validate = () => {
-    const err = validator(value);
+    const err = validator(value || "");
     setError(err);
     return !err;
   };
@@ -27,5 +23,6 @@ export default function useField(
     setError("");
   };
 
-  return { type, value, onChange, reset, error, validate };
+  // Only return properties needed for <input>
+  return { type, value, onChange, error, validate, reset, setValue };
 }

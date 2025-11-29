@@ -1,5 +1,3 @@
-// src/components/transport/SearchArea.jsx
-
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
 import FloatingInput from "./ui/FloatingInput";
@@ -8,13 +6,21 @@ import RouteList from "./RouteList";
 import useHSLRouting from "../../hooks/useHSLRouting";
 import useField from "../../hooks/useField";
 
+// Safe validator for inputs
+const validateInput = (value) => {
+  const val = (value || "").trim();
+  if (!val) return "This field is required";
+  return "";
+};
+
 function SearchArea({
   date, setDate, time, setTime, routes, setRoutes, isDarkMode,
   formInputRef, activeRouteIndex, setActiveRouteIndex
 }) {
-  const { loading: routeLoading, validateInput, searchRoute } = useHSLRouting();
-  const fromField = useField("", validateInput);
-  const toField = useField("", validateInput);
+  const { loading: routeLoading, searchRoute } = useHSLRouting();
+
+  const fromField = useField("text", "", validateInput);
+  const toField = useField("text", "", validateInput);
 
   const inputClass = isDarkMode
     ? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400"
@@ -43,23 +49,24 @@ function SearchArea({
   return (
     <div
       className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-5 ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}
+        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
+      }`}
     >
       {/* Origin */}
       <FloatingInput
         ref={formInputRef}
-        type="text"
+        type={fromField.type}
         icon="start"
         placeholder="Enter origin"
-        value={fromField.value}           // managed by useField
+        value={fromField.value}
         onChange={fromField.onChange}
+        className={inputClass}
         onUseLocation={() => {
           navigator.geolocation.getCurrentPosition(
             (pos) => fromField.setValue(`${pos.coords.latitude},${pos.coords.longitude}`),
             () => alert("Failed to get location")
           );
         }}
-        className={inputClass}
       />
       {fromField.error && <p className="text-red-500 text-sm">{fromField.error}</p>}
 
@@ -76,15 +83,14 @@ function SearchArea({
 
       {/* Destination */}
       <FloatingInput
-      type="text"
-      icon="end"
-      placeholder="Enter destination"
-      value={toField.value}
-      onChange={toField.onChange}
-      className={inputClass}
+        type={toField.type}
+        icon="end"
+        placeholder="Enter destination"
+        value={toField.value}
+        onChange={toField.onChange}
+        className={inputClass}
       />
       {toField.error && <p className="text-red-500 text-sm">{toField.error}</p>}
-
 
       {/* Date & Time */}
       <div className="flex gap-4">
