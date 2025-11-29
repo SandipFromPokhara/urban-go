@@ -2,12 +2,18 @@
 
 import { useState } from "react";
 
-export default function useField(type = "text", initialValue = "", validator = () => "") {
+export default function useField(type = "text", initialValue = "", validator = () => "", maxLength = Infinity) {
   const [value, setValue] = useState(initialValue || ""); // always a string
   const [error, setError] = useState("");
 
   const onChange = (e) => {
-    const val = (e.target.value || "").toString();
+    let val = (e.target.value || "").toString();
+
+    // Apply maxLength
+    if (val.length > maxLength) {
+      val = val.slice(0, maxLength);
+    }
+    
     setValue(val);
     setError(validator(val));
   };

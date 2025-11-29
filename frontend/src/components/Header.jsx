@@ -28,7 +28,7 @@ function Header() {
 
   return (
     <motion.header
-      className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-[#2c1f5e] via-[#3b2a7a] to-[#1b1f55] backdrop-blur-sm"
+      className="fixed top-0 left-0 w-full z-50 bg-linear-to-b from-[#2c1f5e] via-[#3b2a7a] to-[#1b1f55] backdrop-blur-sm"
       animate={controls}
     >
       <div className="flex items-center justify-between h-20 px-6 py-4 text-white rounded-b-2xl">

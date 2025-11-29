@@ -19,8 +19,10 @@ function SearchArea({
 }) {
   const { loading: routeLoading, searchRoute } = useTransportRouting();
 
-  const fromField = useField("text", "", validateInput);
-  const toField = useField("text", "", validateInput);
+  const fromField = useField("text", "", validateInput, 110);
+  const toField = useField("text", "", validateInput, 110);
+
+  const MAX_INPUT_LENGTH = 110;
 
   const inputClass = isDarkMode
     ? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400"
@@ -36,11 +38,25 @@ function SearchArea({
   const handleSearch = async () => {
     if (!fromField.validate() || !toField.validate()) return;
 
+    // Validate input length
+    if (fromField.value.length > MAX_INPUT_LENGTH || toField.value.length > MAX_INPUT_LENGTH) {
+      alert("Origin or destination address is too long!");
+      return;
+    }
+
+    // Clear previous results immediately
+    setRoutes([]);
+
     try {
       const result = await searchRoute(fromField.value, toField.value);
-      if (result) setRoutes(result);
+      if (!result || result.length === 0) {
+        alert("No routes found for this query.");
+        return;
+      }
+      setRoutes(result);
     } catch (err) {
-      alert(err.message);
+      console.error("Search route error:", err);
+      alert("Failed to fetch routes. Please try again.");
     }
   };
 
@@ -48,72 +64,79 @@ function SearchArea({
 
   return (
     <div
-      className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-5 ${
+      className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-6 ${
         isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
       }`}
     >
-      {/* Origin */}
-      <FloatingInput
-        ref={formInputRef}
-        type={fromField.type}
-        icon="start"
-        placeholder="Enter origin"
-        value={fromField.value}
-        onChange={fromField.onChange}
-        className={inputClass}
-        onUseLocation={() => {
-          navigator.geolocation.getCurrentPosition(
-            (pos) => fromField.setValue(`${pos.coords.latitude},${pos.coords.longitude}`),
-            () => alert("Failed to get location")
-          );
-        }}
-      />
-      {fromField.error && <p className="text-red-500 text-sm">{fromField.error}</p>}
 
-      {/* Swap button */}
-      <div className="flex justify-center">
-        <motion.div
-          whileHover={{ scale: 1.1, rotate: 15 }}
-          whileTap={{ scale: 0.9, rotate: -15 }}
-          className="cursor-pointer"
-        >
-          <SwapButton onSwap={handleSwap} />
-        </motion.div>
+      {/* Search Inputs Container */}
+      <div className="flex flex-col gap-6">
+
+        {/* Origin + Swap */}
+        <div className="relative w-full max-w-md">
+          <FloatingInput
+            ref={formInputRef}
+            type={fromField.type}
+            icon="start"
+            placeholder="Enter origin"
+            value={fromField.value}
+            onChange={fromField.onChange}
+            className={`${inputClass} w-full`} // input fills container
+            onUseLocation={() => {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => fromField.setValue(`${pos.coords.latitude},${pos.coords.longitude}`),
+                () => alert("Failed to get location")
+              );
+            }}
+          />
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 15 }}
+            whileTap={{ scale: 0.9, rotate: -15 }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            <SwapButton onSwap={handleSwap} />
+          </motion.div>
+        </div>
+        {fromField.error && <p className="text-red-500 text-sm">{fromField.error}</p>}
+
+        {/* Destination */}
+        <div className="w-full max-w-md">
+          <FloatingInput
+            type={toField.type}
+            icon="end"
+            placeholder="Enter destination"
+            value={toField.value}
+            onChange={toField.onChange}
+            className={`${inputClass} w-full`} // same width as From input
+          />
+        </div>
+        {toField.error && <p className="text-red-500 text-sm">{toField.error}</p>}
+
+        {/* Date & Time */}
+        <div className="flex gap-4 w-full max-w-md">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className={`${inputClass} w-full px-4 py-2 border rounded-md outline-none focus:ring-2`}
+          />
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className={`${inputClass} w-full px-4 py-2 border rounded-md outline-none focus:ring-2`}
+          />
+        </div>
+
       </div>
 
-      {/* Destination */}
-      <FloatingInput
-        type={toField.type}
-        icon="end"
-        placeholder="Enter destination"
-        value={toField.value}
-        onChange={toField.onChange}
-        className={inputClass}
-      />
-      {toField.error && <p className="text-red-500 text-sm">{toField.error}</p>}
-
-      {/* Date & Time */}
-      <div className="flex gap-4">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
-        />
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
-        />
-      </div>
 
       {/* Search Button */}
       <button
         type="button"
         onClick={handleSearch}
         disabled={isSearchDisabled}
-        className={`flex items-center justify-center gap-2 px-5 py-2 rounded-md font-semibold
+        className={`w-full max-w-md flex items-center justify-center gap-2 px-5 py-2 rounded-md font-semibold
             transition-all duration-200 ease-in-out cursor-pointer hover:-translate-y-1
             ${isSearchDisabled ? "bg-gray-400 cursor-not-allowed"
                                : "bg-blue-500 hover:bg-blue-600"
