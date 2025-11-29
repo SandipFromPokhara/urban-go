@@ -7,7 +7,16 @@ export default defineConfig({
   base: "/urban-go/",
   plugins: [
     react(),
-    tailwindcss(),],        
+    tailwindcss(),
+  ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      },
+    },
+  },
 });
 
 

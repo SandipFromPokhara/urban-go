@@ -1,3 +1,5 @@
+// src/components/transport/MapSection.jsx
+
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Polyline } from "react-leaflet";
 import L from "leaflet";
 import LocateButton from "./LocateButton";
