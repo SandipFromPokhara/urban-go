@@ -1,6 +1,8 @@
 // src/hooks/useHSLRouting.js
 
 import { useState } from "react";
+const API_URL = import.meta.env.VITE_API  || "http://localhost:5001";
+console.log("API_URL:", API_URL);
 
 export default function useHSLRouting() {
     const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function useHSLRouting() {
         setLoading(true);
     
     try {
-        const res = await fetch ("http://localhost:3001/api/search-route", {
+        const res = await fetch (`${API_URL}/api/search-route`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ from, to }),
