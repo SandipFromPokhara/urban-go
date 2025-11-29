@@ -7,7 +7,7 @@ const cors = require("cors");
 const connectDB = require("./src/config/db");
 const authMiddleware = require("./src/middlewares/authMiddleware");
 const authRoutes = require("./src/routes/authRoutes");
-
+const hslRoutes = require("./src/routes/hslRoutes");
 //console.log("AUTH ROUTES:", authRoutes); 
 // Load environment variables
 dotenv.config();
@@ -18,6 +18,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Route for transportation
+app.use("/api", hslRoutes);
 // Connect to database
 connectDB();
 
