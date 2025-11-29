@@ -41,7 +41,6 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
     dark: "&copy; OpenStreetMap &copy; Carto",
   };
 
-  // Custom icons
   const getTransportIcon = (route) => {
     const icons = {
       metro: "orange",
@@ -50,7 +49,8 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
       walk: "yellow",
       train: "purple",
     };
-    const color = icons[route.modes[0]] || "yellow";
+    const mode = route.modes[0]?.m || "walk"; // safer access
+    const color = icons[mode] || "yellow";
     return new L.Icon({
       iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
       shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
@@ -58,6 +58,7 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
       iconAnchor: [12, 41],
     });
   };
+
 
   return (
     <div className={`relative w-full flex-1 h-full overflow-hidden rounded-lg shadow-xl/30 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
@@ -70,6 +71,8 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
         className="w-full h-full"
         whenCreated={(mapInstance) => (mapRef.current = mapInstance)}
       >
+
+
         <TileLayer
           url={mapStyle === "satellite" ? tiles.satellite : isDarkMode ? tiles.dark : tiles.street}
           attribution={mapStyle === "satellite" ? attribution.satellite : isDarkMode ? attribution.dark : attribution.street}
@@ -87,7 +90,7 @@ function MapSection({ routes, isDarkMode, mapStyle, setMapStyle, activeRouteInde
             <Popup>
               <strong>{route.name}</strong><br/>
               Duration: {route.duration} min<br/>
-              Modes: {route.modes.join(" → ")}
+              Modes: {route.modes.map(m => m.m.toUpperCase()).join(" → ")}
             </Popup>
 
           </Marker>
