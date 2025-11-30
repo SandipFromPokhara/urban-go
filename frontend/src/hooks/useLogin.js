@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const useLogin = (email, password) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,14 +32,13 @@ const useLogin = (email, password) => {
         throw new Error(data.message || "Login failed");
       }
 
-      // Store JWT token and user data in localStorage
+      // Store JWT token and user data via auth context
       if (data.token) {
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        login(data.token, data.user);
       }
 
       setLoading(false);
-      alert(`Welcome back, ${data.user.username}!`);
+      setError(null);
       navigate("/");
     } catch (err) {
       setLoading(false);

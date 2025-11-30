@@ -1,25 +1,32 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const useSignup = (formData) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { showSignupSuccess } = useAuth();
 
   const handleSignup = async () => {
-    // Validation
+    // Validation - Check each field individually for specific error messages
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       setError("Please fill all required fields");
       return;
     }
 
-    if (!formData.dateOfBirth || !formData.street || !formData.city || !formData.postalCode) {
-      setError("Please provide your date of birth and full address");
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+    if (!formData.dateOfBirth) {
+      setError("Please provide your date of birth");
+      return;
+    }
+
+    if (!formData.street || !formData.city || !formData.postalCode) {
+      setError("Please provide your full address");
       return;
     }
 
@@ -55,9 +62,11 @@ const useSignup = (formData) => {
         throw new Error(data.message || "Registration failed");
       }
 
+      // Show success message via context
       setLoading(false);
-      alert(`Registration successful! Welcome ${data.firstName}`);
-      navigate("/");
+      setError(null);
+      showSignupSuccess();
+      navigate("/login");
     } catch (err) {
       setLoading(false);
       setError(err.message);
