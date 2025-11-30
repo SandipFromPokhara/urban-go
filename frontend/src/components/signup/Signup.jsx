@@ -128,8 +128,8 @@ const Signup = ({ isDarkMode }) => {
             onChange={dateOfBirthField.onChange}
             name="dateOfBirth"
             onFocus={(e) => e.target.showPicker && e.target.showPicker()}
-            className={`${inputFieldClass} cursor-pointer ${!dateOfBirthField.value ? 'text-transparent' : ''}`}
-            style={{ colorScheme: 'light' }}
+            className={`${inputFieldClass} cursor-pointer ${!dateOfBirthField.value ? 'opacity-0' : ''}`}
+            style={{ colorScheme: isDarkMode ? 'dark' : 'light' }}
           />
           {!dateOfBirthField.value && (
             <span className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none font-inter text-base ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>
