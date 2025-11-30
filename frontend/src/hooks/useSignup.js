@@ -8,7 +8,7 @@ const useSignup = (formData) => {
 
   const handleSignup = async () => {
     // Validation
-    if (!formData.username || !formData.email || !formData.password) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       setError("Please fill all required fields");
       return;
     }
@@ -29,7 +29,8 @@ const useSignup = (formData) => {
     try {
       // Assemble payload matching backend User model
       const payload = {
-        username: formData.username,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
         dateOfBirth: formData.dateOfBirth,
@@ -55,7 +56,7 @@ const useSignup = (formData) => {
       }
 
       setLoading(false);
-      alert(`Registration successful! Welcome ${data.username}`);
+      alert(`Registration successful! Welcome ${data.firstName}`);
       navigate("/");
     } catch (err) {
       setLoading(false);
