@@ -6,9 +6,12 @@ const cors = require("cors");
 const connectDB = require("./src/config/db");
 const authMiddleware = require("./src/middlewares/authMiddleware");
 const authRoutes = require("./src/routes/authRoutes");
-const favoritesRoutes = require("./src/routes/favoritesRoutes");
-const commentsRoutes = require("./src/routes/commentsRoutes");
-const transportRoutes = require("./src/routes/transportRoutes");
+const eventsRoutes = require("./src/routes/eventsRoutes");
+
+//console.log("AUTH ROUTES:", authRoutes);
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 
@@ -29,8 +32,7 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
 
 // User API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/favorites", favoritesRoutes);
-app.use("/api/comments", commentsRoutes);
+app.use("/api/events", eventsRoutes);
 
 // 404 Handler
 app.use((req, res) => {

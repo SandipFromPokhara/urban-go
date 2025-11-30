@@ -1,64 +1,273 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SearchBar from '../components/events/SearchBar';
 import EventsGrid from '../components/events/EventsGrid';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Pagination from '../components/events/Pagination';
-import { getMockEvents } from '../utils/mockEventsData';
 import '../styles/events.css';
 
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
 
 const EventsList = ({ isDarkMode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalEvents, setTotalEvents] = useState(0);
+  
+  // Get current page from URL, default to 1
+  const currentPage = parseInt(searchParams.get('page')) || 1;
+  
+  // Get filters from URL params
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'date');
+  const [filters, setFilters] = useState({
+    category: searchParams.get('category') || '',
+    categoryKeywords: searchParams.get('keywords') ? searchParams.get('keywords').split(',') : [],
+    categoryText: searchParams.get('categoryText') || '',
+    location: searchParams.get('location') || '',
+    startDate: searchParams.get('startDate') || '',
+    endDate: searchParams.get('endDate') || ''
+  });
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  // Fetch events on component mount
+  // Function to fetch ALL events when location filter is active
+  const fetchAllEventsForLocation = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('Fetching ALL events for location filter...');
+
+      let allEvents = [];
+      let currentFetchPage = 1;
+      let totalPages = 1;
+      const PAGE_SIZE = 100; // Fetch 100 at a time
+
+      // Build query parameters (without location - we'll filter client-side)
+      const baseParams = {
+        page_size: PAGE_SIZE,
+        language: 'en',
+        start: filters.startDate || 'today'
+      };
+
+      if (filters.endDate) baseParams.end = filters.endDate;
+      if (filters.categoryKeywords?.length > 0) {
+        baseParams.keyword = filters.categoryKeywords.join(',');
+      }
+      
+      // Add search text (combining category text search if no keywords)
+      let searchText = searchTerm.trim();
+      if (filters.category && (!filters.categoryKeywords || filters.categoryKeywords.length === 0)) {
+        searchText = searchText 
+          ? `${filters.category.toLowerCase()} ${searchText}`
+          : filters.category.toLowerCase();
+      }
+      if (searchText) baseParams.text = searchText;
+      
+      if (sortBy) baseParams.sort = sortBy === 'date' || sortBy === 'recent' ? 'start_time' : 'name';
+
+      // Fetch pages until we have all events (max 5 pages = 500 events)
+      while (currentFetchPage <= totalPages && currentFetchPage <= 5) {
+        const params = new URLSearchParams({
+          ...baseParams,
+          page: currentFetchPage
+        });
+
+        console.log(`Fetching page ${currentFetchPage}/${totalPages}...`);
+        
+        const response = await fetch(`http://localhost:5000/api/events?${params}`);
+        if (!response.ok) throw new Error('Failed to fetch events');
+
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          allEvents = allEvents.concat(result.data);
+          totalPages = result.pagination?.total_pages || 1;
+          currentFetchPage++;
+        } else {
+          break;
+        }
+      }
+
+      console.log(`Fetched ${allEvents.length} total events from ${currentFetchPage - 1} pages`);
+
+      // Transform all events
+      let transformedEvents = allEvents.map(event => ({
+        id: event.apiId,
+        name: event.name?.en || event.name?.fi || 'Untitled Event',
+        description: event.shortDescription?.en || event.description?.en || '',
+        longDescription: event.description?.en || event.shortDescription?.en || '',
+        date: event.startTime,
+        endDate: event.endTime,
+        location: event.location?.name?.en || event.location?.city?.en || 'Helsinki',
+        fullLocation: {
+          name: event.location?.name?.en || '',
+          street: event.location?.streetAddress?.en || '',
+          city: event.location?.city?.en || '',
+          postalCode: event.location?.postalCode || ''
+        },
+        image: event.images?.[0]?.url || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400',
+        category: event.categories?.[0] || event.keywords?.[0]?.name?.en || '',
+        tags: event.categories || [],
+        isFree: event.offers?.[0]?.isFree || false,
+        ticketPrice: event.offers?.[0]?.isFree ? 'Free Entry' : (event.offers?.[0]?.price?.en || 'Check website'),
+        infoUrl: event.infoUrl?.en || '',
+        provider: event.provider?.en || '',
+        rawData: event
+      }));
+
+      // Filter by location
+      const filteredEvents = transformedEvents.filter(event => {
+        const cityMatch = event.fullLocation?.city?.toLowerCase() === filters.location.toLowerCase();
+        const locationMatch = event.location?.toLowerCase().includes(filters.location.toLowerCase());
+        return cityMatch || locationMatch;
+      });
+
+      console.log(`After location filter: ${filteredEvents.length} events in ${filters.location}`);
+
+      // Paginate filtered results
+      const totalFiltered = filteredEvents.length;
+      const totalPagesFiltered = Math.ceil(totalFiltered / EVENTS_PER_PAGE);
+      const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
+      const endIndex = startIndex + EVENTS_PER_PAGE;
+      const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
+
+      setEvents(paginatedEvents);
+      setTotalEvents(totalFiltered);
+      setTotalPages(totalPagesFiltered);
+      setLoading(false);
+
+    } catch (err) {
+      console.error('Error fetching all events:', err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  // Fetch when page or filters change
   useEffect(() => {
     fetchEvents();
-  }, []);
-
-  // Filter events when search term changes
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredEvents(events);
-    } else {
-      const filtered = events.filter(event =>
-        event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.location?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredEvents(filtered);
-    }
-    // Reset to page 1 when search changes
-    setCurrentPage(1);
-  }, [searchTerm, events]);
+  }, [currentPage, filters, searchTerm]); // Added searchTerm to dependencies
 
   const fetchEvents = async () => {
     try {
+      // If location filter is active, use special fetch all function
+      if (filters.location) {
+        await fetchAllEventsForLocation();
+        return;
+      }
+
       setLoading(true);
-      // Try to fetch from backend first, fallback to mock data
-      const response = await fetch('/api/events');
-      
-      if (response.ok) {
-        const data = await response.json();
-        setEvents(data);
-        setFilteredEvents(data);
+      setError(null);
+
+      // Build query parameters for normal pagination
+      const params = new URLSearchParams({
+        page: currentPage,
+        page_size: EVENTS_PER_PAGE,
+        language: 'en'
+      });
+
+      // Add date filters
+      if (filters.startDate) {
+        params.append('start', filters.startDate);
       } else {
-        // Use mock data if API fails
-        const mockData = getMockEvents();
-        setEvents(mockData);
-        setFilteredEvents(mockData);
+        params.append('start', 'today');
+      }
+
+      if (filters.endDate) {
+        params.append('end', filters.endDate);
+      }
+
+      // Add category filtering
+      if (filters.categoryKeywords && filters.categoryKeywords.length > 0) {
+        // Use comma-separated keywords for OR matching
+        params.append('keyword', filters.categoryKeywords.join(','));
+      }
+
+      // Add search text (combining category text search if no keywords)
+      let searchText = searchTerm.trim();
+      
+      // If category has no keywords, add category name to search
+      if (filters.category && (!filters.categoryKeywords || filters.categoryKeywords.length === 0)) {
+        searchText = searchText 
+          ? `${filters.category.toLowerCase()} ${searchText}`
+          : filters.category.toLowerCase();
+      }
+      
+      if (searchText) {
+        params.append('text', searchText);
+      }
+
+      // NOTE: Location filter is handled client-side, not sent to API
+      // This ensures consistent pagination
+
+      // Add sort parameter
+      if (sortBy) {
+        params.append('sort', sortBy);
+      }
+
+      console.log('Fetching with params:', Object.fromEntries(params));
+
+      const response = await fetch(`http://localhost:5000/api/events?${params}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Backend error:', response.status, errorText);
+        throw new Error('Failed to fetch events');
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Transform API data to match frontend format
+        let transformedEvents = result.data.map(event => ({
+          id: event.apiId,
+          name: event.name?.en || event.name?.fi || 'Untitled Event',
+          description: event.shortDescription?.en || event.description?.en || '',
+          longDescription: event.description?.en || event.shortDescription?.en || '',
+          date: event.startTime,
+          endDate: event.endTime,
+          location: event.location?.name?.en || event.location?.city?.en || 'Helsinki',
+          fullLocation: {
+            name: event.location?.name?.en || '',
+            street: event.location?.streetAddress?.en || '',
+            city: event.location?.city?.en || '',
+            postalCode: event.location?.postalCode || ''
+          },
+          image: event.images?.[0]?.url || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400',
+          category: event.categories?.[0] || event.keywords?.[0]?.name?.en || '',
+          tags: event.categories || [],
+          isFree: event.offers?.[0]?.isFree || false,
+          ticketPrice: event.offers?.[0]?.isFree ? 'Free Entry' : (event.offers?.[0]?.price?.en || 'Check website'),
+          infoUrl: event.infoUrl?.en || '',
+          provider: event.provider?.en || '',
+          rawData: event
+        }));
+
+        // Set events directly - trust API filtering
+        setEvents(transformedEvents);
+        setTotalEvents(result.pagination?.total || 0);
+        setTotalPages(result.pagination?.total_pages || 1);
+        
+        console.log('Results:', {
+          currentPage,
+          totalPages: result.pagination?.total_pages,
+          totalEvents: result.pagination?.total,
+          eventsOnThisPage: transformedEvents.length,
+          appliedFilters: filters,
+          searchTerm
+        });
+      } else {
+        throw new Error('Invalid response format');
       }
     } catch (err) {
-      // Fallback to mock data on error
-      console.log('Using mock data:', err.message);
-      const mockData = getMockEvents();
-      setEvents(mockData);
-      setFilteredEvents(mockData);
+      console.error('Error fetching events:', err);
+      setError(err.message);
+      setEvents([]);
+      setTotalPages(1);
+      setTotalEvents(0);
     } finally {
       setLoading(false);
     }
@@ -66,21 +275,69 @@ const EventsList = ({ isDarkMode }) => {
 
   const handleSearchChange = (value) => {
     setSearchTerm(value);
+    
+    // Update URL with search term
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set('search', value);
+    } else {
+      newParams.delete('search');
+    }
+    newParams.set('page', '1'); // Reset to page 1
+    setSearchParams(newParams);
+  };
+
+  const handleSortChange = (value) => {
+    setSortBy(value);
+    
+    // Update URL with sort parameter
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('sort', value);
+    newParams.set('page', '1'); // Reset to page 1
+    setSearchParams(newParams);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    
+    // Update URL with all filters
+    const newParams = new URLSearchParams();
+    newParams.set('page', '1'); // Reset to page 1
+    
+    if (newFilters.category) {
+      newParams.set('category', newFilters.category);
+    }
+    if (newFilters.categoryKeywords && newFilters.categoryKeywords.length > 0) {
+      newParams.set('keywords', newFilters.categoryKeywords.join(','));
+    }
+    if (newFilters.categoryText) {
+      newParams.set('categoryText', newFilters.categoryText);
+    }
+    if (newFilters.location) {
+      newParams.set('location', newFilters.location);
+    }
+    if (newFilters.startDate) {
+      newParams.set('startDate', newFilters.startDate);
+    }
+    if (newFilters.endDate) {
+      newParams.set('endDate', newFilters.endDate);
+    }
+    if (searchTerm) {
+      newParams.set('search', searchTerm);
+    }
+    
+    setSearchParams(newParams);
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-    // Scroll to top when page changes
+    // Preserve all existing params and just update page
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', page);
+    setSearchParams(newParams);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
-  const endIndex = startIndex + EVENTS_PER_PAGE;
-  const currentEvents = filteredEvents.slice(startIndex, endIndex);
-
-  if (loading) {
+  if (loading && currentPage === 1 && !searchTerm && !filters.category && !filters.startDate) {
     return <LoadingSpinner message="Loading events..." />;
   }
 
@@ -89,7 +346,6 @@ const EventsList = ({ isDarkMode }) => {
       <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ marginTop: '0', paddingTop: '0' }}>
         {/* Animated Hero Section */}
         <div className="hero-section">
-          {/* Grid Background */}
           <div className="hero-grid-background"></div>
 
           {/* 15 Floating Bubbles */}
@@ -127,17 +383,47 @@ const EventsList = ({ isDarkMode }) => {
           <SearchBar 
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            sortBy={sortBy}
+            filters={filters}
             isDarkMode={isDarkMode}
+            searching={searching}
           />
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className={`${isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg p-4`}>
+              <p className={`${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
+                Error loading events: {error}. Please try again later.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Loading indicator for page changes */}
+        {loading && (currentPage > 1 || searchTerm || filters.category || filters.startDate) && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {searching ? 'Searching...' : 'Loading events...'}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Events Grid */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <EventsGrid events={currentEvents} isDarkMode={isDarkMode} />
-        </div>
+        {!loading && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <EventsGrid events={events} isDarkMode={isDarkMode} />
+          </div>
+        )}
 
         {/* Pagination */}
-        {filteredEvents.length > 0 && (
+        {!loading && events.length > 0 && totalPages > 1 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
             <Pagination 
               currentPage={currentPage}
@@ -149,12 +435,14 @@ const EventsList = ({ isDarkMode }) => {
         )}
 
         {/* Results Count */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
-          <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-            Showing {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} of {filteredEvents.length} events
-            {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
-          </p>
-        </div>
+        {!loading && events.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
+            <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Showing {((currentPage - 1) * EVENTS_PER_PAGE) + 1}-{Math.min(currentPage * EVENTS_PER_PAGE, totalEvents)} of {totalEvents} events
+              {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
+            </p>
+          </div>
+        )}
       </div>
     </>
   );
