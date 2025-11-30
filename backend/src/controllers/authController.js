@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken");
  * - Validates required input fields for registration (username, email, password, dateOfBirth).
  * - Checks if the email is already registered (unique user check).
  * - Hashes user password securely before saving.
- * - Creates and stores the new user document in MongoDB.
+ * - Creates and stores the new user document in MongoDB. 
  * - Responds with confirmation (never sends password/hash back).
  *
  * @route POST /auth/register
@@ -18,11 +18,11 @@ const jwt = require("jsonwebtoken");
  */
 
 const register = async (req, res) => {
-  const { username, email, password, dateOfBirth, address } =
+  const { firstName, lastName, email, password, dateOfBirth, address } =
     req.body;
 
   // Validate registration input: All required fields must be provided.
-  if (!username || !email || !password || !dateOfBirth || !address) {
+  if (!firstName || !lastName || !email || !password || !dateOfBirth || !address) {
     return res.status(400).json({ message: "Missing required fields." });
   }
 
@@ -37,7 +37,8 @@ const register = async (req, res) => {
 
     // Create and store new user document in MongoDB collection.
     const user = await User.create({
-      username,
+      firstName,
+      lastName,
       email,
       password: hashed,
       dateOfBirth,
