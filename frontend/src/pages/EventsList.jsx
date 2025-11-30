@@ -77,7 +77,7 @@ const EventsList = ({ isDarkMode }) => {
 
         console.log(`Fetching page ${currentFetchPage}/${totalPages}...`);
         
-        const response = await fetch(`http://localhost:5000/api/events?${params}`);
+        const response = await fetch(`http://localhost:5001/api/events?${params}`);
         if (!response.ok) throw new Error('Failed to fetch events');
 
         const result = await response.json();
