@@ -71,7 +71,7 @@ const EventCard = ({ event, isDarkMode }) => {
       </div>
 
       {/* Event Details */}
-      <div className="p-4 flex-grow flex flex-col">
+      <div className="p-4 grow flex flex-col">
         <h3 className={`text-xl font-bold mb-2 line-clamp-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
           {event.name}
         </h3>
