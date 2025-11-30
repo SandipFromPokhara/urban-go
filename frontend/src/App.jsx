@@ -9,6 +9,7 @@ import TransportPage from "./pages/TransportPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import { AuthProvider } from "./context/AuthContext";
 import { useEffect, useState } from "react";
 
 function App() {
@@ -27,20 +28,22 @@ function App() {
   }, [isDarkMode]);
 
   return (
-    <HashRouter>
-        <Header />    
-          <Routes>
-            {/* Use relative paths (no leading /) */}
-            <Route path="" element={<Home isDarkMode={isDarkMode} />} />
-            <Route path="events" element={<EventsList isDarkMode={isDarkMode} />} />
-            <Route path="events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
-            <Route path="transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
-            <Route path="login" element={<LoginPage isDarkMode={isDarkMode} />} />
-            <Route path="signup" element={<SignupPage isDarkMode={isDarkMode} />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>  
-        <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />   
-    </HashRouter>
+    <AuthProvider>
+      <HashRouter>
+        <Header />
+        <Routes>
+          {/* Use relative paths (no leading /) */}
+          <Route path="" element={<Home isDarkMode={isDarkMode} />} />
+          <Route path="events" element={<EventsList isDarkMode={isDarkMode} />} />
+          <Route path="events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
+          <Route path="transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
+          <Route path="login" element={<LoginPage isDarkMode={isDarkMode} />} />
+          <Route path="signup" element={<SignupPage isDarkMode={isDarkMode} />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+        <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+      </HashRouter>
+    </AuthProvider>
   );
 }
 

@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 
-export default function useField(type = "text", initialValue = "", validator = () => "", maxLength = Infinity) {
+export default function useField(
+  type = "text",
+  initialValue = "",
+  validator = () => "",
+  maxLength = Infinity
+) {
   const [value, setValue] = useState(initialValue || ""); // always a string
   const [error, setError] = useState("");
 
@@ -13,7 +18,7 @@ export default function useField(type = "text", initialValue = "", validator = (
     if (val.length > maxLength) {
       val = val.slice(0, maxLength);
     }
-    
+
     setValue(val);
     setError(validator(val));
   };
