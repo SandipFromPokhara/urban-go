@@ -1,3 +1,5 @@
+// src/components/transport/ui/FloatingInput.jsx
+
 import { forwardRef } from "react";
 import { FiMapPin, FiTarget, FiCrosshair } from "react-icons/fi";
 

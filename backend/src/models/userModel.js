@@ -1,16 +1,22 @@
-// backend/models/userModel.js
+// backend/src/models/userModel.js
 
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const { Schema, model } = mongoose;
-
-const userSchema = new Schema(
+const userSchema = mongoose.Schema(
   {
-    username: {
+    firstName: {
       type: String,
       required: true,
       minlength: 3,
-      maxlength: 50,
+      maxlength: 20,
+    },
+
+    lastName: {
+      type: String,
+      required: true,
+      minlength: 3,
+      maxlength: 20,
     },
 
     email: {
@@ -77,18 +83,50 @@ const userSchema = new Schema(
     reviews: [
       {
         eventId: { type: String, required: true },
-        comment: { type: String, required: true },
         rating: { type: Number, min: 1, max: 5 },
         createdAt: { type: Date, default: Date.now },
       },
     ],
-
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   { timestamps: true }
 );
 
-module.exports = model("User", userSchema);
+// static signup method
+userSchema.statics.signup = async function ( firstName, lastName, email, password, dateOfBirth, address ) {
+
+  const userExists = await this.findOne({ email });
+  if (userExists) throw Error("User already exists")
+
+  const salt = await bcrypt.genSalt(12);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const user = await this.create({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
+    dateOfBirth,
+    address,
+  });
+
+  return user;
+};
+
+userSchema.statics.login = async function(email, password) {
+
+  const user = await this.findOne({ email });
+  if (!user) throw Error("Incorrect email");
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) throw Error("Incorrect password");
+
+  return user;
+};
+
+module.exports = mongoose.model("User", userSchema);

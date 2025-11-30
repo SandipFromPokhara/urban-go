@@ -1,6 +1,5 @@
+require("dotenv").config();
 const express = require("express");
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
 const cors = require("cors");
 
 // Import routes
@@ -20,13 +19,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Connect to database
-connectDB();
-
-// Simple test route
-app.get("/", (req, res) => {
-  res.send("Backend server is running ✅");
-});
+// Transportation API route
+app.use("/api", transportRoutes);
 
 // Protected route: requires a valid JWT token
 app.get("/api/protectedroute", authMiddleware, (req, res) => {
@@ -36,7 +30,7 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
   });
 });
 
-// API Routes
+// User API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventsRoutes);
 
@@ -45,7 +39,10 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-const PORT = process.env.TEST_PORT || 5000;
+// Connect to database
+connectDB();
+
+const PORT = process.env.TEST_PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Test server listening on port ${PORT}`);
 });

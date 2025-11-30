@@ -8,6 +8,7 @@ import EventsList from "./pages/EventsList";
 import EventDetails from "./pages/EventDetails";
 import TransportPage from "./pages/TransportPage";
 import AuthPage from "./pages/AuthPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import { useEffect, useState } from "react";
 
 function App() {
@@ -27,18 +28,17 @@ function App() {
 
   return (
     <HashRouter>
-      <Header />
-      <Routes>
-        {/* Use relative paths (no leading /) */}
-        <Route path="" element={<Home isDarkMode={isDarkMode} />} />
-        <Route path="events" element={<EventsList isDarkMode={isDarkMode} />} />
-        <Route path="events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
-        <Route path="transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
-        <Route path="login" element={<AuthPage />} />
-        {/* Catch-all route redirects to home */}
-        <Route path="*" element={<Navigate to="" replace />} />
-      </Routes>
-      <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <Header />
+          <Routes>
+            {/* Use relative paths (no leading /) */}
+            <Route path="" element={<Home isDarkMode={isDarkMode} />} />
+            <Route path="events" element={<EventsList isDarkMode={isDarkMode} />} />
+            <Route path="events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
+            <Route path="transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
+            <Route path="login" element={<AuthPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
     </HashRouter>
   );
 }
