@@ -1,5 +1,5 @@
 // AuthPage.jsx
-import { useState } from "react";
+import React, { useState } from "react";
 import Login from "../components/signup/Login.jsx";
 import Signup from "../components/signup/Signup.jsx";
 
@@ -7,8 +7,9 @@ const AuthPage = () => {
   const [page, setPage] = useState("login");
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ marginTop: '0', paddingTop: '0' }}>
-     <section className="hero-section" style={{ padding: '20px 10px' }}>
+    <section className="hero-section">
+      <div className="auth-outer-wrapper">
+        <div className="auth-inner-content scroll-wrapper">
           {page === "login" ? <Login /> : <Signup />}
           {/* Switch links */}
           <div
@@ -17,9 +18,6 @@ const AuthPage = () => {
               justifyContent: "center",
               marginTop: "20px",
               fontSize: "16px",
-              fontSize: "14px", // Reduced for mobile
-              padding: "0 20px", // Add horizontal padding
-              textAlign: "center",// Center text on mobile
             }}
           >
             {page === "login" ? (
@@ -52,8 +50,9 @@ const AuthPage = () => {
               </span>
             )}
           </div>
+        </div>
+      </div>
     </section>
-    </div>
   );
 };
 
