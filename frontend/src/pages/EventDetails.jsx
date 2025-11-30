@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, MapPin, Clock, ArrowLeft, Heart, Share2, Users, ExternalLink } from 'lucide-react';
+import { useFavorites } from "../context/FavoritesContext";
 
 const EventDetails = ({ isDarkMode }) => {
   const { id } = useParams();
@@ -9,7 +10,7 @@ const EventDetails = ({ isDarkMode }) => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   // Get the full search params user came from (includes page, filters, etc.)
   const fromSearch = location.state?.fromSearch || '?page=1';
@@ -20,7 +21,7 @@ const EventDetails = ({ isDarkMode }) => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`http://localhost:5000/api/events/${id}?language=en`);
+        const response = await fetch(`http://localhost:5001/api/events/${id}?language=en`);
         
         if (!response.ok) {
           throw new Error('Event not found');
@@ -102,9 +103,9 @@ const EventDetails = ({ isDarkMode }) => {
     navigate('/transportation');
   };
 
-  const handleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    // TODO: Implement favorite saving to backend
+  const handleFavoriteClick = (e) => {
+    e.stopPropagation();
+    toggleFavorite(event);
   };
 
   const handleShare = async () => {
@@ -177,23 +178,23 @@ const EventDetails = ({ isDarkMode }) => {
             e.target.src = 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800';
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
         
         {/* Action Buttons */}
         <div className="absolute top-4 right-4 flex gap-2" style={{ zIndex: 10 }}>
           <button
-            onClick={handleFavorite}
+            onClick={handleFavoriteClick}
             className="p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
             style={{
-              backgroundColor: isFavorite ? '#ef4444' : '#ffffff',
+              backgroundColor: isFavorite(event.id) ? '#ef4444' : '#ffffff',
               border: 'none',
               cursor: 'pointer'
             }}
           >
             <Heart
               style={{
-                color: isFavorite ? '#ffffff' : '#374151',
-                fill: isFavorite ? '#ffffff' : 'none',
+                color: isFavorite(event.id) ? '#ffffff' : '#374151',
+                fill: isFavorite(event.id) ? '#ffffff' : 'none',
                 width: '20px',
                 height: '20px'
               }}

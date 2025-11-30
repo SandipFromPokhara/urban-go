@@ -1,6 +1,6 @@
 import { Calendar, MapPin, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useFavorites } from "../../context/favoritesContext";
+import { useFavorites } from "../../context/FavoritesContext";
 
 const FavoriteCard = ({ event }) => {
   const navigate = useNavigate();

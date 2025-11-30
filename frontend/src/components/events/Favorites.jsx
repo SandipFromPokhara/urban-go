@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import FavoriteCard from "./FavoriteCard";
-import { useFavorites } from "../../context/favoritesContext";
+import FavoriteCard from "./FavoritesCard";
+import { useFavorites } from "../../context/FavoritesContext";
 
 const Favorites = ({ isDarkMode }) => {
   const { favorites } = useFavorites();

@@ -10,7 +10,7 @@ import TransportPage from "./pages/TransportPage";
 import AuthPage from "./pages/AuthPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { useEffect, useState } from "react";
-import { FavoritesProvider } from "./context/favoritesContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
