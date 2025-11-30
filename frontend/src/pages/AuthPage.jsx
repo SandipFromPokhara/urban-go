@@ -1,4 +1,3 @@
-// AuthPage.jsx
 import { useState } from "react";
 import Login from "../components/signup/Login.jsx";
 import Signup from "../components/signup/Signup.jsx";
@@ -7,53 +6,37 @@ const AuthPage = () => {
   const [page, setPage] = useState("login");
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ marginTop: '0', paddingTop: '0' }}>
-     <section className="hero-section" style={{ padding: '20px 10px' }}>
-          {page === "login" ? <Login /> : <Signup />}
-          {/* Switch links */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "20px",
-              fontSize: "16px",
-              fontSize: "14px", // Reduced for mobile
-              padding: "0 20px", // Add horizontal padding
-              textAlign: "center",// Center text on mobile
-            }}
-          >
-            {page === "login" ? (
-              <span>
-                Don't have an account?{" "}
-                <span
-                  style={{
-                    color: "#2563eb",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                  }}
-                  onClick={() => setPage("signup")}
-                >
-                  Press here to register
-                </span>
+    <section className="bg-slate-50 text-slate-800 pt-24 pb-8 relative md:pt-20 md:pb-6 min-h-screen">
+
+      <div className="relative z-10 px-5 py-5">
+        {page === "login" ? <Login /> : <Signup />}
+        
+        {/* Switch links */}
+        <div className="flex justify-center mt-5 text-base px-5 text-center font-inter text-slate-700 md:text-sm">
+          {page === "login" ? (
+            <span>
+              Don't have an account?{" "}
+              <span
+                className="text-blue-600 cursor-pointer underline font-semibold hover:text-blue-700 transition-colors duration-200"
+                onClick={() => setPage("signup")}
+              >
+                Press here to register
               </span>
-            ) : (
-              <span>
-                Already have an account?{" "}
-                <span
-                  style={{
-                    color: "#2563eb",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                  }}
-                  onClick={() => setPage("login")}
-                >
-                  Press here to login
-                </span>
+            </span>
+          ) : (
+            <span>
+              Already have an account?{" "}
+              <span
+                className="text-blue-600 cursor-pointer underline font-semibold hover:text-blue-700 transition-colors duration-200"
+                onClick={() => setPage("login")}
+              >
+                Press here to login
               </span>
-            )}
-          </div>
+            </span>
+          )}
+        </div>
+      </div>
     </section>
-    </div>
   );
 };
 
