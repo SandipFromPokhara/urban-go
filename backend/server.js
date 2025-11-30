@@ -10,7 +10,6 @@ const favoritesRoutes = require("./src/routes/favoritesRoutes");
 const commentsRoutes = require("./src/routes/commentsRoutes");
 const eventsRoutes = require("./src/routes/eventsRoutes");
 
-console.log("AUTH ROUTES:", authRoutes); 
 // Load environment variables
 const transportRoutes = require("./src/routes/transportRoutes");
 
@@ -35,10 +34,10 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/favorites", favoritesRoutes);
 app.use("/api/comments", commentsRoutes);
-app.use("/api/events", eventsRoutes);
 
 // Connect to database
 connectDB();
+app.use("/api/events", eventsRoutes);
 
 // 404 Handler
 app.use((req, res) => {
