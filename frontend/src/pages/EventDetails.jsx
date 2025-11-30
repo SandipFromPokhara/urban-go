@@ -9,9 +9,11 @@ import {
   Share2,
   Users,
   ExternalLink,
+  Star,
 } from "lucide-react";
 import { useFavorites } from "../context/FavoritesContext";
 import CommentSection from "../components/events/CommentSection";
+import { getEventRatings, postRating } from "../hooks/ratings";
 
 const EventDetails = ({ isDarkMode }) => {
   const { id } = useParams();
@@ -21,9 +23,41 @@ const EventDetails = ({ isDarkMode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isFavorite, toggleFavorite } = useFavorites();
+  const [userRating, setUserRating] = useState(null);
+  const [averageRating, setAverageRating] = useState(null);
+  const [hoverRating, setHoverRating] = useState(0);
 
   // Get the full search params user came from (includes page, filters, etc.)
   const fromSearch = location.state?.fromSearch || "?page=1";
+  const getToken = () => localStorage.getItem("token");
+  const token = getToken();
+  let loggedIn = null;
+
+  if (token) {
+    try {
+      loggedIn = jwtDecode(token);
+    } catch (error) {
+      console.error("Token decode error:", error);
+    }
+  }
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      const { averageRating, userRating } = await getEventRatings(id, token);
+      setAverageRating(averageRating);
+      setUserRating(userRating);
+    };
+    fetchRatings();
+  }, [id, token]);
+
+  const handleRating = async (rating) => {
+    if (!getToken()) {
+      return alert("You must be logged in to rate events");
+    }
+    const { averageRating: newAverage } = await postRating(id, rating, token);
+    setUserRating(rating);
+    setAverageRating(newAverage);
+  };
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -162,17 +196,6 @@ const EventDetails = ({ isDarkMode }) => {
       window.open(event.infoUrl, "_blank", "noopener,noreferrer");
     }
   };
-
-  const token = localStorage.getItem("token");
-  let logedIn = null;
-
-  if (token) {
-    try {
-      logedIn = jwtDecode(token);
-    } catch (error) {
-      console.error("Token decode error:", error);
-    }
-  }
 
   const formatDate = (dateString) => {
     const options = {
@@ -505,6 +528,37 @@ const EventDetails = ({ isDarkMode }) => {
                     </p>
                   </div>
                 </div>
+                <div className="flex items-start gap-3">
+                  <p
+                    className={`font-semibold mb-1 ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    Your Rating
+                  </p>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <Star
+                        key={n}
+                        className={`w-6 h-6 cursor-pointer ${
+                          n <= (hoverRating || userRating)
+                            ? "text-yellow-400"
+                            : "text-gray-300"
+                        }`}
+                        onMouseEnter={() => setHoverRating(n)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        onClick={() => handleRating(n)}
+                      />
+                    ))}
+                    <span
+                      className={`${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      } ml-2`}
+                    >
+                      {userRating ? `${userRating} stars` : "No rating yet"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Ticket Price */}
@@ -526,6 +580,11 @@ const EventDetails = ({ isDarkMode }) => {
                 >
                   {event.ticketPrice}
                 </p>
+              </div>
+
+              <div className="mt-2">
+                <strong>Average Rating:</strong>{" "}
+                {averageRating ? averageRating.toFixed(1) : "No rating yet"}
               </div>
 
               {/* Action Buttons */}
@@ -627,10 +686,10 @@ const EventDetails = ({ isDarkMode }) => {
               />
               <span style={{ color: "#ffffff" }}>Back to Events</span>
             </button>
-            {logedIn ? (
+            {loggedIn ? (
               <CommentSection
                 eventId={event.id}
-                currentUser={logedIn}
+                currentUser={loggedIn}
                 isDarkMode={isDarkMode}
               />
             ) : (
