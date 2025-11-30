@@ -8,6 +8,7 @@ const authMiddleware = require("./src/middlewares/authMiddleware");
 const authRoutes = require("./src/routes/authRoutes");
 const favoritesRoutes = require("./src/routes/favoritesRoutes");
 const commentsRoutes = require("./src/routes/commentsRoutes");
+const eventsRoutes = require("./src/routes/eventsRoutes");
 
 console.log("AUTH ROUTES:", authRoutes); 
 // Load environment variables
@@ -34,6 +35,7 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/favorites", favoritesRoutes);
 app.use("/api/comments", commentsRoutes);
+app.use("/api/events", eventsRoutes);
 
 // Connect to database
 connectDB();
@@ -43,7 +45,7 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-const PORT = process.env.TEST_PORT || 5001;
+const PORT = process.env.TEST_PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Test server listening on port ${PORT}`);
 });
