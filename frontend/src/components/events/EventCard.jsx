@@ -1,11 +1,18 @@
 import { Calendar, MapPin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const EventCard = ({ event, isDarkMode }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleEventClick = () => {
-    navigate(`/events/${event.id}`);
+    // Save the entire current URL search params (includes page, filters, search, etc.)
+    const currentSearch = location.search;
+    
+    // Navigate to event details and pass the full search params
+    navigate(`/events/${event.id}`, { 
+      state: { fromSearch: currentSearch } 
+    });
   };
 
   const formatDate = (dateString) => {

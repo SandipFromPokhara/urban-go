@@ -7,8 +7,10 @@ const cors = require("cors");
 const connectDB = require("./src/config/db");
 const authMiddleware = require("./src/middlewares/authMiddleware");
 const authRoutes = require("./src/routes/authRoutes");
+const eventsRoutes = require("./src/routes/eventsRoutes");
 
-//console.log("AUTH ROUTES:", authRoutes); 
+//console.log("AUTH ROUTES:", authRoutes);
+
 // Load environment variables
 dotenv.config();
 
@@ -36,6 +38,7 @@ app.get("/api/protectedroute", authMiddleware, (req, res) => {
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/events", eventsRoutes);
 
 // 404 Handler
 app.use((req, res) => {
