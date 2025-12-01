@@ -65,10 +65,8 @@ const EventDetails = ({ isDarkMode }) => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `http://localhost:5001/api/events/${id}?language=en`
-        );
-
+        const response = await fetch(`http://localhost:5001/api/events/${id}?language=en`);
+        
         if (!response.ok) {
           throw new Error("Event not found");
         }

@@ -118,4 +118,7 @@ frontend/self-assessment/
 frontend/src/components/SignupPage/
 frontend/src/api/
 
+# Personal documentation (not to be shared)
+AUTH_IMPLEMENTATION_SUMMARY.md
+
 

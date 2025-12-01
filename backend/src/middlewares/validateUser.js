@@ -44,7 +44,7 @@ const validateSignup = (req, res, next) => {
 
         next();
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({ message: err.message });
     }
 };
 
@@ -58,7 +58,7 @@ const validateLogin = (req, res, next) => {
 
         next();
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({ message: err.message });
     }
 }
 
