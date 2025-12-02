@@ -20,7 +20,7 @@ const SearchBar = ({
   }, [searchTerm]);
 
   const handleSearchClick = () => {
-    onSearchChange(localSearchTerm);
+    onSearchChange(localSearchTerm.trim());
   };
 
   const handleKeyPress = (e) => {
@@ -211,7 +211,7 @@ const SearchBar = ({
           >
             <Filter 
               className="w-4 h-4 transition-colors duration-200" 
-              style={{ color: showFilters || hasActiveFilters ? '#ffffff' : (isDarkMode ? '#3b82f6' : '#3b82f6') }} 
+              style={{ color: showFilters || hasActiveFilters ? '#ffffff' : (isDarkMode ? '#3b82f6' : '#574199') }} 
             />
             {hasActiveFilters && (
               <span 

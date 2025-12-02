@@ -15,10 +15,10 @@ const EventsList = ({ isDarkMode }) => {
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [totalEvents, setTotalEvents] = useState(0);
-  
+
   // Get current page from URL, default to 1
   const currentPage = parseInt(searchParams.get('page')) || 1;
-  
+
   // Get filters from URL params
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'date');
@@ -56,17 +56,30 @@ const EventsList = ({ isDarkMode }) => {
       if (filters.categoryKeywords?.length > 0) {
         baseParams.keyword = filters.categoryKeywords.join(',');
       }
-      
+
       // Add search text (combining category text search if no keywords)
       let searchText = searchTerm.trim();
       if (filters.category && (!filters.categoryKeywords || filters.categoryKeywords.length === 0)) {
-        searchText = searchText 
+        searchText = searchText
           ? `${filters.category.toLowerCase()} ${searchText}`
           : filters.category.toLowerCase();
       }
       if (searchText) baseParams.text = searchText;
-      
+
       if (sortBy) baseParams.sort = sortBy === 'date' || sortBy === 'recent' ? 'start_time' : 'name';
+
+      // 🔢 BLOCK ONLY "ONLY NUMBERS" SEARCH TERMS
+      const trimmed = searchTerm.trim();
+      const onlyNumbers = trimmed !== '' && /^[0-9]+$/.test(trimmed);
+
+      if (onlyNumbers) {
+        console.log('Search is only numbers, showing no results');
+        setEvents([]);
+        setTotalEvents(0);
+        setTotalPages(0);
+        setLoading(false);
+        return;
+      }
 
       // Fetch pages until we have all events (max 5 pages = 500 events)
       while (currentFetchPage <= totalPages && currentFetchPage <= 5) {
@@ -76,12 +89,12 @@ const EventsList = ({ isDarkMode }) => {
         });
 
         console.log(`Fetching page ${currentFetchPage}/${totalPages}...`);
-        
+
         const response = await fetch(`http://localhost:5001/api/events?${params}`);
         if (!response.ok) throw new Error('Failed to fetch events');
 
         const result = await response.json();
-        
+
         if (result.success && result.data) {
           allEvents = allEvents.concat(result.data);
           totalPages = result.pagination?.total_pages || 1;
@@ -118,6 +131,24 @@ const EventsList = ({ isDarkMode }) => {
         rawData: event
       }));
 
+      // Filter out past events and invalid dates (before 2020)
+      const now = new Date();
+      now.setHours(0, 0, 0, 0); // Set to start of today
+      const cutoffDate = new Date('2020-01-01');
+
+      transformedEvents = transformedEvents.filter(event => {
+        if (!event.date) return false;
+        const eventDate = new Date(event.date);
+        if (isNaN(eventDate.getTime())) return false;
+        if (eventDate < cutoffDate) return false;
+
+        // Compare dates only (not times)
+        const eventDateOnly = new Date(eventDate);
+        eventDateOnly.setHours(0, 0, 0, 0);
+
+        return eventDateOnly >= now;
+      });
+
       // Filter by location
       const filteredEvents = transformedEvents.filter(event => {
         const cityMatch = event.fullLocation?.city?.toLowerCase() === filters.location.toLowerCase();
@@ -125,7 +156,7 @@ const EventsList = ({ isDarkMode }) => {
         return cityMatch || locationMatch;
       });
 
-      console.log(`After location filter: ${filteredEvents.length} events in ${filters.location}`);
+      console.log(`After date + location filter: ${filteredEvents.length} events in ${filters.location}`);
 
       // Paginate filtered results
       const totalFiltered = filteredEvents.length;
@@ -145,11 +176,6 @@ const EventsList = ({ isDarkMode }) => {
       setLoading(false);
     }
   };
-
-  // Fetch when page or filters change
-  useEffect(() => {
-    fetchEvents();
-  }, [currentPage, filters, searchTerm]); // Added searchTerm to dependencies
 
   const fetchEvents = async () => {
     try {
@@ -188,20 +214,19 @@ const EventsList = ({ isDarkMode }) => {
 
       // Add search text (combining category text search if no keywords)
       let searchText = searchTerm.trim();
-      
+
       // If category has no keywords, add category name to search
       if (filters.category && (!filters.categoryKeywords || filters.categoryKeywords.length === 0)) {
-        searchText = searchText 
+        searchText = searchText
           ? `${filters.category.toLowerCase()} ${searchText}`
           : filters.category.toLowerCase();
       }
-      
+
       if (searchText) {
         params.append('text', searchText);
       }
 
       // NOTE: Location filter is handled client-side, not sent to API
-      // This ensures consistent pagination
 
       // Add sort parameter
       if (sortBy) {
@@ -210,8 +235,21 @@ const EventsList = ({ isDarkMode }) => {
 
       console.log('Fetching with params:', Object.fromEntries(params));
 
+      // 🔢 BLOCK ONLY "ONLY NUMBERS" SEARCH TERMS
+      const trimmed = searchTerm.trim();
+      const onlyNumbers = trimmed !== '' && /^[0-9]+$/.test(trimmed);
+
+      if (onlyNumbers) {
+        console.log('Search is only numbers, showing no results');
+        setEvents([]);
+        setTotalEvents(0);
+        setTotalPages(0);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(`http://localhost:5001/api/events?${params}`);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Backend error:', response.status, errorText);
@@ -219,7 +257,7 @@ const EventsList = ({ isDarkMode }) => {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         // Transform API data to match frontend format
         let transformedEvents = result.data.map(event => ({
@@ -246,11 +284,51 @@ const EventsList = ({ isDarkMode }) => {
           rawData: event
         }));
 
-        // Set events directly - trust API filtering
+        // Filter out past events and invalid dates (before 2020)
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Set to start of today
+        const cutoffDate = new Date('2020-01-01');
+
+        transformedEvents = transformedEvents.filter(event => {
+          if (!event.date) {
+            console.log(`Excluding event with no date: ${event.name}`);
+            return false;
+          }
+
+          const eventDate = new Date(event.date);
+
+          // Check if date is valid
+          if (isNaN(eventDate.getTime())) {
+            console.log(`Excluding event with invalid date: ${event.name}`);
+            return false;
+          }
+
+          // Exclude events before 2020 (likely bad data)
+          if (eventDate < cutoffDate) {
+            console.log(`Excluding old event: ${event.name} (${event.date})`);
+            return false;
+          }
+
+          // Compare dates only (not times) - set event date to start of day
+          const eventDateOnly = new Date(eventDate);
+          eventDateOnly.setHours(0, 0, 0, 0);
+
+          // Show events from today onwards
+          const isUpcoming = eventDateOnly >= now;
+
+          if (!isUpcoming) {
+            console.log(`Excluding past event: ${event.name} (${event.date})`);
+          }
+
+          return isUpcoming;
+        });
+
+        console.log(`Filtered to ${transformedEvents.length} valid upcoming events`);
+
         setEvents(transformedEvents);
         setTotalEvents(result.pagination?.total || 0);
         setTotalPages(result.pagination?.total_pages || 1);
-        
+
         console.log('Results:', {
           currentPage,
           totalPages: result.pagination?.total_pages,
@@ -273,9 +351,14 @@ const EventsList = ({ isDarkMode }) => {
     }
   };
 
+  // Fetch when page or filters change
+  useEffect(() => {
+    fetchEvents();
+  }, [currentPage, filters, searchTerm]); // Added searchTerm to dependencies
+
   const handleSearchChange = (value) => {
     setSearchTerm(value);
-    
+
     // Update URL with search term
     const newParams = new URLSearchParams(searchParams);
     if (value) {
@@ -289,7 +372,7 @@ const EventsList = ({ isDarkMode }) => {
 
   const handleSortChange = (value) => {
     setSortBy(value);
-    
+
     // Update URL with sort parameter
     const newParams = new URLSearchParams(searchParams);
     newParams.set('sort', value);
@@ -299,11 +382,11 @@ const EventsList = ({ isDarkMode }) => {
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-    
+
     // Update URL with all filters
     const newParams = new URLSearchParams();
     newParams.set('page', '1'); // Reset to page 1
-    
+
     if (newFilters.category) {
       newParams.set('category', newFilters.category);
     }
@@ -325,7 +408,7 @@ const EventsList = ({ isDarkMode }) => {
     if (searchTerm) {
       newParams.set('search', searchTerm);
     }
-    
+
     setSearchParams(newParams);
   };
 
@@ -343,7 +426,10 @@ const EventsList = ({ isDarkMode }) => {
 
   return (
     <>
-      <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ marginTop: '0', paddingTop: '0' }}>
+      <div
+        className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}
+        style={{ marginTop: '0', paddingTop: '0' }}
+      >
         {/* Animated Hero Section */}
         <div className="hero-section">
           <div className="hero-grid-background"></div>
@@ -380,7 +466,7 @@ const EventsList = ({ isDarkMode }) => {
 
         {/* Search and Filter Section */}
         <div className="search-section">
-          <SearchBar 
+          <SearchBar
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
             onFilterChange={handleFilterChange}
@@ -395,7 +481,9 @@ const EventsList = ({ isDarkMode }) => {
         {/* Error Message */}
         {error && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className={`${isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg p-4`}>
+            <div
+              className={`${isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg p-4`}
+            >
               <p className={`${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
                 Error loading events: {error}. Please try again later.
               </p>
@@ -416,16 +504,47 @@ const EventsList = ({ isDarkMode }) => {
         )}
 
         {/* Events Grid */}
-        {!loading && (
+        {!loading && events.length > 0 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <EventsGrid events={events} isDarkMode={isDarkMode} />
+          </div>
+        )}
+
+        {/* No Results Message */}
+        {!loading && events.length === 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+            <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <svg
+                className="mx-auto h-12 w-12 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h3
+                className={`text-lg font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                }`}
+              >
+                No events found matching your search
+              </h3>
+              <p className="text-sm">
+                Try adjusting your filters or search terms
+              </p>
+            </div>
           </div>
         )}
 
         {/* Pagination */}
         {!loading && events.length > 0 && totalPages > 1 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-            <Pagination 
+            <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
@@ -438,7 +557,8 @@ const EventsList = ({ isDarkMode }) => {
         {!loading && events.length > 0 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
             <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Showing {((currentPage - 1) * EVENTS_PER_PAGE) + 1}-{Math.min(currentPage * EVENTS_PER_PAGE, totalEvents)} of {totalEvents} events
+              Showing {((currentPage - 1) * EVENTS_PER_PAGE) + 1}-
+              {Math.min(currentPage * EVENTS_PER_PAGE, totalEvents)} of {totalEvents} events
               {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
             </p>
           </div>
