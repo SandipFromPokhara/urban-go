@@ -14,6 +14,7 @@ import {
 import { useFavorites } from "../context/FavoritesContext";
 import CommentSection from "../components/events/CommentSection";
 import { getEventRatings, postRating } from "../hooks/ratings";
+import { jwtDecode } from "jwt-decode";
 
 const EventDetails = ({ isDarkMode }) => {
   const { id } = useParams();
@@ -29,7 +30,7 @@ const EventDetails = ({ isDarkMode }) => {
 
   // Get the full search params user came from (includes page, filters, etc.)
   const fromSearch = location.state?.fromSearch || "?page=1";
-  const getToken = () => localStorage.getItem("token");
+  const getToken = () => localStorage.getItem("authToken");
   const token = getToken();
   let loggedIn = null;
 
@@ -684,15 +685,11 @@ const EventDetails = ({ isDarkMode }) => {
               />
               <span style={{ color: "#ffffff" }}>Back to Events</span>
             </button>
-            {loggedIn ? (
               <CommentSection
-                eventId={event.id}
+                apiId={event.id}
                 currentUser={loggedIn}
                 isDarkMode={isDarkMode}
               />
-            ) : (
-              <p className="text-gray-500 mt-6">Sign in to post comments.</p>
-            )}
           </div>
         </div>
       </div>

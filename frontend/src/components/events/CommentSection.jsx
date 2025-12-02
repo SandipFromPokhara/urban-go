@@ -3,25 +3,25 @@ import { Trash2, Flag } from "lucide-react";
 
 import { getComments, addComment, deleteComment } from "../../hooks/comments";
 
-function CommentSection({ eventId, currentUser, isDarkMode }) {
+function CommentSection({ apiId, currentUser, isDarkMode }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
 
   // Load comments
   useEffect(() => {
     const load = async () => {
-      const data = await getComments(eventId);
+      const data = await getComments(apiId);
       setComments(data);
     };
 
     load();
-  }, [eventId]);
+  }, [apiId]);
 
   // Add comment
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
-    const data = await addComment(eventId, newComment);
+    const data = await addComment(apiId, newComment);
 
     // Append comment
     if (data && data._id) {
@@ -65,7 +65,9 @@ function CommentSection({ eventId, currentUser, isDarkMode }) {
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-semibold" style={{ color: isDarkMode ? "#ffffff" : "#111827" }}>
-                  {c.user?.username}
+                  {c.user
+                    ? `${c.user.firstName} ${c.user.lastName}`
+                    : "Unknown user"}
                 </p>
                 <p style={{ color: isDarkMode ? "#d1d5db" : "#374151" }}>{c.comment}</p>
                 <p style={{ color: isDarkMode ? "#9ca3af" : "#6b7280" }}>
@@ -76,8 +78,9 @@ function CommentSection({ eventId, currentUser, isDarkMode }) {
               <div className="flex flex-col items-center gap-2 ml-4">
                 {/* Delete button if owner/admin */}
                 {currentUser &&
-                  (currentUser.role === "admin" ||
-                    currentUser.userId === String(c.user?._id)) && (
+                  (currentUser.role?.toLowerCase() === "admin" ||
+                    String(currentUser._id || currentUser.userId) ===
+                      String(c.user?._id || c.user)) && (
                     <button onClick={() => handleDeleteComment(c._id)}>
                       <Trash2 className="w-5 h-5 hover:opacity-80" style={{color: isDarkMode ? "#ffffff" : "#111827"
                       }}/>

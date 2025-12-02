@@ -9,7 +9,7 @@ const {
 
 // only authenticated users can add or delete comments
 router.post("/", auth, addComment);
-router.get("/:eventId", getCommentsForEvent);
+router.get("/:apiId", getCommentsForEvent);
 router.delete("/:commentId", auth, deleteComment);
 
 module.exports = router;

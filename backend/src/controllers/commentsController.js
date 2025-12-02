@@ -4,16 +4,16 @@ const User = require("../models/userModel");
 // Add a new comment
 const addComment = async (req, res) => {
   const userId = req.user.userId;
-  const { eventId, comment } = req.body;
+  const { apiId, comment } = req.body;
   const username = req.user.firstName + " " + req.user.lastName;
 
-  if (!eventId || !comment) {
-    return res.status(400).json({ message: "Missing eventId or comment" });
+  if (!apiId || !comment) {
+    return res.status(400).json({ message: "Missing apiId or comment" });
   }
 
   try {
     const newComment = await Comment.create({
-      eventId,
+      apiId,
       user: userId,
       username: username,
       comment,
@@ -33,10 +33,10 @@ const addComment = async (req, res) => {
 
 // Get comments for an event
 const getCommentsForEvent = async (req, res) => {
-  const { eventId } = req.params;
+  const { apiId } = req.params;
 
   try {
-    const comments = await Comment.find({ eventId }).populate("user", "username");
+    const comments = await Comment.find({ apiId }).populate("user", "firstName lastName role");
     res.status(200).json(comments);
   } catch (error) {
     res
