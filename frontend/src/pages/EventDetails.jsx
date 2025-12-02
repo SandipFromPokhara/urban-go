@@ -527,6 +527,7 @@ const EventDetails = ({ isDarkMode }) => {
                     </p>
                   </div>
                 </div>
+                {/* User Rating */}
                 <div className="flex items-start gap-3">
                   <p
                     className={`font-semibold mb-1 ${

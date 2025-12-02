@@ -1,8 +1,8 @@
 const BASE_URL = 'http://localhost:5001/api/ratings';
 
-export const getEventRatings = async (eventId, token) => {
+export const getEventRatings = async (apiId, token) => {
   try {
-    const res = await fetch(`${BASE_URL}/event/${eventId}`, {
+    const res = await fetch(`${BASE_URL}/events/${apiId}/average`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
 
@@ -19,9 +19,9 @@ export const getEventRatings = async (eventId, token) => {
   }
 };
 
-export const postRating = async (eventId, rating, token) => {
+export const postRating = async (apiId, rating, token) => {
   try {
-    const res = await fetch(`${BASE_URL}/event/${eventId}`, {
+    const res = await fetch(`${BASE_URL}/events/${apiId}/rate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
