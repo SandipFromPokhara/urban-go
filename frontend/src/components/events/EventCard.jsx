@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useFavorites } from "../../context/FavoritesContext";
 import { getEventRatings } from "../../hooks/ratings";
 import { useEffect, useState } from "react";
+import StarRating from "./StarRating";
 
 const EventCard = ({ event, isDarkMode }) => {
   const navigate = useNavigate();
@@ -126,20 +127,8 @@ const EventCard = ({ event, isDarkMode }) => {
           </div>
         </div>
 
-<div className="flex items-center gap-1 mt-2">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <Star
-              key={n}
-              className={`w-5 h-5 ${
-                averageRating && n <= Math.round(averageRating)
-                  ? "text-yellow-400"
-                  : "text-gray-300"
-              }`}
-            />
-          ))}
-          <span className={`ml-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-            {averageRating ? averageRating.toFixed(1) : "No rating yet"}
-          </span>
+        <div className="mt-2">
+          <StarRating rating={averageRating} isDarkMode={isDarkMode} />
         </div>
 
         {/* Card Footer - Pushed to bottom */}
