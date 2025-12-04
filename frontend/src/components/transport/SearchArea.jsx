@@ -60,6 +60,8 @@ function SearchArea({
     selectToSuggestion(tempGeo);
   };
 
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
   const handleSearch = async () => {
     let from = fromSelectedGeo;
     let to = toSelectedGeo;
@@ -70,7 +72,7 @@ function SearchArea({
       const res = await fetch(`/api/autocomplete?q=${encodeURIComponent(fieldValue)}`);
       if (!res.ok) throw new Error(`Failed to fetch ${fieldName} suggestions.`);
       const json = await res.json();
-      if (!json.length) throw new Error(`${fieldName} not found in Capital Region.`);
+      if (!json.length) throw new Error(`${cap(fieldValue)} is located outside of Capital Region of Finland.`);
       return json[0]; // { name, lat, lon }
     };
 
@@ -87,6 +89,7 @@ function SearchArea({
         return;
       }
 
+      // Steps
       const formattedRoutes = result.map((itinerary) => {
         const legs = itinerary.legs || [];
 
@@ -95,6 +98,15 @@ function SearchArea({
           const start = leg.startTime ? new Date(leg.startTime) : null;
           const end = leg.endTime ? new Date(leg.endTime) : null;
           const durationMinutes = start && end ? Math.round((end - start) / 60000) : 0;
+
+          // intermediate stops
+          const intermediateStops = (leg.intermediatePlaces || []).map((ip) => ({
+            name: ip.name || ip.stop?.name || "",
+            code: ip.stop?.code || "",
+            lat: ip.stop?.lat || null,
+            lon: ip.stop?.lon || null,
+            platform: ip.stop?.platformCode || "",
+          }));
 
           return {
             mode: leg.mode.toLowerCase(),
@@ -106,6 +118,11 @@ function SearchArea({
             endTime: end ? end.toISOString() : null,
             routeShortName: leg.route?.shortName || "", // bus/tram/train number
             routeLongName: leg.route?.longName || "",   // full route name
+            zones: {
+              from: leg.from?.stop?.zoneId || "",
+              to: leg.to?.stop?.zoneId || "",
+            },
+            intermediateStops,
           };
         });
 
