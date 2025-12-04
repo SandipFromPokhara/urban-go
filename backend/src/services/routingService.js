@@ -1,11 +1,20 @@
 // backend/src/services/routingService.js
 
-const getRoutes = async (fromCoords, toCoords) => {
+const getRoutes = async (fromCoords, toCoords, dateTime ) => {
+  let dateArg = "";
+  if (dateTime) {
+    const dt = new Date(dateTime);
+    const dateStr = dt.toISOString().split("T")[0]; // yyyy-mm-dd
+    const timeStr = dt.toTimeString().split(" ")[0]; // HH:mm:ss
+    dateArg = `date: "${dateStr}", time: "${timeStr}"`;
+  }
+
   const query = `{
             plan(
                 from: {lat: ${fromCoords.lat}, lon: ${fromCoords.lon}}
                 to: {lat: ${toCoords.lat}, lon: ${toCoords.lon}}
                 numItineraries: 5
+                ${dateArg}
             ) {
                 itineraries {
                     duration

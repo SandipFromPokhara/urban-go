@@ -53,7 +53,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing coordinates" });
     }
 
-    const itineraries = await getRoutes(fromCoords, toCoords);
+    const itineraries = await getRoutes(fromCoords, toCoords, req.body.dateTime);
     if (!itineraries.length) return res.status(404).json({ error: "No routes found." });
 
     return res.json({ routes: itineraries });
