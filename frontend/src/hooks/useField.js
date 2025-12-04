@@ -15,10 +15,7 @@ export default function useField(
     let val = (e.target.value || "").toString();
 
     // Apply maxLength
-    if (val.length > maxLength) {
-      val = val.slice(0, maxLength);
-    }
-
+    if (val.length > maxLength) val = val.slice(0, maxLength);
     setValue(val);
     setError(validator(val));
   };
@@ -35,5 +32,5 @@ export default function useField(
   };
 
   // Only return properties needed for <input>
-  return { type, value, onChange, error, validate, reset, setValue };
+  return { inputProps: { type, value, onChange, maxLength  }, error, validate, reset, value, setValue };
 }

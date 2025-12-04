@@ -17,15 +17,26 @@ export default function useTransportRouting() {
         return "";
     };
 
-    const searchRoute = async (from, to) => {
+    const searchRoute = async (from, to, dateTime) => {
         setError("");
         setLoading(true);
     
     try {
+        const body = {
+            fromLat: from.lat,
+            fromLon: from.lon,
+            toLat: to.lat,
+            toLon: to.lon,
+        }
+
+        if (dateTime) {
+            body.dateTime = dateTime;
+        }
+
         const res = await fetch (`${API_URL}/api/search-route`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ from, to }),
+            body: JSON.stringify(body),
         });
 
         console.log("API_URL:", API_URL);

@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import MapSection from "../components/transport/MapSection";
 import HeroSection from "../components/transport/HeroSection";
 import SearchArea from "../components/transport/SearchArea";
-import RouteList from "../components/transport/RouteList";
 import RightPanel from "../components/transport/RightPanel";
 import MapInfoPanel from "../components/transport/MapInfoPanel"; 
 import "leaflet/dist/leaflet.css";
