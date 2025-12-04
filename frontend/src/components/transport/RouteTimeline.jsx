@@ -119,10 +119,20 @@ export default function RouteTimeline({
             {route.steps?.map((step, i) => {
               const mode = normalizeMode(step.mode);
               return (
-                <div key={i} className="flex items-center gap-1">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${modeColor(mode)}`}>
+                <div key={i} className="relative group flex flex-col items-center gap-1 overflow-visible">
+                  {/* Mode Icon */}
+                  <div className={`w-6 h-6 flex items-center justify-center text-white rounded-full ${modeColor(mode)}`}>
                     {modeIcon(mode)}
                   </div>
+
+                  {/* Hover Badge for Route Number */}
+                  {step.routeShortName && (
+                    <span className="absolute -top-6 text-xs font-semibold bg-gray-200 text-gray-700 px-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                      {step.routeShortName}
+                    </span>
+                  )}
+
+                  {/* Connector */}
                   {i < route.steps.length - 1 && <div className="w-6 h-1 bg-gray-300" />}
                 </div>
               );
@@ -131,22 +141,24 @@ export default function RouteTimeline({
 
           {/* Step Timeline */}
           {expandedIndex === idx && route.steps?.length > 0 && (
-            <div className="flex flex-col gap-2 mt-2 relative pl-8">
+            <div className="flex flex-col gap-2 mt-2 relative pl-2">
               {route.steps.map((step, i) => {
                 const mode = normalizeMode(step.mode);
                 return (
                   <div key={i} className="flex items-start gap-3 relative">
                     {/* Dot + Connector */}
                     <div className="absolute left-0 flex flex-col items-center">
-                      <div className={`w-4 h-4 rounded-full ${modeColor(mode)} border-2 border-white z-10`} />
+                      <div className={`w-2 h-2 rounded-full ${modeColor(mode)} border-2 border-white z-10`} />
                       {i < route.steps.length - 1 && <div className="w-px flex-1 bg-gray-300 mt-0.5" />}
                     </div>
 
                     {/* Step Info */}
-                    <div>
+                    <div className="pl-2">
                       <div className="flex items-center gap-2 font-semibold text-sm">
-                        {modeIcon(mode)} {mode.toUpperCase()} ({step.duration} min)
+                        {modeIcon(mode)}
+                        {mode.toUpperCase()} {step.routeShortName && ` ${step.routeShortName}`} ({step.duration} mins)
                       </div>
+
                       <div className="text-xs text-gray-400 ml-6">
                         {step.from_name} → {step.to_name} ({step.distance} km)
                         <br />
@@ -157,6 +169,13 @@ export default function RouteTimeline({
                           </span>
                         )}
                       </div>
+
+                      {step.routeLongName && (
+                        <div className="text-xs text-gray-500 ml-6">
+                          Route-info: {step.routeLongName}
+                        </div>
+                      )}
+
                     </div>
                   </div>
                 );
