@@ -104,6 +104,8 @@ function SearchArea({
             duration: durationMinutes,
             startTime: start ? start.toISOString() : null,
             endTime: end ? end.toISOString() : null,
+            routeShortName: leg.route?.shortName || "", // bus/tram/train number
+            routeLongName: leg.route?.longName || "",   // full route name
           };
         });
 
