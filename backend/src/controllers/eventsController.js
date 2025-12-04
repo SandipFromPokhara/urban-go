@@ -1,5 +1,5 @@
 const Event = require("../models/eventModel");
-const linkedEventsService = require("../services/linkedEventsService");
+const eventsService = require("../services/eventsService");
 
 /**
  * Get events with caching and filtering
@@ -21,7 +21,7 @@ exports.getEvents = async (req, res) => {
 
     console.log('getEvents called with params:', { start, end, keyword, text, location, sort, language, page, page_size });
 
-    // Fetch from LinkedEvents API for accurate total count and pagination
+    // Fetch from Events API for accurate total count and pagination
     const apiParams = {
       start,
       end,
@@ -42,7 +42,7 @@ exports.getEvents = async (req, res) => {
       console.log('Adding text search:', text.trim());
     }
 
-    // Add location filter (division parameter for LinkedEvents)
+    // Add location filter (division parameter for Events)
     // Maps city names to their division identifiers
     if (location && location.trim()) {
       const locationMap = {
@@ -58,19 +58,19 @@ exports.getEvents = async (req, res) => {
       }
     }
 
-    // Add sort parameter to LinkedEvents API
-    // LinkedEvents supports: start_time, end_time, name, duration, etc.
+    // Add sort parameter to Events API
+    // Events supports: start_time, end_time, name, duration, etc.
     if (sort === 'date' || sort === 'recent') {
       apiParams.sort = 'start_time'; // Sort by event start time
     } else if (sort === 'name') {
       apiParams.sort = 'name'; // Sort alphabetically
     }
 
-    console.log('Calling LinkedEvents API with params:', apiParams);
+    console.log('Calling Events API with params:', apiParams);
 
-    const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+    const apiResponse = await eventsService.fetchEvents(apiParams);
 
-    console.log('LinkedEvents API Response:', {
+    console.log('Events API Response:', {
       success: apiResponse.success,
       count: apiResponse.data?.length,
       total: apiResponse.meta?.count,
@@ -79,7 +79,7 @@ exports.getEvents = async (req, res) => {
     });
 
     if (!apiResponse.success) {
-      console.error('LinkedEvents API returned success: false');
+      console.error('Events API returned success: false');
       return res.status(200).json({
         success: true,
         source: "api",
@@ -94,7 +94,7 @@ exports.getEvents = async (req, res) => {
     }
 
     if (!apiResponse.data || !Array.isArray(apiResponse.data)) {
-      console.error('LinkedEvents API returned invalid data format');
+      console.error('Events API returned invalid data format');
       return res.status(200).json({
         success: true,
         source: "api",
@@ -109,7 +109,7 @@ exports.getEvents = async (req, res) => {
     }
 
     if (apiResponse.data.length === 0) {
-      console.log('LinkedEvents API returned 0 events');
+      console.log('Events API returned 0 events');
       return res.status(200).json({
         success: true,
         source: "api",
@@ -125,7 +125,7 @@ exports.getEvents = async (req, res) => {
 
     // Cache the fetched events in background
     const eventsToCache = apiResponse.data.map((event) =>
-      linkedEventsService.transformEvent(event)
+      eventsService.transformEvent(event)
     );
 
     console.log(`Transformed ${eventsToCache.length} events for response`);
@@ -185,7 +185,7 @@ exports.getEventById = async (req, res) => {
     }
 
     // Fetch from API
-    const apiResponse = await linkedEventsService.fetchEventById(id, language);
+    const apiResponse = await eventsService.fetchEventById(id, language);
 
     if (!apiResponse.success) {
       return res.status(404).json({
@@ -195,7 +195,7 @@ exports.getEventById = async (req, res) => {
     }
 
     // Transform and cache
-    const transformedEvent = linkedEventsService.transformEvent(
+    const transformedEvent = eventsService.transformEvent(
       apiResponse.data
     );
 
@@ -241,7 +241,7 @@ exports.refreshEvents = async (req, res) => {
       page_size = 100,
     } = req.query;
 
-    const apiResponse = await linkedEventsService.fetchEvents({
+    const apiResponse = await eventsService.fetchEvents({
       start,
       end,
       language,
@@ -257,7 +257,7 @@ exports.refreshEvents = async (req, res) => {
     }
 
     const eventsToCache = apiResponse.data.map((event) =>
-      linkedEventsService.transformEvent(event)
+      eventsService.transformEvent(event)
     );
 
     const cachePromises = eventsToCache.map((event) =>
