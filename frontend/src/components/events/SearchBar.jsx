@@ -1,5 +1,16 @@
 import { Search, Filter, X, Calendar, MapPin, Tag } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const MAIN_CATEGORIES = [
+  'Culture',
+  'Music',
+  'Art',
+  'History',
+  'Sports',
+  'Food & Drink',
+  'Theatre',
+  'Museum'
+];
 
 const SearchBar = ({ 
   searchTerm, 
@@ -14,8 +25,11 @@ const SearchBar = ({
   const [showFilters, setShowFilters] = useState(false);
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm || '');
 
+  // ⬇️ NO API FETCH — just use main categories
+  const categories = MAIN_CATEGORIES;
+
   // Update local state when prop changes
-  useState(() => {
+  useEffect(() => {
     setLocalSearchTerm(searchTerm || '');
   }, [searchTerm]);
 
@@ -29,61 +43,6 @@ const SearchBar = ({
     }
   };
 
-  // Categories with multiple filtering strategies for better accuracy
-  // Using both keyword IDs (when available) and text fallback
-  const categories = [
-    { 
-      name: 'Music', 
-      keywords: ['yso:p1808', 'yso:p11185'],  // Music, concerts
-      text: 'musiikki konsertti music concert'
-    },
-    { 
-      name: 'Arts & Culture', 
-      keywords: ['yso:p2739', 'yso:p5121', 'yso:p360'],  // Visual arts, art, culture
-      text: 'taide kulttuuri art culture gallery'
-    },
-    { 
-      name: 'Sports', 
-      keywords: ['yso:p965', 'yso:p916'],  // Sports, exercise
-      text: 'urheilu liikunta sport exercise'
-    },
-    { 
-      name: 'Food & Drink', 
-      keywords: ['yso:p3670', 'yso:p5261'],  // Food culture, gastronomy
-      text: 'ruoka juoma food drink gastronomy'
-    },
-    { 
-      name: 'Theater', 
-      keywords: ['yso:p2625', 'yso:p8113'],  // Theatre, drama
-      text: 'teatteri draama theatre drama performance'
-    },
-    { 
-      name: 'Technology', 
-      keywords: [],  // Empty - will use text search instead
-      text: 'teknologia digitalisaatio technology digital tech'
-    },
-    { 
-      name: 'Museum', 
-      keywords: ['yso:p4934', 'yso:p5121'],  // Museums, art
-      text: 'museo museum exhibition näyttely'
-    },
-    { 
-      name: 'Film', 
-      keywords: ['yso:p1235', 'yso:p16327'],  // Film, cinema
-      text: 'elokuva cinema film movie'
-    },
-    { 
-      name: 'Workshop', 
-      keywords: ['yso:p9270', 'yso:p2149'],  // Courses, education
-      text: 'kurssi workshop course opetus education'
-    },
-    { 
-      name: 'Kids & Family', 
-      keywords: ['yso:p4354', 'yso:p13050'],  // Children, families
-      text: 'lapset perhe children family kids'
-    }
-  ];
-
   // Helsinki Metropolitan Area locations
   const locations = [
     { name: 'All Locations', value: '' },
@@ -93,7 +52,6 @@ const SearchBar = ({
     { name: 'Kauniainen', value: 'kauniainen' }
   ];
 
-  const isInputActive = isInputHovered || isInputFocused;
   const hasActiveFilters = filters.category || filters.location || filters.startDate || filters.endDate;
 
   const handleClearFilters = () => {
@@ -109,12 +67,12 @@ const SearchBar = ({
 
   const handleFilterChange = (filterName, value) => {
     if (filterName === 'category') {
-      const selectedCategory = categories.find(cat => cat.name === value);
+      // Use the chosen main category as text search
       onFilterChange({
         ...filters,
         category: value,
-        categoryKeywords: selectedCategory ? selectedCategory.keywords : [],
-        categoryText: selectedCategory ? selectedCategory.text : ''
+        categoryKeywords: [],
+        categoryText: value ? value.toLowerCase() : ''
       });
     } else {
       onFilterChange({
@@ -247,7 +205,7 @@ const SearchBar = ({
         {showFilters && (
           <div className="mt-3 pt-3 border-t" style={{ borderColor: isDarkMode ? '#374151' : '#e5e7eb' }}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              {/* Category Filter */}
+              {/* Category Filter - LIMITED MAIN CATEGORIES */}
               <div className="relative">
                 <label 
                   className="block text-xs font-medium mb-1"
@@ -268,8 +226,8 @@ const SearchBar = ({
                 >
                   <option value="">All Categories</option>
                   {categories.map(category => (
-                    <option key={category.name} value={category.name}>
-                      {category.name}
+                    <option key={category} value={category}>
+                      {category}
                     </option>
                   ))}
                 </select>

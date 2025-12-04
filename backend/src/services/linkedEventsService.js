@@ -1,10 +1,11 @@
 const axios = require("axios");
 
-const LINKED_EVENTS_BASE_URL = "https://api.hel.fi/linkedevents/v1";
+// Use environment variable for API URL
+const LINKED_EVENTS_BASE_URL = process.env.EVENTS_URL || "https://api.hel.fi/linkedevents/v1";
 
-class LinkedEventsService {
+class EventsService {
   /**
-   * Fetch events from LinkedEvents API
+   * Fetch events from external Events API
    * @param {Object} params - Query parameters
    * @param {string} params.start - Start date (ISO format or 'today')
    * @param {string} params.end - End date (ISO format or 'next_week')
@@ -29,7 +30,7 @@ class LinkedEventsService {
         page: params.page || 1,
       };
 
-      // Add optional filters 
+      // Add optional filters (only if they have values)
       if (params.end) {
         queryParams.end = params.end;
       }
@@ -51,17 +52,17 @@ class LinkedEventsService {
         queryParams.text = params.text.trim();
       }
 
-      console.log('LinkedEvents API request:', {
+      console.log('External Events API request:', {
         url: `${LINKED_EVENTS_BASE_URL}/event/`,
         params: queryParams
       });
 
       const response = await axios.get(`${LINKED_EVENTS_BASE_URL}/event/`, {
         params: queryParams,
-        timeout: 10000, 
+        timeout: 10000, // 10 second timeout
       });
 
-      console.log('LinkedEvents API response:', {
+      console.log('External Events API response:', {
         status: response.status,
         dataCount: response.data.data?.length,
         totalCount: response.data.meta?.count
@@ -77,7 +78,7 @@ class LinkedEventsService {
         },
       };
     } catch (error) {
-      console.error("LinkedEvents API Error:", error.message);
+      console.error("External Events API Error:", error.message);
       
       if (error.response) {
         // API responded with error status
@@ -96,11 +97,11 @@ class LinkedEventsService {
             next: null,
             previous: null,
           },
-          error: `LinkedEvents API error: ${error.response.status} - ${error.response.statusText}`
+          error: `External Events API error: ${error.response.status} - ${error.response.statusText}`
         };
       } else if (error.request) {
         // Request made but no response
-        console.error('No response from LinkedEvents API');
+        console.error('No response from External Events API');
         return {
           success: false,
           data: [],
@@ -109,10 +110,10 @@ class LinkedEventsService {
             next: null,
             previous: null,
           },
-          error: "LinkedEvents API is not responding"
+          error: "External Events API is not responding"
         };
       } else {
-        // Other errors
+        // Something else happened
         console.error('Error setting up request:', error.message);
         return {
           success: false,
@@ -122,7 +123,7 @@ class LinkedEventsService {
             next: null,
             previous: null,
           },
-          error: `Error setting up LinkedEvents request: ${error.message}`
+          error: `Error setting up Events API request: ${error.message}`
         };
       }
     }
@@ -130,7 +131,7 @@ class LinkedEventsService {
 
   /**
    * Fetch a single event by ID
-   * @param {string} eventId - Event ID from LinkedEvents API
+   * @param {string} eventId - Event ID from external Events API
    * @param {string} language - Language code (en, fi, sv)
    * @returns {Promise<Object>} Single event data
    */
@@ -163,8 +164,8 @@ class LinkedEventsService {
   }
 
   /**
-   * Transform LinkedEvents API data to our schema format
-   * @param {Object} apiEvent - Event data from LinkedEvents API
+   * Transform external Events API data to our schema format
+   * @param {Object} apiEvent - Event data from external Events API
    * @returns {Object} Transformed event object
    */
   transformEvent(apiEvent) {
@@ -218,4 +219,4 @@ class LinkedEventsService {
   }
 }
 
-module.exports = new LinkedEventsService();
+module.exports = new EventsService();

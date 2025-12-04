@@ -1,137 +1,148 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
 import FloatingInput from "./ui/FloatingInput";
 import SwapButton from "./ui/SwapButton";
 import RouteList from "./RouteList";
+import useTransportRouting from "../../hooks/useTransportRouting";
+import useField from "../../hooks/useField";
+
+// Safe validator for inputs
+const validateInput = (value) => {
+  const val = (value || "").trim();
+  if (!val) return "This field is required";
+  return "";
+};
 
 function SearchArea({
-  from, setFrom, to, setTo,
-  date, setDate, time, setTime,
-  routes, setRoutes, isDarkMode,
-  formInputRef, loading, setLoading,
-  activeRouteIndex, setActiveRouteIndex,
-  swapLocations, fillCurrentLocation
+  date, setDate, time, setTime, routes, setRoutes, isDarkMode,
+  formInputRef, activeRouteIndex, setActiveRouteIndex
 }) {
-  const [showInfo, setShowInfo] = useState(false);
-  const [errors, setErrors] = useState({ from: "", to: "" });
+  const { loading: routeLoading, searchRoute } = useTransportRouting();
+
+  const fromField = useField("text", "", validateInput, 110);
+  const toField = useField("text", "", validateInput, 110);
+
+  const MAX_INPUT_LENGTH = 110;
 
   const inputClass = isDarkMode
     ? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400"
     : "bg-gray-50 border-gray-400 focus:ring-blue-500 text-gray-900 placeholder-gray-500";
 
-  const validateInput = (value) => {
-    const trimmed = value.trim();
-    if (!trimmed) return "Field cannot be empty";
-    if (trimmed.length < 3) return "Address is too short";
-    // Must contain letters and at least one space (mock basic realism)
-    if (!/[a-zA-Z]/.test(trimmed)) return "Must contain letters";
-    if (!/\s/.test(trimmed)) return "Enter a full address with space";
-
-    if (!/^[a-zA-Z0-9\s,.'-]+$/.test(trimmed)) return "Invalid characters";
-    return "";
+  // Swap origin/destination fields
+  const handleSwap = () => {
+    const temp = fromField.value;
+    fromField.setValue(toField.value);
+    toField.setValue(temp);
   };
 
-  const handleFromChange = (value) => {
-    setFrom(value);
-    setErrors((prev) => ({ ...prev, from: validateInput(value) }));
+  const handleSearch = async () => {
+    if (!fromField.validate() || !toField.validate()) return;
+
+    // Validate input length
+    if (fromField.value.length > MAX_INPUT_LENGTH || toField.value.length > MAX_INPUT_LENGTH) {
+      alert("Origin or destination address is too long!");
+      return;
+    }
+
+    // Clear previous results immediately
+    setRoutes([]);
+
+    try {
+      const result = await searchRoute(fromField.value, toField.value);
+      if (!result || result.length === 0) {
+        alert("No routes found for this query.");
+        return;
+      }
+      setRoutes(result);
+    } catch (err) {
+      console.error("Search route error:", err);
+      alert("Failed to fetch routes. Please try again.");
+    }
   };
 
-  const handleToChange = (value) => {
-    setTo(value);
-    setErrors((prev) => ({ ...prev, to: validateInput(value) }));
-  };
-
-  const handleSearch = () => {
-    const fromError = validateInput(from);
-    const toError = validateInput(to);
-    setErrors({ from: fromError, to: toError });
-
-    if (fromError || toError) return;
-
-    setLoading(true);
-    setShowInfo(false);
-
-    // Mock routes
-    setTimeout(() => {
-      const mockRoutes = [
-        { name: "Route 1", duration: 35, co2: 0, modes: ["bus", "metro"], info: "🚶 5 min, 🚌 510, 🚇 M1", steps: ["Walk 5 min to bus stop", "Take bus 510", "Transfer to metro M1"], position: [60.1699, 24.9384] },
-        { name: "Route 2", duration: 40, co2: 0, modes: ["walk", "tram"], info: "🚶 7 min, 🚋 6", steps: ["Walk 7 min", "Take tram 6"], position: [60.1921, 24.9458] },
-        { name: "Route 3", duration: 40, co2: 0, modes: ["bus", "walk"], info: "🚶 10 min, 🚋 41", steps: ["Walk 10 min", "Take bus 41"], position: [60.1746, 24.9678] }
-      ];
-      setRoutes(mockRoutes);
-      setShowInfo(true);
-      setLoading(false);
-    }, 800);
-  };
-
-  const isSearchDisabled = !!validateInput(from) || !!validateInput(to) || loading;
+  const isSearchDisabled = !!fromField.error || !!toField.error || routeLoading;
 
   return (
-    <div className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-5 ${isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}>
-      {/* Origin */}
-      <FloatingInput
-        ref={formInputRef}
-        type="text"
-        icon="start"
-        placeholder="Enter origin"
-        value={from}
-        onChange={(e) => handleFromChange(e.target.value)}
-        onUseLocation={fillCurrentLocation}
-        className={inputClass}
-      />
-      {errors.from && <p className="text-red-500 text-sm">{errors.from}</p>}
+    <div
+      className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-6 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
+      }`}
+    >
 
-      {/* Swap button */}
-      <div className="flex justify-center">
-        <motion.div
-          whileHover={{ scale: 1.1, rotate: 15 }}
-          whileTap={{ scale: 0.9, rotate: -15 }}
-          className="cursor-pointer"
-          onClick={swapLocations}
-        >
-          <SwapButton />
-        </motion.div>
+      {/* Search Inputs Container */}
+      <div className="flex flex-col gap-6">
+
+        {/* Origin + Swap */}
+        <div className="relative w-full max-w-md">
+          <FloatingInput
+            ref={formInputRef}
+            type={fromField.type}
+            icon="start"
+            placeholder="Enter origin"
+            value={fromField.value}
+            onChange={fromField.onChange}
+            className={`${inputClass} w-full`} // input fills container
+            onUseLocation={() => {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => fromField.setValue(`${pos.coords.latitude},${pos.coords.longitude}`),
+                () => alert("Failed to get location")
+              );
+            }}
+          />
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 15 }}
+            whileTap={{ scale: 0.9, rotate: -15 }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            <SwapButton onSwap={handleSwap} />
+          </motion.div>
+        </div>
+        {fromField.error && <p className="text-red-500 text-sm">{fromField.error}</p>}
+
+        {/* Destination */}
+        <div className="w-full max-w-md">
+          <FloatingInput
+            type={toField.type}
+            icon="end"
+            placeholder="Enter destination"
+            value={toField.value}
+            onChange={toField.onChange}
+            className={`${inputClass} w-full`} // same width as From input
+          />
+        </div>
+        {toField.error && <p className="text-red-500 text-sm">{toField.error}</p>}
+
+        {/* Date & Time */}
+        <div className="flex gap-4 w-full max-w-md">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className={`${inputClass} w-full px-4 py-2 border rounded-md outline-none focus:ring-2`}
+          />
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className={`${inputClass} w-full px-4 py-2 border rounded-md outline-none focus:ring-2`}
+          />
+        </div>
+
       </div>
 
-      {/* Destination */}
-      <FloatingInput
-        type="text"
-        icon="end"
-        placeholder="Enter destination"
-        value={to}
-        onChange={(e) => handleToChange(e.target.value)}
-        className={inputClass}
-      />
-      {errors.to && <p className="text-red-500 text-sm">{errors.to}</p>}
-
-      {/* Date & Time */}
-      <div className="flex gap-4">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
-        />
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className={`w-full px-4 py-2 border rounded-md outline-none focus:ring-2 ${inputClass}`}
-        />
-      </div>
 
       {/* Search Button */}
       <button
         type="button"
         onClick={handleSearch}
         disabled={isSearchDisabled}
-        className={`flex items-center justify-center gap-2 px-5 py-2 rounded-md font-semibold
+        className={`w-full max-w-md flex items-center justify-center gap-2 px-5 py-2 rounded-md font-semibold
             transition-all duration-200 ease-in-out cursor-pointer hover:-translate-y-1
-            ${isSearchDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}
-            text-white`}
+            ${isSearchDisabled ? "bg-gray-400 cursor-not-allowed"
+                               : "bg-blue-500 hover:bg-blue-600"
+             } text-white`}
       >
-        {loading ? (
+        {routeLoading ? (
           <svg className="animate-spin h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
@@ -144,37 +155,10 @@ function SearchArea({
         )}
       </button>
 
-      {/* Quick Info */}
-      <AnimatePresence>
-        {showInfo && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 15 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-3 gap-3 mt-4"
-          >
-            <motion.div whileHover={{ scale: 1.05 }} className="flex flex-col items-center bg-blue-50 p-3 rounded-xl shadow-sm border border-blue-100">
-              <FaCloudSun className="text-2xl text-blue-500 mb-1" />
-              <p className="text-sm font-semibold text-gray-800">9°C</p>
-              <p className="text-xs text-gray-500">Cloudy</p>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} className="flex flex-col items-center bg-green-50 p-3 rounded-xl shadow-sm border border-green-100">
-              <FaLeaf className="text-2xl text-green-600 mb-1" />
-              <p className="text-sm font-semibold text-gray-800">0g CO₂</p>
-              <p className="text-xs text-gray-500">Eco-friendly</p>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} className="flex flex-col items-center bg-yellow-50 p-3 rounded-xl shadow-sm border border-yellow-100">
-              <FaRoute className="text-2xl text-yellow-600 mb-1" />
-              <p className="text-sm font-semibold text-gray-800">11 km</p>
-              <p className="text-xs text-gray-500">Distance</p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* Placeholder for API-driven info (weather, CO2, distance) */}
+      
       {/* Route List */}
-      {showInfo && routes.length > 0 && (
+      {routes.length > 0 && (
         <RouteList
           routes={routes}
           isDarkMode={isDarkMode}

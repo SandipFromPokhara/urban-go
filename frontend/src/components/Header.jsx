@@ -1,72 +1,84 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, useScroll } from "framer-motion";
 import Navbar from "./Navbar";
-import { CircleUserRound, Menu, X } from "lucide-react";
-import logo from "../assets/images/Logo.png";
+import { CircleUserRound, Menu, X, LogOut } from "lucide-react";
 import logo2 from "../assets/images/Logo2.png";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import useLogout from "../hooks/useLogout";
 
 function Header() {
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
   const controls = useAnimation();
   const { scrollY } = useScroll();
+  const lastScrollY = useRef(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const { handleLogout } = useLogout();
 
   useEffect(() => {
     return scrollY.onChange((currentScrollY) => {
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        controls.start({
-          y: "-100%",
-          transition: { duration: 0.5, ease: "easeInOut" },
-        });
-      } else {
-        controls.start({
-          y: "0%",
-          transition: { duration: 0.5, ease: "easeInOut" },
-        });
+      const diff = currentScrollY - lastScrollY.current;
+
+      // Only react if scrolled more than 20px
+      if (diff > 20 && currentScrollY > 100) {
+        controls.start({ y: "-100%", transition: { duration: 0.3, ease: "easeInOut" } });
+      } else if (diff < -20 || currentScrollY <= 100) {
+        controls.start({ y: "0%", transition: { duration: 0.3, ease: "easeInOut" } });
       }
-      setLastScrollY(currentScrollY);
+
+      lastScrollY.current = currentScrollY;
     });
-  }, [controls, lastScrollY, scrollY]);
+  }, [controls, scrollY]);
 
   return (
     <motion.header
-      className="fixed top-0 left-0 w-full z-50 bg-linear-to-b from-gradient-start via-gradient-via to-gradient-end backdrop-blur-sm"
+      className="fixed top-0 left-0 z-50 w-full bg-linear-to-b from-[#2c1f5e] via-[#3b2a7a] to-[#1b1f55] backdrop-blur-sm"
       animate={controls}
     >
+      <div className="flex h-20 items-center justify-between rounded-b-2xl px-6 py-4 text-white">
+        <img src={logo2} alt="Logo" className="ml-6 h-auto w-50 select-none" />
 
-      <div className="flex items-center justify-between h-20 px-6 py-4 text-white shadow-md rounded-b-2xl">
-        <img
-          src={logo2}
-          alt="Helsinki Companion Logo"
-          className="h-auto w-50 select-none ml-6"
-        />
-
-        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:flex">
           <Navbar />
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
-          <Link to="login">
-          <motion.button
-            whileHover={{ scale: 1.05, opacity: 0.9 }}
-            whileTap={{ scale: 0.95 }}
-            className="text-white border border-white w-24 px-2 py-2 rounded-md transition duration-100"
-          >
-            <CircleUserRound className="w-5 h-5 inline-block mr-2" />
-            Log in
-          </motion.button>
-          </Link>
+        <div className="hidden items-center gap-4 md:flex">
+          {isAuthenticated ? (
+            <>
+              <span className="mr-2 font-semibold text-white">Welcome, {user?.firstName}</span>
+              <motion.button
+                whileHover={{ scale: 1.05, opacity: 0.9 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleLogout}
+                className="flex items-center gap-2 rounded-md border border-white px-4 py-2 text-white transition duration-100"
+              >
+                <LogOut className="h-5 w-5" />
+                Logout
+              </motion.button>
+            </>
+          ) : (
+            <Link to="login">
+              <motion.button
+                whileHover={{ scale: 1.05, opacity: 0.9 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-24 rounded-md border border-white px-2 py-2 text-white transition duration-100"
+              >
+                <CircleUserRound className="mr-2 inline-block h-5 w-5" />
+                Log in
+              </motion.button>
+            </Link>
+          )}
         </div>
 
         <button
-          className="md:hidden text-white focus:outline-none"
+          className="text-white focus:outline-none md:hidden"
           onClick={() => setMenuOpen((prev) => !prev)}
         >
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
+      {/* Mobile menu */}
       <motion.div
         initial={false}
         animate={menuOpen ? "open" : "closed"}
@@ -75,17 +87,37 @@ function Header() {
           closed: { opacity: 0, y: "-100%", pointerEvents: "none" },
         }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className="md:hidden absolute top-20 left-0 w-full bg-linear-to-t from-gradient-start via-gradient-via to-gradient-end backdrop-blur-sm text-white flex flex-col items-center gap-6 py-8 shadow-lg rounded-b-2xl z-40"
+        className="from-gradient-start via-gradient-via to-gradient-end absolute top-20 left-0 z-40 flex w-full flex-col items-center gap-6 rounded-b-2xl bg-linear-to-t py-8 text-white shadow-lg backdrop-blur-sm md:hidden"
       >
         <Navbar />
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="text-white border border-white w-32 px-3 py-2 rounded-md"
-        >
-          <CircleUserRound className="w-5 h-5 inline-block mr-2" />
-          Log in
-        </motion.button>
+        {isAuthenticated ? (
+          <>
+            <span className="font-semibold text-white">Welcome, {user?.firstName}</span>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setMenuOpen(false);
+                handleLogout();
+              }}
+              className="flex items-center gap-2 rounded-md border border-white px-6 py-2 text-white"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </motion.button>
+          </>
+        ) : (
+          <Link to="login" onClick={() => setMenuOpen(false)}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-32 rounded-md border border-white px-3 py-2 text-white"
+            >
+              <CircleUserRound className="mr-2 inline-block h-5 w-5" />
+              Log in
+            </motion.button>
+          </Link>
+        )}
       </motion.div>
     </motion.header>
   );
