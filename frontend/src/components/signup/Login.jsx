@@ -18,12 +18,12 @@ const Login = ({ isDarkMode }) => {
         >
           Login
         </h1>
-        <div className="mt-2 h-1 w-[60px] rounded bg-gradient-to-r from-blue-500 to-purple-600"></div>
+        <div className="mt-2 h-1 w-[60px] rounded bg-linear-to-r from-blue-500 to-purple-600"></div>
       </div>
 
       <div className="flex flex-col gap-4">
         <div
-          className={`flex w-full items-center rounded-[14px] border-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus-within:-translate-y-px focus-within:border-blue-500 focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.12),0_4px_12px_rgba(59,130,246,0.08)] ${isDarkMode ? "border-gray-600 bg-gray-700 focus-within:bg-gray-700" : "border-slate-200 bg-slate-50 focus-within:bg-white"}`}
+          className={`flex w-full items-center rounded-[14px] border-2 transition-all duration-300 ease-in-out focus-within:-translate-y-px focus-within:border-blue-500 focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.12),0_4px_12px_rgba(59,130,246,0.08)] ${isDarkMode ? "border-gray-600 bg-gray-700 focus-within:bg-gray-700" : "border-slate-200 bg-slate-50 focus-within:bg-white"}`}
         >
           <input
             {...emailField}
@@ -34,7 +34,7 @@ const Login = ({ isDarkMode }) => {
         </div>
 
         <div
-          className={`flex w-full items-center rounded-[14px] border-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus-within:-translate-y-px focus-within:border-blue-500 focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.12),0_4px_12px_rgba(59,130,246,0.08)] ${isDarkMode ? "border-gray-600 bg-gray-700 focus-within:bg-gray-700" : "border-slate-200 bg-slate-50 focus-within:bg-white"}`}
+          className={`flex w-full items-center rounded-[14px] border-2 transition-all duration-300 ease-in-out focus-within:-translate-y-px focus-within:border-blue-500 focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.12),0_4px_12px_rgba(59,130,246,0.08)] ${isDarkMode ? "border-gray-600 bg-gray-700 focus-within:bg-gray-700" : "border-slate-200 bg-slate-50 focus-within:bg-white"}`}
         >
           <input
             {...passwordField}
@@ -63,7 +63,7 @@ const Login = ({ isDarkMode }) => {
 
         <div className="mt-7 mb-3 flex w-full gap-4 md:mt-5 md:mb-2">
           <button
-            className="font-inter flex h-[52px] w-full cursor-pointer items-center justify-center rounded-xl border-none bg-gradient-to-br from-blue-500 to-purple-600 text-base font-semibold text-white shadow-[0_4px_15px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-600 hover:to-purple-700 hover:shadow-[0_6px_20px_rgba(59,130,246,0.4)] active:translate-y-0 active:shadow-[0_2px_10px_rgba(59,130,246,0.3)] disabled:cursor-not-allowed disabled:opacity-60 md:h-12"
+            className="font-inter flex h-[52px] w-full cursor-pointer items-center justify-center rounded-xl border-none bg-linear-to-br from-blue-500 to-purple-600 text-base font-semibold text-white shadow-[0_4px_15px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-600 hover:to-purple-700 hover:shadow-[0_6px_20px_rgba(59,130,246,0.4)] active:translate-y-0 active:shadow-[0_2px_10px_rgba(59,130,246,0.3)] disabled:cursor-not-allowed disabled:opacity-60 md:h-12"
             onClick={handleLogin}
             disabled={loading}
           >

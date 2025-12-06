@@ -29,7 +29,7 @@ class EventsService {
         page: params.page || 1,
       };
 
-      // Add optional filters 
+      // Add optional filters (only if they have values)
       if (params.end) {
         queryParams.end = params.end;
       }
@@ -51,17 +51,17 @@ class EventsService {
         queryParams.text = params.text.trim();
       }
 
-      console.log('Events API request:', {
+      console.log('External Events API request:', {
         url: `${EVENTS_BASE_URL}/event/`,
         params: queryParams
       });
 
       const response = await axios.get(`${EVENTS_BASE_URL}/event/`, {
         params: queryParams,
-        timeout: 10000, 
+        timeout: 10000, // 10 second timeout
       });
 
-      console.log('Events API response:', {
+      console.log('External Events API response:', {
         status: response.status,
         dataCount: response.data.data?.length,
         totalCount: response.data.meta?.count
@@ -77,7 +77,7 @@ class EventsService {
         },
       };
     } catch (error) {
-      console.error("Events API Error:", error.message);
+      console.error("External Events API Error:", error.message);
       
       if (error.response) {
         // API responded with error status
@@ -96,11 +96,11 @@ class EventsService {
             next: null,
             previous: null,
           },
-          error: `Events API error: ${error.response.status} - ${error.response.statusText}`
+          error: `External Events API error: ${error.response.status} - ${error.response.statusText}`
         };
       } else if (error.request) {
         // Request made but no response
-        console.error('No response from Events API');
+        console.error('No response from External Events API');
         return {
           success: false,
           data: [],
@@ -109,10 +109,10 @@ class EventsService {
             next: null,
             previous: null,
           },
-          error: "Events API is not responding"
+          error: "External Events API is not responding"
         };
       } else {
-        // Other errors
+        // Something else happened
         console.error('Error setting up request:', error.message);
         return {
           success: false,
@@ -122,7 +122,7 @@ class EventsService {
             next: null,
             previous: null,
           },
-          error: `Error setting up Events request: ${error.message}`
+          error: `Error setting up Events API request: ${error.message}`
         };
       }
     }
@@ -130,7 +130,7 @@ class EventsService {
 
   /**
    * Fetch a single event by ID
-   * @param {string} eventId - Event ID from Events API
+   * @param {string} eventId - Event ID from external Events API
    * @param {string} language - Language code (en, fi, sv)
    * @returns {Promise<Object>} Single event data
    */
@@ -163,8 +163,8 @@ class EventsService {
   }
 
   /**
-   * Transform Events API data to our schema format
-   * @param {Object} apiEvent - Event data from Events API
+   * Transform external Events API data to our schema format
+   * @param {Object} apiEvent - Event data from external Events API
    * @returns {Object} Transformed event object
    */
   transformEvent(apiEvent) {

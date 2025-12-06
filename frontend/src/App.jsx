@@ -11,13 +11,16 @@ import SignupPage from "./pages/SignupPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { AuthProvider } from "./context/AuthContext";
 import { useEffect, useState } from "react";
+import { FavoritesProvider } from "./context/FavoritesContext";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Detect system dark mode
   useEffect(() => {
-    const darkModePref = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const darkModePref = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
     setIsDarkMode(darkModePref);
   }, []);
 
@@ -29,6 +32,7 @@ function App() {
 
   return (
     <AuthProvider>
+    <FavoritesProvider>
       <HashRouter>
         <Header />
         <Routes>
@@ -43,6 +47,7 @@ function App() {
         </Routes>
         <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
       </HashRouter>
+    </FavoritesProvider>
     </AuthProvider>
   );
 }
