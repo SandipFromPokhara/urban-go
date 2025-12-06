@@ -15,6 +15,7 @@ import { useFavorites } from "../context/favoritesContext";
 import CommentSection from "../components/events/CommentSection";
 import { getEventRatings, postRating } from "../hooks/ratings";
 import { motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
 
 const EventDetails = ({ isDarkMode }) => {
   const { id } = useParams();

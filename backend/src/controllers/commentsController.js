@@ -5,7 +5,7 @@ const User = require("../models/userModel");
 const addComment = async (req, res) => {
   const userId = req.user?.userId;
   const { apiId, comment } = req.body;
-  const username = req.user?.firstName + " " + req.user?.lastName;
+  const username = req.user.firstName + " " + req.user.lastName;
 
   if (!apiId || !comment) {
     return res.status(400).json({ message: "Missing apiId or comment" });
@@ -23,7 +23,10 @@ const addComment = async (req, res) => {
       $push: { comments: newComment._id },
     });
 
-    res.status(201).json(newComment);
+    const populatedComment = await Comment.findById(newComment._id)
+      .populate("user", "firstName lastName role");
+
+    res.status(201).json(populatedComment);
   } catch (error) {
     res
       .status(500)
