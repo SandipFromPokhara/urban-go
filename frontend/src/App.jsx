@@ -11,7 +11,7 @@ import SignupPage from "./pages/SignupPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { AuthProvider } from "./context/AuthContext";
 import { useEffect, useState } from "react";
-import { FavoritesProvider } from "./context/FavoritesContext";
+import { FavoritesProvider } from "./context/favoritesContext";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);

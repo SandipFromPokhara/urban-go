@@ -54,9 +54,12 @@ const userSchema = mongoose.Schema(
       {
         eventId: { type: String, required: true }, // Linked Events API event ID
         title: String,
+        description: String,
         date: String,
+        location: String,
         image: String,
         category: String, // for preference learning
+        tags: [String],
       },
     ],
 

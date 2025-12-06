@@ -1,13 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const {getFavorites, addToFavorites, removeFromFavorites} = require("../controllers/favoritesController");
 const auth = require("../middlewares/authMiddleware");
+const {
+  addFavorite,
+  removeFavorite,
+  getFavorites
+} = require("../controllers/favoritesController");
 
-// All require login
-router.use(auth);
+router.use(auth); // user must be logged in
 
+router.post("/:eventId", addFavorite);
+router.delete("/:eventId", removeFavorite);
 router.get("/", getFavorites);
-router.post("/", addToFavorites);
-router.delete("/:eventId", removeFromFavorites);
 
 module.exports = router;

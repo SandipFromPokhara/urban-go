@@ -3,9 +3,9 @@ const User = require("../models/userModel");
 
 // Add a new comment
 const addComment = async (req, res) => {
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
   const { apiId, comment } = req.body;
-  const username = req.user.firstName + " " + req.user.lastName;
+  const username = req.user?.firstName + " " + req.user?.lastName;
 
   if (!apiId || !comment) {
     return res.status(400).json({ message: "Missing apiId or comment" });
@@ -47,8 +47,8 @@ const getCommentsForEvent = async (req, res) => {
 
 // Delete a comment
 const deleteComment = async (req, res) => {
-  const userId = req.user.userId;
-  const role = req.user.role;
+  const userId = req.user?.userId;
+  const role = req.user?.role;
   const { commentId } = req.params;
 
   try {
