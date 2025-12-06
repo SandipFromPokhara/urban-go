@@ -13,7 +13,16 @@ const commentSchema = new mongoose.Schema(
       required: true,
       minlength: 1,
       maxlength: 500
+    },
+    reports: { 
+      type: Number, 
+      default: 0 
+    },
+    reportedBy: {
+      type: [String],
+      default: []
     }
+
   },
   { timestamps: true }
 );
