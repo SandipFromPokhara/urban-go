@@ -22,6 +22,22 @@ export default function RouteTimeline({
     }
   }, [activeRouteIndex]);
 
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+        if (e.key === "ArrowRight") {
+          setActiveRouteIndex((i) => Math.min(i + 1, routes.length - 1));
+        }
+        if (e.key === "ArrowLeft") {
+          setActiveRouteIndex((i) => Math.max(i - 1, 0));
+        }
+      };
+
+      window.addEventListener("keydown", onKeyDown);
+      return () => window.removeEventListener("keydown", onKeyDown);
+    }, [routes.length, setActiveRouteIndex]);
+
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
     setActiveRouteIndex(index);
@@ -79,18 +95,86 @@ export default function RouteTimeline({
 
   const computeTicket = (route) => {
     const zonesUsed = new Set();
+
     route.steps.forEach((s) => {
       if (s.zones?.from) zonesUsed.add(s.zones.from);
       if (s.zones?.to) zonesUsed.add(s.zones.to);
     });
-    const allZones = ["A", "B", "C", "D"];
-    const used = allZones.filter(z => zonesUsed.has(z));
-    return used.join("") || "Unknown";
+    const order = ["A", "B", "C", "D"];
+    const used = order.filter(z => zonesUsed.has(z));
+
+    if (used.length === 0) return "Unknown";
+
+    // Auto-expand gaps
+    const first = order.indexOf(used[0]);
+    const last = order.indexOf(used[used.length - 1]);
+
+    return order.slice(first, last + 1).join("");
   };
 
+  const ticketInfo = (ticket) => {
+    if (ticket === "Unknown") return null;
+
+    const zoneCount = ticket.length;
+
+    switch (zoneCount) {
+      case 1:
+      case 2:
+        return { label: ticket, group: "2-zone ticket" };
+      case 3:
+        return { label: ticket, group: "3-zone ticket" };
+      case 4:
+        return { label: ticket, group: "4-zone ticket" };
+      default:
+        return null;
+    }
+  };
+
+  const getRouteStats = (route) => {
+    const walking = route.steps
+      .filter((s) => s.mode === "walk")
+      .reduce((sum, s) => sum + s.duration, 0);
+
+    return {
+      walking,
+      duration: route.duration ?? Infinity,
+    };
+  };
+
+  const routeStats = routes.map(getRouteStats);
+
+  const fastestRouteIdx = routeStats.reduce(
+    (best, cur, i) =>
+      cur.duration < routeStats[best].duration ? i : best,
+    0
+  );
+
+  const leastWalkingRouteIdx = routeStats.reduce(
+    (best, cur, i) =>
+      cur.walking < routeStats[best].walking ? i : best,
+    0
+  );
+
   return (
-    <div className="space-y-4 max-h-[600px] overflow-y-auto pb-6">
+    <div className="space-y-4 max-h-[600px] overflow-y-auto pb-6 relative">
+      <div className="sticky top-0 z-20 bg-white dark:bg-gray-900 py-2 border-b border-gray-200 dark:border-gray-700">
+  <div className="flex justify-center gap-2">
+    {routes.map((_, i) => (
+      <button
+        key={i}
+        onClick={() => setActiveRouteIndex(i)}
+        className={`px-3 py-1 rounded-full text-sm font-semibold transition
+          ${i === activeRouteIndex
+            ? "bg-blue-500 text-white"
+            : "bg-gray-300 dark:bg-gray-700 hover:bg-gray-400"}`}
+      >
+        {i + 1}
+      </button>
+    ))}
+  </div>
+</div>
       {routes.map((route, idx) => {
+        const isActive = idx === activeRouteIndex;
         const totalWalking = route.steps
           .filter((s) => s.mode === "walk")
           .reduce((sum, s) => sum + s.duration, 0);
@@ -101,6 +185,7 @@ export default function RouteTimeline({
         );
 
         const ticket = computeTicket(route);
+        const ticketMeta = ticketInfo(ticket);
 
         return (
           <motion.div
@@ -110,7 +195,7 @@ export default function RouteTimeline({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
             onClick={() => toggleExpand(idx)}
-            className={`p-4 rounded-xl cursor-pointer transition-shadow border ${
+            className={`p-4 rounded-xl transition-shadow border ${
               isDarkMode
                 ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
                 : "bg-white border-gray-200 hover:shadow-lg"
@@ -118,16 +203,48 @@ export default function RouteTimeline({
           >
             {/* Top Row */}
             <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center gap-2 font-bold text-lg">
-                <FaClock className="text-gray-400" /> {route.duration || "Unknown"} min
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-black font-semibold">
+                  Route {idx + 1} – {cap(fromInput) || route.origin} → {cap(toInput) || route.destination}
+                </span>
+
+                {idx === fastestRouteIdx && (
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700 font-semibold">
+                    Fastest
+                  </span>
+                )}
+
+                {idx === leastWalkingRouteIdx && (
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 font-semibold">
+                    Least walking
+                  </span>
+                )}
               </div>
-              <span className="text-sm text-gray-400">
-                {cap(fromInput) || route.origin} → {cap(toInput) || route.destination}
-              </span>
+
+              <div className="flex items-center gap-1 font-bold text-lg">
+                <FaClock className="text-gray-800" /> {route.duration || "Unknown"} mins
+              </div>
             </div>
 
+            {/* Route navigation */}
+            <div className="flex items-center justify-center gap-4 mb-3">
+              <button
+                disabled={activeRouteIndex <= 0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveRouteIndex((i) => Math.max(i - 1, 0));
+                }}
+                className={`px-3 py-1 rounded text-sm font-medium transition
+                  ${activeRouteIndex <= 0
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"}`}
+              >
+                Earlier Departures
+              </button>
+            </div>      
+                
             {/* Horizontal Timeline */}
-            <div className="flex items-center gap-2 overflow-visible justify-start pl-23 mb-2 relative">
+            <div className="flex items-center gap-2 overflow-visible justify-start pl-24 mb-2 relative">
               {route.steps?.map((step, i) => {
                 const mode = normalizeMode(step.mode);
                 const label = cap(mode) + (step.routeShortName ? ` ${step.routeShortName}` : "");
@@ -175,9 +292,17 @@ export default function RouteTimeline({
 
             {/* Step Details */}
             {expandedIndex === idx && route.steps?.length > 0 && (
-              <div className="flex flex-col gap-2 mt-2 relative pl-2">
+              <div className="flex flex-col gap-4 mt-2 relative pl-2">
                 <div className="text-xs text-gray-500 mb-1 ml-6">
-                  Total walking: {totalWalking} min • Total stops: {totalStops} • Ticket: {ticket}
+                  Total walking: {totalWalking} mins. Required ticket: {" "}
+                  <span className="font-semibold text-gray-700 dark:text-gray-200">
+                  {ticketMeta?.label}
+                </span>
+                {ticketMeta && (
+                  <span className="ml-1 text-gray-400">
+                    ({ticketMeta.group})
+                  </span>
+                )}
                 </div>
 
                 {route.steps.map((step, i) => {
@@ -196,12 +321,12 @@ export default function RouteTimeline({
                       {/* Step Info + Show/Hide */}
                       <div className="flex items-center justify-between w-full ml-6">
                         <div className="flex flex-col">
-                          <div className="flex items-center gap-2 font-semibold text-sm">
+                          <div className="flex items-center gap-1 font-semibold text-base">
                             {modeIcon(mode)}
                             {cap(mode)} {step.routeShortName && step.routeShortName} ({step.duration} mins)
                           </div>
 
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-gray-600">
                             {step.from_name} → {step.to_name} ({step.distance} km)
                             <br />
                             {step.startTime && step.endTime && (
@@ -213,7 +338,7 @@ export default function RouteTimeline({
                           </div>
 
                           {step.routeLongName && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-400">
                               {cap(mode)} full route info: {step.routeLongName}
                             </div>
                           )}
@@ -221,7 +346,7 @@ export default function RouteTimeline({
 
                         {stops.length >= 1 && (
                           <button
-                            className="text-blue-500 text-xs underline hover:text-blue-700 ml-2"
+                            className="text-blue-500 text-xs underline hover:text-blue-700 mr-5 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleStops(idx, i);
@@ -242,9 +367,26 @@ export default function RouteTimeline({
                           ))}
                         </div>
                       )}
+
+                     
                     </div>
                   );
                 })}
+                 <div className="flex items-center justify-center gap-4 mb-3">
+                        <button
+                          disabled={activeRouteIndex >= routes.length - 1}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveRouteIndex((i) => Math.min(i + 1, routes.length - 1));
+                          }}
+                          className={`px-3 py-1 rounded text-sm font-medium transition
+                            ${activeRouteIndex >= routes.length - 1
+                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                        >
+                          Later Departures
+                        </button>
+                      </div>
               </div>
             )}
           </motion.div>
