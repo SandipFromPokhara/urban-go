@@ -233,7 +233,7 @@ exports.getEvents = async (req, res) => {
 
       console.log("Calling external Events API (simple) with params:", apiParams);
 
-      const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+      const apiResponse = await eventsService.fetchEvents(apiParams);
 
       console.log("External Events API Response (simple):", {
         success: apiResponse.success,
@@ -262,7 +262,7 @@ exports.getEvents = async (req, res) => {
       }
 
       let eventsToCache = apiResponse.data.map((event) =>
-        linkedEventsService.transformEvent(event)
+        eventsService.transformEvent(event)
       );
 
       // Cache in background
