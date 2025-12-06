@@ -2,7 +2,13 @@ const User = require("../models/userModel");
 
 const addToFavorites = async (req, res) => {
   const userId = req.user.userId;
-  const { eventId, title, date, image, category } = req.body;
+  const event = req.body;
+
+  if (!event.eventId && !event.id) {
+    return res.status(400).json({ message: "Event must have an eventId or id." });
+  }
+
+  const eventId = event.eventId || event.id; // ensure we have eventId
 
   try {
     const user = await User.findById(userId);
@@ -19,7 +25,7 @@ const addToFavorites = async (req, res) => {
     }
 
     // Add to favorites
-    user.favorites.push({ eventId, title, date, image, category });
+    user.favorites.push({ ...event, eventId });
     await user.save();
 
     res.status(200).json({ message: "Event added to favorites.", favorites: user.favorites });

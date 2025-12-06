@@ -15,203 +15,73 @@ const EventsList = ({ isDarkMode }) => {
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [totalEvents, setTotalEvents] = useState(0);
-  
+  const [loading, setLoading] = useState(true);
+
   // Get current page from URL, default to 1
   const currentPage = parseInt(searchParams.get('page')) || 1;
-  
+
   // Get filters from URL params
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'date');
   const [filters, setFilters] = useState({
     category: searchParams.get('category') || '',
-    categoryKeywords: searchParams.get('keywords') ? searchParams.get('keywords').split(',') : [],
+    categoryKeywords: searchParams.get('keywords')
+      ? searchParams.get('keywords').split(',')
+      : [],
     categoryText: searchParams.get('categoryText') || '',
     location: searchParams.get('location') || '',
     startDate: searchParams.get('startDate') || '',
-    endDate: searchParams.get('endDate') || ''
+    endDate: searchParams.get('endDate') || '',
   });
-  const [loading, setLoading] = useState(true);
 
-  // Function to fetch ALL events when location filter is active
-  const fetchAllEventsForLocation = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      console.log('Fetching ALL events for location filter...');
-
-      let allEvents = [];
-      let currentFetchPage = 1;
-      let totalPages = 1;
-      const PAGE_SIZE = 100; // Fetch 100 at a time
-
-      // Build query parameters (without location - we'll filter client-side)
-      const baseParams = {
-        page_size: PAGE_SIZE,
-        language: 'en',
-        start: filters.startDate || 'today'
-      };
-
-      if (filters.endDate) baseParams.end = filters.endDate;
-      if (filters.categoryKeywords?.length > 0) {
-        baseParams.keyword = filters.categoryKeywords.join(',');
-      }
-      
-      // Add search text (combining category text search if no keywords)
-      let searchText = searchTerm.trim();
-      if (filters.category && (!filters.categoryKeywords || filters.categoryKeywords.length === 0)) {
-        searchText = searchText 
-          ? `${filters.category.toLowerCase()} ${searchText}`
-          : filters.category.toLowerCase();
-      }
-      if (searchText) baseParams.text = searchText;
-      
-      if (sortBy) baseParams.sort = sortBy === 'date' || sortBy === 'recent' ? 'start_time' : 'name';
-
-      // Fetch pages until we have all events (max 5 pages = 500 events)
-      while (currentFetchPage <= totalPages && currentFetchPage <= 5) {
-        const params = new URLSearchParams({
-          ...baseParams,
-          page: currentFetchPage
-        });
-
-        console.log(`Fetching page ${currentFetchPage}/${totalPages}...`);
-        
-        const response = await fetch(`http://localhost:5001/api/events?${params}`);
-        if (!response.ok) throw new Error('Failed to fetch events');
-
-        const result = await response.json();
-        
-        if (result.success && result.data) {
-          allEvents = allEvents.concat(result.data);
-          totalPages = result.pagination?.total_pages || 1;
-          currentFetchPage++;
-        } else {
-          break;
-        }
-      }
-
-      console.log(`Fetched ${allEvents.length} total events from ${currentFetchPage - 1} pages`);
-
-      // Transform all events
-      let transformedEvents = allEvents.map(event => ({
-        id: event.apiId,
-        name: event.name?.en || event.name?.fi || 'Untitled Event',
-        description: event.shortDescription?.en || event.description?.en || '',
-        longDescription: event.description?.en || event.shortDescription?.en || '',
-        date: event.startTime,
-        endDate: event.endTime,
-        location: event.location?.name?.en || event.location?.city?.en || 'Helsinki',
-        fullLocation: {
-          name: event.location?.name?.en || '',
-          street: event.location?.streetAddress?.en || '',
-          city: event.location?.city?.en || '',
-          postalCode: event.location?.postalCode || ''
-        },
-        image: event.images?.[0]?.url || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400',
-        category: event.categories?.[0] || event.keywords?.[0]?.name?.en || '',
-        tags: event.categories || [],
-        isFree: event.offers?.[0]?.isFree || false,
-        ticketPrice: event.offers?.[0]?.isFree ? 'Free Entry' : (event.offers?.[0]?.price?.en || 'Check website'),
-        infoUrl: event.infoUrl?.en || '',
-        provider: event.provider?.en || '',
-        rawData: event
-      }));
-
-      // Filter by location
-      const filteredEvents = transformedEvents.filter(event => {
-        const cityMatch = event.fullLocation?.city?.toLowerCase() === filters.location.toLowerCase();
-        const locationMatch = event.location?.toLowerCase().includes(filters.location.toLowerCase());
-        return cityMatch || locationMatch;
-      });
-
-      console.log(`After location filter: ${filteredEvents.length} events in ${filters.location}`);
-
-      // Paginate filtered results
-      const totalFiltered = filteredEvents.length;
-      const totalPagesFiltered = Math.ceil(totalFiltered / EVENTS_PER_PAGE);
-      const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
-      const endIndex = startIndex + EVENTS_PER_PAGE;
-      const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
-
-      setEvents(paginatedEvents);
-      setTotalEvents(totalFiltered);
-      setTotalPages(totalPagesFiltered);
-      setLoading(false);
-
-    } catch (err) {
-      console.error('Error fetching all events:', err);
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
-  // Fetch when page or filters change
-  useEffect(() => {
-    fetchEvents();
-  }, [currentPage, filters, searchTerm]); // Added searchTerm to dependencies
-
+  // Fetch events from backend
   const fetchEvents = async () => {
     try {
-      // If location filter is active, use special fetch all function
-      if (filters.location) {
-        await fetchAllEventsForLocation();
-        return;
-      }
-
       setLoading(true);
       setError(null);
 
-      // Build query parameters for normal pagination
-      const params = new URLSearchParams({
-        page: currentPage,
-        page_size: EVENTS_PER_PAGE,
-        language: 'en'
-      });
+      const params = new URLSearchParams();
 
-      // Add date filters
+      params.set('page', currentPage);
+      params.set('page_size', EVENTS_PER_PAGE.toString());
+      params.set('language', 'en');
+
+      // Dates
       if (filters.startDate) {
-        params.append('start', filters.startDate);
+        params.set('start', filters.startDate); // strict start
       } else {
-        params.append('start', 'today');
+        params.set('start', 'today'); // default to today
       }
 
       if (filters.endDate) {
-        params.append('end', filters.endDate);
+        params.set('end', filters.endDate);
       }
 
-      // Add category filtering
-      if (filters.categoryKeywords && filters.categoryKeywords.length > 0) {
-        // Use comma-separated keywords for OR matching
-        params.append('keyword', filters.categoryKeywords.join(','));
+      // Location
+      if (filters.location) {
+        params.set('location', filters.location);
       }
 
-      // Add search text (combining category text search if no keywords)
-      let searchText = searchTerm.trim();
-      
-      // If category has no keywords, add category name to search
-      if (filters.category && (!filters.categoryKeywords || filters.categoryKeywords.length === 0)) {
-        searchText = searchText 
-          ? `${filters.category.toLowerCase()} ${searchText}`
-          : filters.category.toLowerCase();
-      }
-      
-      if (searchText) {
-        params.append('text', searchText);
+      // Category text: used on backend for server-side category filter
+      if (filters.categoryText) {
+        params.set('categoryText', filters.categoryText);
       }
 
-      // NOTE: Location filter is handled client-side, not sent to API
-      // This ensures consistent pagination
+      // User search term
+      if (searchTerm.trim()) {
+        params.set('text', searchTerm.trim());
+        params.set('search', searchTerm.trim()); // keep in URL as well
+      }
 
-      // Add sort parameter
+      // Sort
       if (sortBy) {
-        params.append('sort', sortBy);
+        params.set('sort', sortBy);
       }
 
-      console.log('Fetching with params:', Object.fromEntries(params));
+      console.log('Fetching events with params:', Object.fromEntries(params));
 
       const response = await fetch(`http://localhost:5001/api/events?${params}`);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Backend error:', response.status, errorText);
@@ -219,91 +89,117 @@ const EventsList = ({ isDarkMode }) => {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
-        // Transform API data to match frontend format
-        let transformedEvents = result.data.map(event => ({
+        const transformedEvents = result.data.map((event) => ({
           id: event.apiId,
           name: event.name?.en || event.name?.fi || 'Untitled Event',
           description: event.shortDescription?.en || event.description?.en || '',
-          longDescription: event.description?.en || event.shortDescription?.en || '',
+          longDescription:
+            event.description?.en || event.shortDescription?.en || '',
           date: event.startTime,
           endDate: event.endTime,
-          location: event.location?.name?.en || event.location?.city?.en || 'Helsinki',
+          location:
+            event.location?.name?.en ||
+            event.location?.city?.en ||
+            'Helsinki',
           fullLocation: {
             name: event.location?.name?.en || '',
             street: event.location?.streetAddress?.en || '',
             city: event.location?.city?.en || '',
-            postalCode: event.location?.postalCode || ''
+            postalCode: event.location?.postalCode || '',
           },
-          image: event.images?.[0]?.url || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400',
+          image:
+            event.images?.[0]?.url ||
+            'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400',
           category: event.categories?.[0] || event.keywords?.[0]?.name?.en || '',
           tags: event.categories || [],
           isFree: event.offers?.[0]?.isFree || false,
-          ticketPrice: event.offers?.[0]?.isFree ? 'Free Entry' : (event.offers?.[0]?.price?.en || 'Check website'),
+          ticketPrice: event.offers?.[0]?.isFree
+            ? 'Free Entry'
+            : event.offers?.[0]?.price?.en || 'Check website for pricing',
           infoUrl: event.infoUrl?.en || '',
           provider: event.provider?.en || '',
-          rawData: event
+          rawData: event,
         }));
 
-        // Set events directly - trust API filtering
         setEvents(transformedEvents);
         setTotalEvents(result.pagination?.total || 0);
         setTotalPages(result.pagination?.total_pages || 1);
-        
-        console.log('Results:', {
-          currentPage,
+
+        console.log('Result summary:', {
+          page: result.pagination?.page,
           totalPages: result.pagination?.total_pages,
           totalEvents: result.pagination?.total,
-          eventsOnThisPage: transformedEvents.length,
-          appliedFilters: filters,
-          searchTerm
+          eventsOnPage: transformedEvents.length,
         });
       } else {
-        throw new Error('Invalid response format');
+        setEvents([]);
+        setTotalEvents(0);
+        setTotalPages(1);
       }
     } catch (err) {
       console.error('Error fetching events:', err);
       setError(err.message);
       setEvents([]);
-      setTotalPages(1);
       setTotalEvents(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
+      setSearching(false);
     }
   };
 
+  // Fetch when page / filters / search / sort change
+  useEffect(() => {
+    // If search term contains numbers → show no results immediately
+    const trimmed = searchTerm.trim();
+    const hasNumbers = /\d/.test(trimmed);
+
+    if (trimmed && hasNumbers) {
+      console.log('Search contains numbers, showing no results');
+      setEvents([]);
+      setTotalEvents(0);
+      setTotalPages(0);
+      setLoading(false);
+      setSearching(false);
+      return;
+    }
+
+    fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, filters, searchTerm, sortBy]);
+
+  // Handlers
   const handleSearchChange = (value) => {
     setSearchTerm(value);
-    
-    // Update URL with search term
+    setSearching(true);
+
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set('search', value);
     } else {
       newParams.delete('search');
     }
-    newParams.set('page', '1'); // Reset to page 1
+    newParams.set('page', '1'); // Reset to first page when searching
     setSearchParams(newParams);
   };
 
   const handleSortChange = (value) => {
     setSortBy(value);
-    
-    // Update URL with sort parameter
+
     const newParams = new URLSearchParams(searchParams);
     newParams.set('sort', value);
-    newParams.set('page', '1'); // Reset to page 1
+    newParams.set('page', '1');
     setSearchParams(newParams);
   };
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-    
-    // Update URL with all filters
+
     const newParams = new URLSearchParams();
-    newParams.set('page', '1'); // Reset to page 1
-    
+    newParams.set('page', '1');
+
     if (newFilters.category) {
       newParams.set('category', newFilters.category);
     }
@@ -325,25 +221,41 @@ const EventsList = ({ isDarkMode }) => {
     if (searchTerm) {
       newParams.set('search', searchTerm);
     }
-    
+    if (sortBy) {
+      newParams.set('sort', sortBy);
+    }
+
     setSearchParams(newParams);
   };
 
   const handlePageChange = (page) => {
-    // Preserve all existing params and just update page
     const newParams = new URLSearchParams(searchParams);
-    newParams.set('page', page);
+    newParams.set('page', page.toString());
     setSearchParams(newParams);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (loading && currentPage === 1 && !searchTerm && !filters.category && !filters.startDate) {
+  // Initial "big" loading (first page, no filters)
+  if (
+    loading &&
+    currentPage === 1 &&
+    !searchTerm &&
+    !filters.category &&
+    !filters.startDate &&
+    !filters.endDate &&
+    !filters.location
+  ) {
     return <LoadingSpinner message="Loading events..." />;
   }
 
   return (
     <>
-      <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ marginTop: '0', paddingTop: '0' }}>
+      <div
+        className={`min-h-screen ${
+          isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+        }`}
+        style={{ marginTop: '0', paddingTop: '0' }}
+      >
         {/* Animated Hero Section */}
         <div className="hero-section">
           <div className="hero-grid-background"></div>
@@ -380,7 +292,7 @@ const EventsList = ({ isDarkMode }) => {
 
         {/* Search and Filter Section */}
         <div className="search-section">
-          <SearchBar 
+          <SearchBar
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
             onFilterChange={handleFilterChange}
@@ -395,27 +307,47 @@ const EventsList = ({ isDarkMode }) => {
         {/* Error Message */}
         {error && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className={`${isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg p-4`}>
-              <p className={`${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
+            <div
+              className={`${
+                isDarkMode
+                  ? 'bg-red-900/20 border-red-800'
+                  : 'bg-red-50 border-red-200'
+              } border rounded-lg p-4`}
+            >
+              <p
+                className={`${
+                  isDarkMode ? 'text-red-300' : 'text-red-800'
+                }`}
+              >
                 Error loading events: {error}. Please try again later.
               </p>
             </div>
           </div>
         )}
 
-        {/* Loading indicator for page changes */}
-        {loading && (currentPage > 1 || searchTerm || filters.category || filters.startDate) && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {searching ? 'Searching...' : 'Loading events...'}
-              </p>
+        {/* Loading indicator for page / filter / search changes */}
+        {loading &&
+          (currentPage > 1 ||
+            searchTerm ||
+            filters.category ||
+            filters.startDate ||
+            filters.endDate ||
+            filters.location) && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p
+                  className={`mt-2 text-sm ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}
+                >
+                  {searching ? 'Searching...' : 'Loading events...'}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Events Grid */}
+        {/* Events Grid (includes its own "no results" message) */}
         {!loading && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <EventsGrid events={events} isDarkMode={isDarkMode} />
@@ -425,7 +357,7 @@ const EventsList = ({ isDarkMode }) => {
         {/* Pagination */}
         {!loading && events.length > 0 && totalPages > 1 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-            <Pagination 
+            <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
@@ -437,9 +369,19 @@ const EventsList = ({ isDarkMode }) => {
         {/* Results Count */}
         {!loading && events.length > 0 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
-            <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Showing {((currentPage - 1) * EVENTS_PER_PAGE) + 1}-{Math.min(currentPage * EVENTS_PER_PAGE, totalEvents)} of {totalEvents} events
-              {totalPages > 1 && <span> • Page {currentPage} of {totalPages}</span>}
+            <p
+              className={`text-center ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
+              Showing{' '}
+              {((currentPage - 1) * EVENTS_PER_PAGE) + 1}
+              -
+              {Math.min(currentPage * EVENTS_PER_PAGE, totalEvents)} of{' '}
+              {totalEvents} events
+              {totalPages > 1 && (
+                <span> • Page {currentPage} of {totalPages}</span>
+              )}
             </p>
           </div>
         )}

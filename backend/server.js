@@ -10,6 +10,7 @@ const favoritesRoutes = require("./src/routes/favoritesRoutes");
 const commentsRoutes = require("./src/routes/commentsRoutes");
 const eventsRoutes = require("./src/routes/eventsRoutes");
 const transportRoutes = require("./src/routes/transportRoutes");
+const ratingRoutes = require("./src/routes/ratingRoutes");
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/favorites", favoritesRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/events", eventsRoutes);
+app.use("/api/ratings", ratingRoutes);
 
 // 404 Handler
 app.use((req, res) => {
