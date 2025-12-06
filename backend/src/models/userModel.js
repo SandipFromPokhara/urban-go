@@ -56,6 +56,7 @@ const userSchema = mongoose.Schema(
         title: String,
         description: String,
         date: String,
+        endDate: String,
         location: String,
         image: String,
         category: String, // for preference learning

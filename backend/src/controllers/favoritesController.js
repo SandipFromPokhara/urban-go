@@ -42,6 +42,7 @@ const addFavorite = async (req, res) => {
       title: event.name?.en || event.name?.fi || "Untitled Event",
       description: event.description?.en || event.description?.fi || "",
       date: event.startTime,
+      endDate: event.endTime,
       location: event.location?.name?.en || event.location?.name?.fi || "TBA",
       image: event.images?.[0]?.url || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800",
       category: event.categories?.[0] || "other",

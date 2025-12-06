@@ -52,6 +52,7 @@ const FavoritesList = ({ isDarkMode }) => {
                 name: fav.title,
                 description: cleanHtml(fav.description),
                 date: formatDate(fav.date),
+                endDate: formatDate(fav.endDate),
                 image: fav.image,
                 category: fav.category,
                 location: fav.location || "TBA",
