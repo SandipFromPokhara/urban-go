@@ -1,17 +1,18 @@
 import { Calendar, MapPin, Heart } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useFavorites } from "../../context/FavoritesContext";
+import { useFavorites } from "../../context/favoritesContext";
 import { getEventRatings } from "../../hooks/ratings";
 import { useEffect, useState } from "react";
 import StarRating from "./StarRating";
+import { motion } from "framer-motion";
 
 const EventCard = ({ event, isDarkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorited, add, remove } = useFavorites();
   const [averageRating, setAverageRating] = useState(0);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("authToken");
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -28,9 +29,17 @@ const EventCard = ({ event, isDarkMode }) => {
     });
   };
 
-  const handleFavoriteClick = (e) => {
+  const handleFavoriteClick = async (e) => {
     e.stopPropagation();
-    toggleFavorite(event);
+    try {
+      if (isFavorited(event.id)) {
+        await remove(event.id);
+      } else {
+        await add(event.id);
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    }
   };
 
   const formatDateRange = (start, end) => {
@@ -80,25 +89,29 @@ const EventCard = ({ event, isDarkMode }) => {
           </span>
         )}
 
-        <button
+        <motion.button
           onClick={handleFavoriteClick}
           className="absolute top-3 left-3 p-2 rounded-full"
           style={{
-            backgroundColor: isFavorite(event.id || event.eventId)
-              ? "#ef4444"
-              : "#ffffff",
-            border: "none",
+            backgroundColor: isFavorited(event.id) ? "#ef4444" : "#ffffff",
           }}
         >
-          <Heart
-            style={{
-              width: 20,
-              height: 20,
-              color: isFavorite(event.id || event.eventId) ? "#fff" : "#374151",
-              fill: isFavorite(event.id || event.eventId) ? "#fff" : "none",
+          <motion.div
+            animate={{
+              scale: isFavorited(event.id) ? [1, 1.4, 1] : [1, 0.8, 1],
             }}
-          />
-        </button>
+            transition={{
+              duration: 0.3,
+            }}
+          >
+            <Heart
+              style={{
+                color: isFavorited(event.id) ? "#ffffff" : "#374151",
+                fill: isFavorited(event.id) ? "#ffffff" : "none",
+              }}
+            />
+          </motion.div>
+        </motion.button>
       </div>
 
       {/* Content */}

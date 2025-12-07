@@ -1,62 +1,61 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getFavorites, addFavorite, removeFavorite } from "../hooks/favorites";
+import axios from "axios";
 
 const FavoritesContext = createContext();
 
 export const FavoritesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
-  const getToken = () => localStorage.getItem("token");
+  const [loading, setLoading] = useState(true);
 
-  // Load favorites only if logged in
+  const token = localStorage.getItem("authToken");
+
+  // Fetch favorites
   useEffect(() => {
-    const load = async () => {
-      if (!getToken()) return;
+    (async () => {
+      if (!token) return setLoading(false);
       try {
-        const data = await getFavorites();
-        setFavorites(data);
+        const res = await axios.get("http://localhost:5001/api/favorites", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavorites(res.data.favorites || []);
       } catch (err) {
-        console.error("Failed to load favorites:", err);
+        console.error("Could not fetch favorites:", err);
+      } finally {
+        setLoading(false);
       }
-    };
-    load();
-  }, []);
+    })();
+  }, [token]);
 
-  const isFavorite = (eventId) => {
-    if (!getToken()) return false;
-    return favorites.some((f) => (f.eventId || f.id) === eventId);
-  };
-
-  const toggleFavorite = async (event) => {
-    if (!getToken()) {
-      alert("You must be logged in to save favorites");
-      return;
-    }
-
+  const add = async (eventId) => {
+    if (!token) return console.error("User not authenticated");
     try {
-      const eventId = event.id || event.eventId;
-
-      if (isFavorite(eventId)) {
-        await removeFavorite(eventId);
-        setFavorites((prev) =>
-          prev.filter((f) => (f.eventId || f.id) !== eventId)
-        );
-      } else {
-        const normalizedEvent = { ...event, eventId }; // ensure eventId field exists
-
-        await addFavorite(normalizedEvent);
-
-        setFavorites((prev) => [...prev, normalizedEvent]);
-      }
+      const res = await axios.post(
+        `http://localhost:5001/api/favorites/${eventId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setFavorites(res.data.favorites);
     } catch (err) {
-      console.error("Failed to toggle favorite:", err);
-      alert(err.message || "Failed to toggle favorite");
+      console.error("Failed to add favorite:", err);
     }
   };
+
+  const remove = async (eventId) => {
+    if (!token) return console.error("User not authenticated");
+    try {
+      const res = await axios.delete(`http://localhost:5001/api/favorites/${eventId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFavorites(res.data.favorites);
+    } catch (err) {
+      console.error("Failed to remove favorite:", err);
+    }
+  };
+
+  const isFavorited = (eventId) => favorites.some((f) => f.eventId === eventId);
 
   return (
-    <FavoritesContext.Provider
-      value={{ favorites, isFavorite, toggleFavorite }}
-    >
+    <FavoritesContext.Provider value={{ favorites, loading, add, remove, isFavorited }}>
       {children}
     </FavoritesContext.Provider>
   );

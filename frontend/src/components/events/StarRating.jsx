@@ -2,6 +2,7 @@ import React from "react";
 
 const Star = ({ fill = 0, id }) => {
   const gradientId = `star-grad-${id}`;
+  fill = Math.max(0, Math.min(fill, 1));
 
   return (
     <svg
@@ -32,7 +33,7 @@ const StarRating = ({ rating = 0, isDarkMode }) => {
         if (rating >= n) fill = 1;
         else if (rating + 1 > n) fill = rating - (n - 1);
 
-        return <Star key={n} id={n} fill={fill} />;
+        return <Star key={n} id={n+ Math.random()} fill={fill} />;
       })}
       <span
         className={`ml-2 text-sm ${
