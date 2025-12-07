@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, useScroll } from "framer-motion";
-import Navbar from "./Navbar";
-import { CircleUserRound, Menu, X, LogOut } from "lucide-react";
-import logo2 from "../assets/images/Logo2.png";
+import { CircleUserRound, LogOut, Menu, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import logo2 from "../assets/images/Logo2.png";
 import { useAuth } from "../context/AuthContext";
 import useLogout from "../hooks/useLogout";
+import Navbar from "./Navbar";
 
 function Header() {
   const controls = useAnimation();
@@ -21,9 +21,15 @@ function Header() {
 
       // Only react if scrolled more than 20px
       if (diff > 20 && currentScrollY > 100) {
-        controls.start({ y: "-100%", transition: { duration: 0.3, ease: "easeInOut" } });
+        controls.start({
+          y: "-100%",
+          transition: { duration: 0.3, ease: "easeInOut" },
+        });
       } else if (diff < -20 || currentScrollY <= 100) {
-        controls.start({ y: "0%", transition: { duration: 0.3, ease: "easeInOut" } });
+        controls.start({
+          y: "0%",
+          transition: { duration: 0.3, ease: "easeInOut" },
+        });
       }
 
       lastScrollY.current = currentScrollY;
@@ -45,7 +51,13 @@ function Header() {
         <div className="hidden items-center gap-4 md:flex">
           {isAuthenticated ? (
             <>
-              <span className="mr-2 font-semibold text-white">Welcome, {user?.firstName}</span>
+              <Link
+                to="user-panel"
+                className="mr-2 font-semibold text-white hover:text-indigo-200 transition-colors"
+              >
+                Welcome, {user?.firstName}
+              </Link>
+
               <motion.button
                 whileHover={{ scale: 1.05, opacity: 0.9 }}
                 whileTap={{ scale: 0.95 }}
@@ -92,7 +104,9 @@ function Header() {
         <Navbar />
         {isAuthenticated ? (
           <>
-            <span className="font-semibold text-white">Welcome, {user?.firstName}</span>
+            <span className="font-semibold text-white">
+              Welcome, {user?.firstName}
+            </span>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
