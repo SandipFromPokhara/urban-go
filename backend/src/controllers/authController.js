@@ -27,15 +27,21 @@ const register = async (req, res) => {
   }
 
   try {
-    // Ensure email is unique, prevent duplicate accounts.
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use." });
     }
-    // Securely hash password before storing in the database.
+    
     const hashed = await bcrypt.hash(req.body.password, 12);
 
-    // Create and store new user document in MongoDB collection.
+    // Admin Assignment Logic:
+    // 1. First registered user = admin (userCount === 0)
+    // 2. Email matches ADMIN_EMAIL in .env = admin
+    // 3. Otherwise = regular user
+    const userCount = await User.countDocuments();
+    const isAdminEmail = email === process.env.ADMIN_EMAIL;
+    const role = (userCount === 0 || isAdminEmail) ? "admin" : "user";
+
     const user = await User.create({
       firstName,
       lastName,
@@ -43,7 +49,7 @@ const register = async (req, res) => {
       password: hashed,
       dateOfBirth,
       address,
-      role: "user",
+      role,
     });
     // Safe response: never include password or hash.
     res.status(201).json({
