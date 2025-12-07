@@ -53,6 +53,7 @@ function Header() {
             <>
               <Link
                 to="user-panel"
+                onClick={() => setMenuOpen(false)}
                 className="mr-2 font-semibold text-white hover:text-indigo-200 transition-colors"
               >
                 Welcome, {user?.firstName}
@@ -104,9 +105,13 @@ function Header() {
         <Navbar />
         {isAuthenticated ? (
           <>
-            <span className="font-semibold text-white">
+            <Link
+              to="user-panel"
+              onClick={() => setMenuOpen(false)}
+              className="font-semibold text-white hover:text-indigo-200 transition-colors"
+            >
               Welcome, {user?.firstName}
-            </span>
+            </Link>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
