@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
   {
-    eventId: { type: String, required: true },
+    apiId: { type: String, required: true },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -13,7 +13,16 @@ const commentSchema = new mongoose.Schema(
       required: true,
       minlength: 1,
       maxlength: 500
+    },
+    reports: { 
+      type: Number, 
+      default: 0 
+    },
+    reportedBy: {
+      type: [String],
+      default: []
     }
+
   },
   { timestamps: true }
 );

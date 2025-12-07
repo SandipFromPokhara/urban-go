@@ -54,9 +54,13 @@ const userSchema = mongoose.Schema(
       {
         eventId: { type: String, required: true }, // Linked Events API event ID
         title: String,
+        description: String,
         date: String,
+        endDate: String,
+        location: String,
         image: String,
         category: String, // for preference learning
+        tags: [String],
       },
     ],
 
@@ -82,7 +86,7 @@ const userSchema = mongoose.Schema(
 
     reviews: [
       {
-        eventId: { type: String, required: true },
+        apiId: { type: String, required: true },
         rating: { type: Number, min: 1, max: 5 },
         createdAt: { type: Date, default: Date.now },
       },
