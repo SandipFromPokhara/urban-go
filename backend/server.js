@@ -13,6 +13,7 @@ const transportRoutes = require("./src/routes/transportRoutes");
 const autocompleteRoutes = require("./src/routes/autocompleteRoutes");
 const userRoutes = require("./src/routes/userRoutes");
 const ratingRoutes = require("./src/routes/ratingRoutes");
+const adminRoutes = require("./src/routes/adminRoutes");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/comments", commentsRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ratings", ratingRoutes);
+app.use("/api/admin", adminRoutes);
 
 // 404 Handler
 app.use((req, res) => {
