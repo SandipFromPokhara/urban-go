@@ -40,7 +40,13 @@ const register = async (req, res) => {
     // 3. Otherwise = regular user
     const userCount = await User.countDocuments();
     const isAdminEmail = email === process.env.ADMIN_EMAIL;
-    const role = (userCount === 0 || isAdminEmail) ? "admin" : "user";
+    // First user becomes superadmin, ADMIN_EMAIL becomes admin, others are users
+    let role = "user";
+    if (userCount === 0) {
+      role = "superadmin";
+    } else if (isAdminEmail) {
+      role = "admin";
+    }
 
     const user = await User.create({
       firstName,

@@ -47,6 +47,9 @@ backend/coverage/
 # Local environment overrides
 *.local
 
+# Admin documentation (internal use only)
+ADMIN_PANEL.md
+
 # =============================
 # Editor & OS specific
 # =============================
@@ -121,4 +124,3 @@ frontend/src/api/
 # Personal documentation (not to be shared)
 AUTH_IMPLEMENTATION_SUMMARY.md
 
-ADMIN_README.md

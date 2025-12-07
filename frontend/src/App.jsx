@@ -13,6 +13,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import SignupPage from "./pages/SignupPage";
 import TransportPage from "./pages/TransportPage";
 import UserPanel from "./pages/UserPanel";
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -45,6 +46,7 @@ function App() {
           <Route path="login" element={<LoginPage isDarkMode={isDarkMode} />} />
           <Route path="signup" element={<SignupPage isDarkMode={isDarkMode} />} />
           <Route path="user-panel" element={<UserPanel isDarkMode={isDarkMode} />} />
+          <Route path="admin" element={<AdminPanel isDarkMode={isDarkMode} />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />

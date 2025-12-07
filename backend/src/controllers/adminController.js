@@ -95,31 +95,129 @@ const getAllReviews = async (req, res) => {
 // @access  Admin
 const getAdminStats = async (req, res) => {
   try {
-    const [userCount, commentCount, reportedComments] = await Promise.all([
+    // Count users and comments from database
+    const [userCount, commentCount] = await Promise.all([
       User.countDocuments(),
       Comment.countDocuments(),
-      Comment.countDocuments({ reports: { $gt: 0 } })
     ]);
 
-    const roleDistribution = await User.aggregate([
-      { $group: { _id: "$role", count: { $sum: 1 } } }
-    ]);
+    // Fetch recent users (last 5)
+    const recentUsers = await User.find()
+      .select("firstName lastName email role createdAt")
+      .sort({ createdAt: -1 })
+      .limit(5);
 
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    const recentUsers = await User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
+    // Fetch total events from external API
+    let totalEvents = 0;
+    try {
+      const eventsUrl = process.env.EVENTS_URL || "https://api.hel.fi/linkedevents/v1";
+      const response = await fetch(`${eventsUrl}/event/?page_size=1`);
+      const data = await response.json();
+      totalEvents = data.meta?.count || 0;
+    } catch (apiError) {
+      console.error("Error fetching events count:", apiError);
+      totalEvents = 0;
+    }
 
     res.status(200).json({
       totalUsers: userCount,
-      totalComments: commentCount,
-      reportedComments,
-      recentUsers,
-      roles: roleDistribution.reduce((acc, item) => {
-        acc[item._id] = item.count;
-        return acc;
-      }, {})
+      totalReviews: commentCount,
+      totalEvents: totalEvents,
+      recentUsers: recentUsers
     });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// @desc    Update user role
+// @route   PATCH /api/admin/users/:userId/role
+// @access  Admin (superadmin can modify admins, regular admin cannot)
+const updateUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      res.status(400);
+      throw new Error("Invalid user ID");
+    }
+
+    if (!["user", "admin", "superadmin"].includes(role)) {
+      res.status(400);
+      throw new Error("Invalid role. Must be 'user', 'admin', or 'superadmin'");
+    }
+
+    // Get the target user
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    // Only superadmin can modify admin/superadmin roles
+    if ((targetUser.role === "admin" || targetUser.role === "superadmin" || role === "admin" || role === "superadmin") && req.user.role !== "superadmin") {
+      res.status(403);
+      throw new Error("Only super admin can modify admin roles");
+    }
+
+    // Update the role
+    targetUser.role = role;
+    await targetUser.save();
+
+    res.status(200).json({ 
+      user: {
+        _id: targetUser._id,
+        firstName: targetUser.firstName,
+        lastName: targetUser.lastName,
+        email: targetUser.email,
+        role: targetUser.role
+      }, 
+      message: "Role updated successfully" 
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/admin/users/:userId
+// @access  Admin (superadmin can delete admins, regular admin cannot)
+const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      res.status(400);
+      throw new Error("Invalid user ID");
+    }
+
+    // Prevent deleting yourself
+    if (userId === req.user.userId) {
+      res.status(400);
+      throw new Error("Cannot delete your own account");
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    // Only superadmin can delete admin or superadmin users
+    if ((user.role === "admin" || user.role === "superadmin") && req.user.role !== "superadmin") {
+      res.status(403);
+      throw new Error("Only super admin can delete admin users");
+    }
+
+    // Delete all user's comments
+    await Comment.deleteMany({ user: userId });
+
+    // Delete user
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -130,5 +228,7 @@ module.exports = {
   getUserDetails,
   deleteReview,
   getAllReviews,
-  getAdminStats
+  getAdminStats,
+  updateUserRole,
+  deleteUser
 };
