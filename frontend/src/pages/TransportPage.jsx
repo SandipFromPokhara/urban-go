@@ -30,7 +30,15 @@ function TransportPage({ isDarkMode }) {
   // Geolocation fill
   const fillCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
-      (pos) => setFrom(`${pos.coords.latitude}, ${pos.coords.longitude}`),
+      (pos) => {
+        const geo = {
+          name: "Current location",
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+        };
+        setFrom("Current location");
+        // Pass geo into SearchArea somehow
+      },
       () => alert("Failed to get location")
     );
   };
