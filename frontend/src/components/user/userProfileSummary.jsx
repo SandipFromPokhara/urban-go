@@ -14,8 +14,9 @@ export default function UserProfileSummary({ profile }) {
 
         <button
           type="button"
-          aria-label="Edit avatar"
-          className="absolute bottom-0 right-0 h-6 w-6 rounded-full bg-white border border-gray-300 flex items-center justify-center text-xs text-gray-600 shadow"
+          aria-label="Change profile avatar (coming soon)"
+          className="absolute bottom-0 right-0 h-6 w-6 rounded-full bg-white border border-gray-300 flex items-center justify-center text-xs text-gray-600 shadow cursor-default"
+          disabled
         >
           ✎
         </button>
