@@ -1,4 +1,5 @@
 // frontend/src/hooks/useAutoCompleteHandlers.js
+
 export const createAutoCompleteKeyHandler = ({
   suggestions,
   activeIndex,
@@ -26,8 +27,12 @@ export const createAutoCompleteKeyHandler = ({
         e.preventDefault();
         if (activeIndex >= 0 && activeIndex < suggestions.length) {
           const selected = suggestions[activeIndex];
-          setFieldValue(selected.name);
-          setSelectedGeo(selected);
+
+          if (selected?.lat != null && selected?.lon != null) {
+            setFieldValue(selected.name);
+            setSelectedGeo(selected);
+          }
+
           setActiveIndex(-1);
         }
         break;

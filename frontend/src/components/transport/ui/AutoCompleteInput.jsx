@@ -1,15 +1,18 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function AutoCompleteInput({
-  value,
-  onChange,
-  suggestions = [],
-  setSelectedGeo,
-  placeholder,
-  className,
-  onKeyDown,
-}) {
+const  AutoCompleteInput = forwardRef(function AutoCompleteInput(
+  {
+    value,
+    onChange,
+    suggestions = [],
+    setSelectedGeo,
+    placeholder,
+    className,
+    onKeyDown,
+  },
+  inputRef
+) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const wrapperRef = useRef(null);
@@ -23,7 +26,8 @@ export default function AutoCompleteInput({
   }, []);
 
   useEffect(() => {
-    if (suggestions.length > 0) setOpen(true);
+    setOpen(suggestions.length > 0);
+    setActiveIndex(-1);
   }, [suggestions]);
 
   const selectItem = (item) => {
@@ -35,6 +39,7 @@ export default function AutoCompleteInput({
   return (
     <div ref={wrapperRef} className="w-full relative">
       <input
+      ref={inputRef}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
@@ -80,4 +85,6 @@ export default function AutoCompleteInput({
       </AnimatePresence>
     </div>
   );
-}
+});
+
+export default AutoCompleteInput;
