@@ -33,12 +33,14 @@ function SearchArea({
     suggestions: fromSuggestions,
     selectedGeo: fromSelectedGeo,
     selectSuggestion: selectFromSuggestion,
+    setSelectedGeo: setFromSelectedGeo,
   } = useAutoComplete(fromField.value, fromField.setValue);
 
   const {
     suggestions: toSuggestions,
     selectedGeo: toSelectedGeo,
     selectSuggestion: selectToSuggestion,
+    setSelectedGeo: setToSelectedGeo,
   } = useAutoComplete(toField.value, toField.setValue);
 
   const fromWrapperRef = useRef(null);
@@ -56,8 +58,8 @@ function SearchArea({
     toField.setValue(tempVal);
 
     const tempGeo = fromSelectedGeo;
-    selectFromSuggestion(toSelectedGeo);
-    selectToSuggestion(tempGeo);
+    selectFromSuggestion(toSelectedGeo || null);
+    selectToSuggestion(tempGeo || null);
   };
 
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -83,7 +85,14 @@ function SearchArea({
       setRoutes([]);
 
       const dateTime = date && time ? new Date(`${date}T${time}`) : null;
-      const result = await searchRoute(from, to, dateTime ? dateTime.toISOString() : null);
+      const response = await searchRoute(
+        { lat: from.lat, lon: from.lon, name: from.name },
+        { lat: to.lat, lon: to.lon, name: to.name },
+        dateTime ? dateTime.toISOString() : null
+      );
+      const result = response;
+      console.log("route response:", response);
+
       if (!result?.length) {
         alert("No routes found for this query.");
         return;
@@ -152,7 +161,7 @@ function SearchArea({
     activeIndex: fromActiveIndex,
     setActiveIndex: setFromActiveIndex,
     setFieldValue: fromField.setValue,
-    setSelectedGeo: selectFromSuggestion,
+    setSelectedGeo: setFromSelectedGeo,
   });
 
   const handleToKeyDown = createAutoCompleteKeyHandler({
@@ -160,7 +169,7 @@ function SearchArea({
     activeIndex: toActiveIndex,
     setActiveIndex: setToActiveIndex,
     setFieldValue: toField.setValue,
-    setSelectedGeo: selectToSuggestion,
+    setSelectedGeo: setToSelectedGeo,
   });
 
   return (
@@ -178,10 +187,14 @@ function SearchArea({
           ref={formInputRef}
           {...fromField.inputProps}
           suggestions={fromSuggestions}
-          onSelect={selectFromSuggestion}
+          setSelectedGeo={selectFromSuggestion}
           placeholder="Enter origin"
           className={`${inputClass} pl-7 w-full`}
           onKeyDown={handleFromKeyDown}
+          onChange={(e) => {
+          fromField.inputProps.onChange(e);
+          selectFromSuggestion(null);
+        }}
         />
         <SwapButton
           onSwap={handleSwap}
@@ -200,10 +213,14 @@ function SearchArea({
         <AutoCompleteInput
           {...toField.inputProps}
           suggestions={toSuggestions}
-          onSelect={selectToSuggestion}
+          setSelectedGeo={selectToSuggestion}
           placeholder="Enter destination"
           className={`${inputClass} pl-7 w-full`}
           onKeyDown={handleToKeyDown}
+          onChange={(e) => {
+          toField.inputProps.onChange(e);
+          selectToSuggestion(null);
+        }}
         />
         {toField.error && <p className="text-red-500 text-sm mt-1">{toField.error}</p>}
       </div>
