@@ -164,6 +164,7 @@ const Signup = ({ isDarkMode }) => {
             value={dateOfBirthField.value}
             onChange={dateOfBirthField.onChange}
             name="dateOfBirth"
+            max={new Date().toISOString().split('T')[0]}
             onFocus={(e) => e.target.showPicker && e.target.showPicker()}
             className={`${inputFieldClass} cursor-pointer ${
               !dateOfBirthField.value ? "opacity-0" : ""
