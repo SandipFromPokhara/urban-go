@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import MapSection from "../components/transport/MapSection";
 import HeroSection from "../components/transport/HeroSection";
 import SearchArea from "../components/transport/SearchArea";
-import RouteList from "../components/transport/RouteList";
 import RightPanel from "../components/transport/RightPanel";
 import MapInfoPanel from "../components/transport/MapInfoPanel"; 
 import "leaflet/dist/leaflet.css";
@@ -31,7 +30,15 @@ function TransportPage({ isDarkMode }) {
   // Geolocation fill
   const fillCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
-      (pos) => setFrom(`${pos.coords.latitude}, ${pos.coords.longitude}`),
+      (pos) => {
+        const geo = {
+          name: "Current location",
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+        };
+        setFrom("Current location");
+        // Pass geo into SearchArea somehow
+      },
       () => alert("Failed to get location")
     );
   };
