@@ -4,6 +4,7 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { AuthProvider } from "./context/AuthContext";
+import { FavoritesProvider } from "./context/favoritesContext";
 import EventDetails from "./pages/EventDetails";
 import EventsList from "./pages/EventsList";
 import Home from "./pages/Home";
@@ -12,9 +13,6 @@ import NotFoundPage from "./pages/NotFoundPage";
 import SignupPage from "./pages/SignupPage";
 import TransportPage from "./pages/TransportPage";
 import UserPanel from "./pages/UserPanel";
-import { AuthProvider } from "./context/AuthContext";
-import { useEffect, useState } from "react";
-import { FavoritesProvider } from "./context/favoritesContext";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
