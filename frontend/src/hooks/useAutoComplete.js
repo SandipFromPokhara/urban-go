@@ -1,4 +1,5 @@
 // src/hooks/useAutoComplete.js
+
 import { useState, useEffect, useRef } from "react";
 
 const CAPITAL_REGION_CITIES = ["helsinki", "vantaa", "espoo", "kauniainen"];
@@ -11,6 +12,7 @@ const useAutoComplete = (inputValue, setInputValue) => {
 
   useEffect(() => {
     if (skipNextFetchRef.current) {
+      // Skip fetch triggered by selecting a suggestion
       skipNextFetchRef.current = false;
       return;
     }
@@ -20,7 +22,7 @@ const useAutoComplete = (inputValue, setInputValue) => {
       return;
     }
 
-    // Debounce the input
+    // Debounce fetch
     timeoutRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/autocomplete?q=${encodeURIComponent(inputValue)}`);
@@ -31,17 +33,11 @@ const useAutoComplete = (inputValue, setInputValue) => {
 
         const data = await res.json();
 
-        // Filter only features in Capital Region or Uusimaa
         const validFeatures = (data || []).filter((f) => {
           if (f.lat == null || f.lon == null) return false;
-
           const localadmin = (f.localadmin || "").toLowerCase();
           const region = (f.region || "").toLowerCase();
-
-          return (
-            CAPITAL_REGION_CITIES.includes(localadmin) ||
-            region === "uusimaa"
-          );
+          return CAPITAL_REGION_CITIES.includes(localadmin) || region === "uusimaa";
         });
 
         setSuggestions(validFeatures);
@@ -54,7 +50,7 @@ const useAutoComplete = (inputValue, setInputValue) => {
     return () => clearTimeout(timeoutRef.current);
   }, [inputValue]);
 
-  // Explicit selection handler (mouse / keyboard)
+  // Called when user selects a suggestion
   const selectSuggestion = (suggestion) => {
     if (!suggestion) {
       setSelectedGeo(null);
@@ -66,18 +62,24 @@ const useAutoComplete = (inputValue, setInputValue) => {
       return;
     }
 
-    skipNextFetchRef.current = true;
-
+    skipNextFetchRef.current = true; // prevent fetch on input update
     setSelectedGeo(suggestion);
     setInputValue(suggestion.name || suggestion.label || "");
     setSuggestions([]);
   };
 
+  // Clear selectedGeo if user types manually
+  const handleManualInput = (value) => {
+    setInputValue(value);
+    if (selectedGeo) setSelectedGeo(null); // reset previously selected suggestion
+  };
+
   return {
     suggestions,
     selectedGeo,
-    selectSuggestion,     // for mouse
-    setSelectedGeo,       // for keyboard
+    selectSuggestion,
+    setSelectedGeo,
+    handleManualInput,
   };
 };
 
