@@ -37,20 +37,26 @@ export default function WeatherCard({ weather, isDarkMode }) {
 
   return (
     <div className={`relative rounded-xl p-2 shadow-md overflow-hidden ${isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"}`}>
-      {/* Weather animation */}
-      <div className="absolute inset-0 pointer-events-none">
-        {renderPrecipitation()}
+    {/* Weather animation */}
+    <div className="absolute inset-0 pointer-events-none">
+      {renderPrecipitation()}
+    </div>
+
+    <h3 className="font-bold mb-4 text-center underline">Current Weather</h3>
+
+    <div className="flex items-center relative z-10 gap-4 -ml-2">
+      {/* Icon: let it render naturally */}
+      <div className="flex items-center justify-center">
+        {IconComponent()} {/* size comes from weatherIcons.js */}
       </div>
 
-      <h3 className="font-bold mb-2 text-center underline">Current Weather</h3>
-      <div className="flex items-center relative z-10 gap-4">
-        <div className="flex items-center justify-center">{IconComponent()}</div>
-        <div className="flex flex-col">
-          <p className="text-lg font-medium">{temp} °C</p>
-          <p className="text-sm opacity-80">Wind: {wind} m/s</p>
-          <p className="text-sm opacity-80">Precipitation: {precipitation} mm</p>
-        </div>
+      {/* Text content */}
+      <div className="flex flex-col">
+        <p className="text-lg font-medium">{temp} °C</p>
+        <p className="text-sm opacity-80">Wind: {wind ?? "N/A"} m/s</p>
+        <p className="text-sm opacity-80">Precipitation: {precipitation ?? 0} mm</p>
       </div>
     </div>
+  </div>
   );
 }
