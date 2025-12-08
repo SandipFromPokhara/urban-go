@@ -1,37 +1,95 @@
 // src/components/transport/RightPanel.jsx
 
-import location from "../../assets/icons/location.svg";
-import map from "../../assets/icons/map.svg";
-import cloud from "../../assets/icons/cloud.svg";
+import { FaLeaf, FaTicketAlt, FaExclamationTriangle } from "react-icons/fa";
+import WeatherCard from "./WeatherCard";
+import { useWeather } from "../../hooks/useWeather";
 
-function RightPanel({ isDarkMode }) {
-  const bgClass = isDarkMode ? "bg-gray-800 text-white" : "bg-blue-50 text-gray-900";
+// Coordinates for Helsinki, Finland
+const CAPITAL_REGION_COORDS = { lat: 60.1695, lon: 24.9354 };
+
+function RightPanel({ isDarkMode, co2, ticketInfo, alerts = [] }) {
+  const panelClass = isDarkMode
+    ? "bg-gray-800 text-white"
+    : "bg-blue-50 text-gray-900";
+
+  // Fetch current weather for Helsinki, independent of inputs
+  const weather = useWeather(CAPITAL_REGION_COORDS);
+
+  const sectionTitle = "font-bold mb-2 flex items-center gap-2";
 
   return (
-    <div className="hidden lg:flex lg:flex-col lg:w-1/6 gap-4 px-4">
-      {/* Top Section: Alerts */}
-      <div className={`rounded-xl p-4 shadow-lg ${bgClass}`}>
-        <h3 className="font-semibold mb-2">Transport Alerts</h3>
-        <ul className="text-sm space-y-1">
-          <li>Tram line 9 delayed by 15 min</li>
-          <li>Bus 23 rerouted</li>
-          <li>Metro maintenance 22–24 Nov</li>
-        </ul>
+    <aside className="flex flex-col w-full gap-4 overflow-y-auto max-h-screen">
+
+      {/* 🔔 Transport Alerts */}
+      <div className={`rounded-xl p-4 shadow-lg ${panelClass}`}>
+        <h3 className={sectionTitle}>
+          <FaExclamationTriangle size={20} className="text-yellow-500" />
+          Transport Alerts
+        </h3>
+
+        {alerts.length ? (
+          <ul className="text-sm space-y-1">
+            {alerts.map((a, i) => (
+              <li key={i}>• {a.text}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm opacity-80">No major disruptions</p>
+        )}
       </div>
 
-      {/* Middle Section: Icons / Images */}
-      <div className="flex-1 flex flex-col justify-center items-center gap-3">
-        <img src={location} alt="Location" className="w-12 h-12" />
-        <img src={map} alt="Map" className="w-12 h-12" />
-        <img src={cloud} alt="Weather" className="w-12 h-12" />
+      {/* 🌦 Weather */}
+      <div className={`rounded-xl shadow-lg ${panelClass}`}>
+        {weather ? (
+          <WeatherCard weather={weather} isDarkMode={isDarkMode} />
+        ) : (
+          <p className="text-sm opacity-80">Loading weather...</p>
+        )}
       </div>
 
-      {/* Bottom Section: Info */}
-      <div className={`rounded-xl p-4 shadow-lg mt-auto ${bgClass}`}>
-        <h3 className="font-semibold mb-2">Info</h3>
-        <p className="text-sm">Remember to bring a valid travel card!</p>
+      {/* 🌱 CO₂ Impact */}
+      <div className={`rounded-xl p-4 shadow-lg ${panelClass}`}>
+        <h3 className={sectionTitle}>
+          <FaLeaf className="text-green-400" />
+          Environmental Impact
+        </h3>
+
+        {co2 ? (
+          <>
+            <p className="text-lg font-medium">{co2.grams} g CO₂</p>
+            <p className="text-sm opacity-80">
+              Avg. per passenger · {co2.mode}
+            </p>
+          </>
+        ) : (
+          <p className="text-sm opacity-80">
+            Select a route to see CO₂ impact
+          </p>
+        )}
       </div>
-    </div>
+
+      {/* 🎫 Ticket Info */}
+      <div className={`rounded-xl p-4 shadow-lg mt-auto ${panelClass}`}>
+        <h3 className={sectionTitle}>
+          <FaTicketAlt className="text-purple-400" />
+          Ticket
+        </h3>
+
+        {ticketInfo ? (
+          <>
+            <p className="text-lg font-medium">€{ticketInfo.price}</p>
+            <p className="text-sm opacity-80">
+              Zones {ticketInfo.zones} · {ticketInfo.type}
+            </p>
+          </>
+        ) : (
+          <p className="text-sm opacity-80">
+            Ticket price will appear here
+          </p>
+        )}
+      </div>
+
+    </aside>
   );
 }
 
