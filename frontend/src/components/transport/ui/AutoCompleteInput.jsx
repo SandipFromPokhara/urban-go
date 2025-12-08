@@ -12,6 +12,7 @@ const AutoCompleteInput = forwardRef(function AutoCompleteInput(
     placeholder,
     className,
     onKeyDown,
+    isDarkMode = false,
   },
   inputRef
 ) {
@@ -72,8 +73,12 @@ const AutoCompleteInput = forwardRef(function AutoCompleteInput(
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
-            className="absolute left-0 right-0 mt-1 bg-white shadow-md rounded-md max-h-64 overflow-y-auto z-50 border"
-          >
+            className={`absolute left-0 right-0 mt-1 shadow-md rounded-md max-h-64 overflow-y-auto z-50 border ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-700 text-gray-200"
+                : "bg-white border-gray-300 text-gray-900"
+            }`}
+            >
             {suggestions.map((item, i) => (
               <div
                 key={i}
