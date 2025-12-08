@@ -64,7 +64,7 @@ function TransportPage({ isDarkMode }) {
             time={time} setTime={setTime}
             routes={routes} setRoutes={setRoutes}
             isDarkMode={isDarkMode}
-            formInputRef={formInputRef}
+            ref={formInputRef}
             loading={loading} setLoading={setLoading}
             activeRouteIndex={activeRouteIndex} setActiveRouteIndex={setActiveRouteIndex}
             swapLocations={swapLocations}
