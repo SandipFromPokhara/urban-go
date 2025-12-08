@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const Event = require("../models/eventModel");
-const LinkedEventsService = require("../services/linkedEventsService");
+const LinkedEventsService = require("../services/eventsService");
 
 const addFavorite = async (req, res) => {
   try {
