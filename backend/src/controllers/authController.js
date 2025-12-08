@@ -35,16 +35,16 @@ const register = async (req, res) => {
     const hashed = await bcrypt.hash(req.body.password, 12);
 
     // Admin Assignment Logic:
-    // 1. First registered user = admin (userCount === 0)
-    // 2. Email matches ADMIN_EMAIL in .env = admin
+    // 1. Email matches ADMIN_EMAIL in .env = superadmin (highest priority)
+    // 2. First registered user = admin (if not ADMIN_EMAIL)
     // 3. Otherwise = regular user
     const userCount = await User.countDocuments();
     const isAdminEmail = email === process.env.ADMIN_EMAIL;
-    // First user becomes superadmin, ADMIN_EMAIL becomes admin, others are users
+    // ADMIN_EMAIL always becomes superadmin, first user becomes admin, others are users
     let role = "user";
-    if (userCount === 0) {
+    if (isAdminEmail) {
       role = "superadmin";
-    } else if (isAdminEmail) {
+    } else if (userCount === 0) {
       role = "admin";
     }
 
