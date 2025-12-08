@@ -14,7 +14,8 @@ const getWeatherCondition = ({ temp, precipitation }) => {
 const getWeather = async (lat, lon) => {
   const starttime = new Date().toISOString();
   const endtime = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // +1h
-  const params = "Temperature,Precipitation1h,WindSpeedMS";
+  // Requesting U- and V-components of wind (WindUMS, WindVMS) in m/s
+  const params = "Temperature,Precipitation1h,WindUMS,WindVMS";
 
   const url = `${WFS_URL}?service=WFS&version=2.0.0&request=GetFeature&storedquery_id=ecmwf::forecast::surface::obsstations::simple&latlon=${lat},${lon}&starttime=${starttime}&endtime=${endtime}&parameters=${params}`;
 
@@ -23,13 +24,13 @@ const getWeather = async (lat, lon) => {
     const xml = await res.text();
     const json = await parseStringPromise(xml, { explicitArray: false });
 
-    console.log("FMI keys:", Object.keys(json));
-    console.log(
-      "FeatureCollection:",
-      json["wfs:FeatureCollection"]
-        ? Object.keys(json["wfs:FeatureCollection"])
-        : "MISSING"
-    );
+    // console.log("FMI keys:", Object.keys(json));
+    // console.log(
+    //   "FeatureCollection:",
+    //   json["wfs:FeatureCollection"]
+    //     ? Object.keys(json["wfs:FeatureCollection"])
+    //     : "MISSING"
+    // );
 
     if (json['ExceptionReport']) {
       console.error("FMI ExceptionReport:", JSON.stringify(json['ExceptionReport'], null, 2));
@@ -60,9 +61,17 @@ const getWeather = async (lat, lon) => {
       });
     });
 
+    const windUMS = values.WindUMS ?? 0; // U-component (East-West)
+    const windVMS = values.WindVMS ?? 0; // V-component (North-South)
+
+    // Calculate wind speed (magnitude of the vector)
+    const windSpeedMS = Math.sqrt(windUMS ** 2 + windVMS ** 2);
+
+    const windSpeedKPH = Math.round(windSpeedMS * 3.6);   // Convert wind speed from m/s to km/h (1 m/s = 3.6 km/h)
+
     const weather = {
       temp: values.Temperature ?? null,
-      wind: values.WindSpeedMS ?? 0,
+      wind: windSpeedKPH ?? 0,
       precipitation: values.Precipitation1h ?? 0,
     };
 
