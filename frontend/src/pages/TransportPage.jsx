@@ -19,6 +19,7 @@ function TransportPage({ isDarkMode }) {
   const [activeRouteIndex, setActiveRouteIndex] = useState(null);
   const formRef = useRef(null);
   const formInputRef = useRef(null);
+  const [selectedOrigin, setSelectedOrigin] = useState(null);
 
   // Swap logic
   const swapLocations = () => {
@@ -53,7 +54,7 @@ function TransportPage({ isDarkMode }) {
       </div>
 
       {/* Main content section */}
-      <section className="relative w-full flex flex-col md:flex-row mt-10 pb-8 gap-14 items-stretch px-4 sm:px-6">
+      <section className="relative w-full flex flex-col md:flex-row mt-10 pb-8 gap-8 items-stretch px-4 sm:px-6">
         
         {/* Left Column: SearchArea + RouteList */}
         <div className="md:w-1/2 flex flex-col gap-6">
@@ -69,6 +70,7 @@ function TransportPage({ isDarkMode }) {
             activeRouteIndex={activeRouteIndex} setActiveRouteIndex={setActiveRouteIndex}
             swapLocations={swapLocations}
             fillCurrentLocation={fillCurrentLocation}
+            setSelectedOrigin={setSelectedOrigin}
           />
         </div>
 
@@ -98,8 +100,13 @@ function TransportPage({ isDarkMode }) {
           <MapInfoPanel isDarkMode={isDarkMode} />
         </div>
         {/* Right Panel (optional, hidden on mobile) */}
-        <div className="hidden md:flex md:flex-col md:w-1/5">
-          <RightPanel isDarkMode={isDarkMode} />
+        <div className="w-full flex flex-col md:w-1/5">
+          <RightPanel 
+            isDarkMode={isDarkMode}
+            co2={routes[activeRouteIndex]?.co2}
+            ticketInfo={routes[activeRouteIndex]?.ticketInfo}
+            alerts={[]}
+          />
           </div>
       </section>
     </main>
