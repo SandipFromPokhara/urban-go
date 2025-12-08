@@ -138,8 +138,7 @@ function CommentSection({ apiId, currentUser, isDarkMode }) {
                     }}
                   />
                 </button>
-                {/* Admin view: show number of reports */}
-                {currentUser.role?.toLowerCase() === "admin" && (
+                {currentUser && (currentUser.role?.toLowerCase() === "admin" || currentUser.role?.toLowerCase() === "superadmin") && (
                   <span
                     className="text-xs font-semibold px-2 py-1 rounded-full bg-red-600 text-white"
                     title={`${c.reports || 0} reports`}
