@@ -5,7 +5,8 @@ import MapSection from "../components/transport/MapSection";
 import HeroSection from "../components/transport/HeroSection";
 import SearchArea from "../components/transport/SearchArea";
 import RightPanel from "../components/transport/RightPanel";
-import MapInfoPanel from "../components/transport/MapInfoPanel"; 
+import ServiceDisruption from "../components/transport/ServiceDisruption";
+import { useTransAlerts } from "../hooks/useTransAlerts";
 import "leaflet/dist/leaflet.css";
 
 function TransportPage({ isDarkMode }) {
@@ -20,6 +21,7 @@ function TransportPage({ isDarkMode }) {
   const formRef = useRef(null);
   const formInputRef = useRef(null);
   const [selectedOrigin, setSelectedOrigin] = useState(null);
+  const {alerts, loading: alertsLoading } = useTransAlerts();
 
   // Swap logic
   const swapLocations = () => {
@@ -96,11 +98,13 @@ function TransportPage({ isDarkMode }) {
             />
           </div>
 
-          {/* Use the new component here */}
-          <MapInfoPanel isDarkMode={isDarkMode} />
+          <div className="p-4">
+            <ServiceDisruption isDarkMode={isDarkMode} alerts={alerts} />
+            {alertsLoading && <p className="text-sm opacity-70 mt-2">Loading disruptions...</p>}
+          </div>
         </div>
         {/* Right Panel (optional, hidden on mobile) */}
-        <div className="w-full flex flex-col md:w-1/5">
+        <div className="w-full flex flex-col md:w-1/3">
           <RightPanel 
             isDarkMode={isDarkMode}
             co2={routes[activeRouteIndex]?.co2}
