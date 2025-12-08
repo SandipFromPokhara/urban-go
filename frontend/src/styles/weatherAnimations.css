@@ -1,0 +1,27 @@
+@keyframes rainFall {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes snowFall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%) rotate(360deg); opacity: 0; }
+}
+
+.rainDrop, .snowFlake {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 10px;
+  background: rgba(255,255,255,0.7);
+  animation-iteration-count: infinite;
+}
+
+.snowFlake {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: white;
+}
