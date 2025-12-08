@@ -11,6 +11,7 @@ const commentsRoutes = require("./src/routes/commentsRoutes");
 const eventsRoutes = require("./src/routes/eventsRoutes");
 const transportRoutes = require("./src/routes/transportRoutes");
 const autocompleteRoutes = require("./src/routes/autocompleteRoutes");
+const weatherRoutes = require("./src/routes/weatherRoutes");
 const userRoutes = require("./src/routes/userRoutes");
 const ratingRoutes = require("./src/routes/ratingRoutes");
 
@@ -23,6 +24,7 @@ app.use(cors());
 // Transportation API route
 app.use("/api/search-route", transportRoutes);
 app.use("/api/autocomplete", autocompleteRoutes);
+app.use("/api/weather", weatherRoutes);
 
 // Protected route: requires a valid JWT token
 app.get("/api/protectedroute", authMiddleware, (req, res) => {
