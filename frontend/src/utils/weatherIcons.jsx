@@ -1,6 +1,6 @@
 // src/utils/weatherIcons.js
 
-import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiRaindrops, WiThermometerExterior, } from "react-icons/wi";
+import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiRaindrops, WiThermometerExterior} from "react-icons/wi";
 
 export const weatherIcons = {
   clear: () => <WiDaySunny size={80} className="text-yellow-400" />,
