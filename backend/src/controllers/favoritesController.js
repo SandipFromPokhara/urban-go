@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const Event = require("../models/eventModel");
-const LinkedEventsService = require("../services/eventsService");
+const EventsService = require("../services/eventsService");
 
 const addFavorite = async (req, res) => {
   try {
@@ -28,11 +28,11 @@ const addFavorite = async (req, res) => {
 
     // If not found → fetch from API
     if (!event) {
-      const response = await LinkedEventsService.fetchEventById(eventId);
+      const response = await EventsService.fetchEventById(eventId);
       if (!response.success) {
         return res.status(404).json({ error: "Event not found" });
       }
-      const transformed = LinkedEventsService.transformEvent(response.data);
+      const transformed = EventsService.transformEvent(response.data);
       event = await Event.create(transformed);
     }
 

@@ -31,6 +31,6 @@ export default function useField(
     setError("");
   };
 
-  // Only return properties needed for <input>
-  return { inputProps: { type, value, onChange, maxLength  }, error, validate, reset, value, setValue };
+  // Return properties for spreading directly on <input>
+  return { type, value, onChange, error, validate, reset, setValue };
 }
