@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 import axios from "axios";
 
 const FavoritesContext = createContext();
@@ -6,13 +7,17 @@ const FavoritesContext = createContext();
 export const FavoritesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const token = localStorage.getItem("authToken");
+  const { token } = useAuth();
 
   // Fetch favorites
   useEffect(() => {
+    if (!token) {
+      setFavorites([]);
+      setLoading(false);
+      return;
+    }
+
     (async () => {
-      if (!token) return setLoading(false);
       try {
         const res = await axios.get("http://localhost:5001/api/favorites", {
           headers: { Authorization: `Bearer ${token}` },
@@ -43,9 +48,12 @@ export const FavoritesProvider = ({ children }) => {
   const remove = async (eventId) => {
     if (!token) return console.error("User not authenticated");
     try {
-      const res = await axios.delete(`http://localhost:5001/api/favorites/${eventId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.delete(
+        `http://localhost:5001/api/favorites/${eventId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setFavorites(res.data.favorites);
     } catch (err) {
       console.error("Failed to remove favorite:", err);
@@ -54,8 +62,14 @@ export const FavoritesProvider = ({ children }) => {
 
   const isFavorited = (eventId) => favorites.some((f) => f.eventId === eventId);
 
+  const clearFavorites = () => {
+    setFavorites([]);
+  };
+
   return (
-    <FavoritesContext.Provider value={{ favorites, loading, add, remove, isFavorited }}>
+    <FavoritesContext.Provider
+      value={{ favorites, loading, add, remove, isFavorited, clearFavorites }}
+    >
       {children}
     </FavoritesContext.Provider>
   );
