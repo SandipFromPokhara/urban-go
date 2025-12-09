@@ -202,7 +202,7 @@ exports.getEvents = async (req, res) => {
           );
 
           const apiResponse =
-            await linkedEventsService.fetchEvents(apiParams);
+            await eventsService.fetchEvents(apiParams);
 
           if (
             !apiResponse.success ||
@@ -218,7 +218,7 @@ exports.getEvents = async (req, res) => {
           }
 
           const transformed = apiResponse.data.map((event) =>
-            linkedEventsService.transformEvent(event)
+            eventsService.transformEvent(event)
           );
 
           allEvents = allEvents.concat(transformed);
@@ -367,7 +367,7 @@ exports.getEvents = async (req, res) => {
         apiParams
       );
 
-      const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+      const apiResponse = await eventsService.fetchEvents(apiParams);
 
       if (
         !apiResponse.success ||
@@ -383,7 +383,7 @@ exports.getEvents = async (req, res) => {
       }
 
       const batch = apiResponse.data.map((event) =>
-        linkedEventsService.transformEvent(event)
+        eventsService.transformEvent(event)
       );
 
       allTransformed = allTransformed.concat(batch);
@@ -602,7 +602,7 @@ exports.getCategories = async (req, res) => {
       include: "keywords",
     };
 
-    const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+    const apiResponse = await eventsService.fetchEvents(apiParams);
 
     if (!apiResponse.success || !apiResponse.data) {
       return res.status(500).json({
@@ -624,7 +624,7 @@ exports.getCategories = async (req, res) => {
         });
       }
 
-      const transformedEvent = linkedEventsService.transformEvent(event);
+      const transformedEvent = eventsService.transformEvent(event);
       if (
         transformedEvent.categories &&
         Array.isArray(transformedEvent.categories)
