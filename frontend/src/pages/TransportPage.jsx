@@ -22,6 +22,7 @@ function TransportPage({ isDarkMode }) {
   const formInputRef = useRef(null);
   const [selectedOrigin, setSelectedOrigin] = useState(null);
   const {alerts, loading: alertsLoading } = useTransAlerts();
+  const [currentCoords, setCurrentCoords] = useState(null);
 
   // Swap logic
   const swapLocations = () => {
@@ -40,7 +41,8 @@ function TransportPage({ isDarkMode }) {
           lon: pos.coords.longitude,
         };
         setFrom("Current location");
-        // Pass geo into SearchArea somehow
+        setCurrentCoords(geo); 
+        setSelectedOrigin(geo);
       },
       () => alert("Failed to get location")
     );
@@ -73,6 +75,7 @@ function TransportPage({ isDarkMode }) {
             swapLocations={swapLocations}
             fillCurrentLocation={fillCurrentLocation}
             setSelectedOrigin={setSelectedOrigin}
+            currentCoords={currentCoords}
           />
         </div>
 
