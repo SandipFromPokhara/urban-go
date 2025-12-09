@@ -112,9 +112,9 @@ function CommentSection({ apiId, currentUser, isDarkMode }) {
               </div>
 
               <div className="flex flex-col items-center gap-2 ml-4">
-                {/* Delete button if owner/admin */}
+                {/* Delete button if owner/admin/superadmin */}
                 {currentUser &&
-                  (currentUser.role?.toLowerCase() === "admin" ||
+                  (["admin", "superadmin"].includes(currentUser.role?.toLowerCase()) ||
                     String(currentUser._id || currentUser.userId) ===
                       String(c.user?._id || c.user)) && (
                     <button onClick={() => handleDeleteComment(c._id)}>

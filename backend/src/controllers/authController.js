@@ -57,14 +57,22 @@ const register = async (req, res) => {
       address,
       role,
     });
+
+    // Generate JWT token for auto-login after registration
+    const payload = { userId: user._id, email: user.email, role: user.role };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "2h" });
+
     // Safe response: never include password or hash.
     res.status(201).json({
       message: "User registered successfully!",
-      userId: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role, 
+      token,
+      user: {
+        userId: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     // Handle and report any server or validation errors

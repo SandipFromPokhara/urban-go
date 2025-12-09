@@ -6,7 +6,7 @@ const useSignup = (formData) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { showSignupSuccess } = useAuth();
+  const { login, showSignupSuccess } = useAuth();
 
   const handleSignup = async () => {
     // Validation - Check each field individually for specific error messages
@@ -62,11 +62,16 @@ const useSignup = (formData) => {
         throw new Error(data.message || "Registration failed");
       }
 
-      // Show success message via context
+      // Auto-login user after successful registration
       setLoading(false);
       setError(null);
-      showSignupSuccess();
-      navigate("/login");
+      
+      // Login with the received token and user data
+      login(data.token, data.user);
+      showSignupSuccess(data.user.firstName);
+      
+      // Redirect to home page
+      navigate("/");
     } catch (err) {
       setLoading(false);
       setError(err.message);

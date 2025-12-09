@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState(false);
   const [loginMessage, setLoginMessage] = useState(null);
-  const [signupMessage, setSignupMessage] = useState(false);
+  const [signupMessage, setSignupMessage] = useState(null);
 
   // Check authentication on mount
   useEffect(() => {
@@ -30,7 +30,9 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
       } catch (error) {
         console.error("Error parsing user data:", error);
-        logout();
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        setIsAuthenticated(false);
       }
     }
   }, []);
@@ -49,13 +51,19 @@ export const AuthProvider = ({ children }) => {
     }, 3000);
   };
 
-  const showSignupSuccess = () => {
-    setSignupMessage(true);
+  const showSignupSuccess = (firstName) => {
+    setSignupMessage(firstName);
 
     // Hide message after 3 seconds
     setTimeout(() => {
-      setSignupMessage(false);
+      setSignupMessage(null);
     }, 3000);
+  };
+
+  const updateUser = (updatedUserData) => {
+    const updatedUser = { ...user, ...updatedUserData };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
   };
 
   const logout = () => {
@@ -78,6 +86,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     login,
     logout,
+    updateUser,
     logoutMessage,
     loginMessage,
     signupMessage,

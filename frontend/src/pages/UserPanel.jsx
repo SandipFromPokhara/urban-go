@@ -9,7 +9,7 @@ import EventCard from "../components/events/EventCard";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function UserPanel({ isDarkMode }) {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const { profile, loading, error, updateProfile, deleteProfile } =
     useUserProfile();
@@ -18,17 +18,85 @@ export default function UserPanel({ isDarkMode }) {
   const [activeTab, setActiveTab] = useState("update");
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
 
-  useEffect(() => {
-    if (!isAuthenticated) navigate("/login");
-  }, [isAuthenticated, navigate]);
+  const validateForm = (form) => {
+    const errors = {};
+    
+    // Validate first name - should not be empty and contain letters
+    if (!form.firstName.trim()) {
+      errors.firstName = "First name is required";
+    } else if (!/^[a-zA-Z\s\-']+$/.test(form.firstName)) {
+      errors.firstName = "First name should only contain letters";
+    }
+
+    // Validate last name - should not be empty and contain letters
+    if (!form.lastName.trim()) {
+      errors.lastName = "Last name is required";
+    } else if (!/^[a-zA-Z\s\-']+$/.test(form.lastName)) {
+      errors.lastName = "Last name should only contain letters";
+    }
+
+    // Validate date of birth - should not be in the future
+    if (form.dateOfBirth) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(form.dateOfBirth);
+      
+      if (selectedDate > today) {
+        errors.dateOfBirth = "Date of birth cannot be in the future";
+      }
+      
+      // Check if user is at least 13 years old
+      const minAge = new Date();
+      minAge.setFullYear(minAge.getFullYear() - 13);
+      if (selectedDate > minAge) {
+        errors.dateOfBirth = "You must be at least 13 years old";
+      }
+    }
+
+    // Validate street - should contain both letters and numbers
+    if (form.street.trim()) {
+      if (!/[a-zA-Z]/.test(form.street)) {
+        errors.street = "Street address must contain letters, not just numbers";
+      } else if (form.street.length < 3) {
+        errors.street = "Street address is too short";
+      }
+    }
+
+    // Validate city - should only contain letters
+    if (form.city.trim()) {
+      if (!/^[a-zA-Z\s\-']+$/.test(form.city)) {
+        errors.city = "City should only contain letters";
+      } else if (form.city.length < 2) {
+        errors.city = "City name is too short";
+      }
+    }
+
+    // Validate postal code - should be 5 digits (Finnish postal code format)
+    if (form.postalCode.trim()) {
+      if (!/^\d{5}$/.test(form.postalCode)) {
+        errors.postalCode = "Postal code must be exactly 5 digits";
+      }
+    }
+
+    return errors;
+  };
 
   const handleUpdate = async (form) => {
     try {
+      // Validate form
+      const errors = validateForm(form);
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        return;
+      }
+
       setSaving(true);
       setJustSaved(false);
+      setValidationErrors({});
 
-      await updateProfile({
+      const updatedProfile = await updateProfile({
         firstName: form.firstName,
         lastName: form.lastName,
         dateOfBirth: form.dateOfBirth,
@@ -39,8 +107,18 @@ export default function UserPanel({ isDarkMode }) {
         },
       });
 
+      // Update user data in AuthContext to sync with Header
+      updateUser({
+        firstName: updatedProfile.firstName,
+        lastName: updatedProfile.lastName,
+      });
+
       setJustSaved(true);
       setTimeout(() => setJustSaved(false), 2500);
+    } catch (err) {
+      setValidationErrors({ 
+        submit: err.response?.data?.message || "Failed to update profile" 
+      });
     } finally {
       setSaving(false);
     }
@@ -60,6 +138,11 @@ export default function UserPanel({ isDarkMode }) {
         </div>
       </main>
     );
+  }
+
+  if (!isAuthenticated) {
+    navigate("/login");
+    return null;
   }
 
   if (error || !profile) {
@@ -174,8 +257,17 @@ export default function UserPanel({ isDarkMode }) {
                           id="firstName"
                           name="firstName"
                           defaultValue={profile.firstName}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                            validationErrors.firstName
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-indigo-500"
+                          }`}
                         />
+                        {validationErrors.firstName && (
+                          <p className="text-red-600 text-xs mt-1">
+                            {validationErrors.firstName}
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label
@@ -188,8 +280,17 @@ export default function UserPanel({ isDarkMode }) {
                           id="lastName"
                           name="lastName"
                           defaultValue={profile.lastName}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                            validationErrors.lastName
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-indigo-500"
+                          }`}
                         />
+                        {validationErrors.lastName && (
+                          <p className="text-red-600 text-xs mt-1">
+                            {validationErrors.lastName}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div>
@@ -218,13 +319,23 @@ export default function UserPanel({ isDarkMode }) {
                         type="date"
                         id="dateOfBirth"
                         name="dateOfBirth"
+                        max={new Date().toISOString().split('T')[0]}
                         defaultValue={
                           profile.dateOfBirth
                             ? profile.dateOfBirth.slice(0, 10)
                             : ""
                         }
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                          validationErrors.dateOfBirth
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-indigo-500"
+                        }`}
                       />
+                      {validationErrors.dateOfBirth && (
+                        <p className="text-red-600 text-xs mt-1">
+                          {validationErrors.dateOfBirth}
+                        </p>
+                      )}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="sm:col-span-2">
@@ -237,9 +348,19 @@ export default function UserPanel({ isDarkMode }) {
                         <input
                           id="street"
                           name="street"
+                          placeholder="e.g., Kilonportti 1 A"
                           defaultValue={profile.address?.street || ""}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                            validationErrors.street
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-indigo-500"
+                          }`}
                         />
+                        {validationErrors.street && (
+                          <p className="text-red-600 text-xs mt-1">
+                            {validationErrors.street}
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label
@@ -251,9 +372,19 @@ export default function UserPanel({ isDarkMode }) {
                         <input
                           id="city"
                           name="city"
+                          placeholder="e.g., Espoo"
                           defaultValue={profile.address?.city || ""}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                            validationErrors.city
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-indigo-500"
+                          }`}
                         />
+                        {validationErrors.city && (
+                          <p className="text-red-600 text-xs mt-1">
+                            {validationErrors.city}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="w-full sm:w-40">
@@ -266,10 +397,28 @@ export default function UserPanel({ isDarkMode }) {
                       <input
                         id="postalCode"
                         name="postalCode"
+                        placeholder="e.g., 02610"
+                        maxLength="5"
                         defaultValue={profile.address?.postalCode || ""}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                          validationErrors.postalCode
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-indigo-500"
+                        }`}
                       />
+                      {validationErrors.postalCode && (
+                        <p className="text-red-600 text-xs mt-1">
+                          {validationErrors.postalCode}
+                        </p>
+                      )}
                     </div>
+                    {validationErrors.submit && (
+                      <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                        <p className="text-red-600 text-sm">
+                          {validationErrors.submit}
+                        </p>
+                      </div>
+                    )}
                     <div className="flex items-center justify-end gap-3 pt-2">
                       {saving && (
                         <span className="text-xs text-gray-500">
