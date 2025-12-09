@@ -37,10 +37,12 @@ export default function Home({ isDarkMode }) {
         )}
       </AnimatePresence>
 
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col min-h-screen">
         <Hero />
         <CategoryGrid isDarkMode={isDarkMode} />
+        <div className="mb-10 p-10">
         <WhySection isDarkMode={isDarkMode} />
+        </div>
       </div>
     </div>
   );

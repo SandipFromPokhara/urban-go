@@ -1,4 +1,3 @@
-import SeeAlsoSection from "./Trending";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 
@@ -29,7 +28,7 @@ export default function WhySection({ isDarkMode }) {
           repeat: Infinity,
           repeatType: "mirror",
         }}
-        className="mt-24 max-w-6xl mx-auto rounded-2xl p-0.5 bg-[#1B1036]/80"
+        className="max-w-6xl mx-auto rounded-2xl p-0.5 bg-[#1B1036]/80"
       >
         {isAuthenticated && (
         <motion.div 
@@ -77,15 +76,6 @@ export default function WhySection({ isDarkMode }) {
           </motion.p>
         </motion.div>
         )}
-      </motion.div>
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        className="mt-20 px-6"
-      >
-        <SeeAlsoSection isDarkMode={isDarkMode} />
       </motion.div>
     </div>
   );
