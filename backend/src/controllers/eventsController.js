@@ -182,8 +182,8 @@ exports.getEvents = async (req, res) => {
           "📦 Category filter detected - fetching multiple pages..."
         );
 
-        const FETCH_PAGE_SIZE = 100;
-        const MAX_PAGES = 5;
+        const FETCH_PAGE_SIZE = 50;
+        const MAX_PAGES = 2;
         let allEvents = [];
         let currentApiPage = 1;
         let hasMore = true;
@@ -202,7 +202,7 @@ exports.getEvents = async (req, res) => {
           );
 
           const apiResponse =
-            await linkedEventsService.fetchEvents(apiParams);
+            await eventsService.fetchEvents(apiParams);
 
           if (
             !apiResponse.success ||
@@ -218,7 +218,7 @@ exports.getEvents = async (req, res) => {
           }
 
           const transformed = apiResponse.data.map((event) =>
-            linkedEventsService.transformEvent(event)
+            eventsService.transformEvent(event)
           );
 
           allEvents = allEvents.concat(transformed);
@@ -348,8 +348,8 @@ exports.getEvents = async (req, res) => {
     console.log("UI dates:", { uiStartDate, uiEndDate });
 
     const baseApiParams = buildBaseApiParams();
-    const EXTERNAL_PAGE_SIZE = 100;
-    const MAX_PAGES = 5;
+    const EXTERNAL_PAGE_SIZE = 50;
+    const MAX_PAGES = 2;
 
     let currentApiPage = 1;
     let allTransformed = [];
@@ -367,7 +367,7 @@ exports.getEvents = async (req, res) => {
         apiParams
       );
 
-      const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+      const apiResponse = await eventsService.fetchEvents(apiParams);
 
       if (
         !apiResponse.success ||
@@ -383,7 +383,7 @@ exports.getEvents = async (req, res) => {
       }
 
       const batch = apiResponse.data.map((event) =>
-        linkedEventsService.transformEvent(event)
+        eventsService.transformEvent(event)
       );
 
       allTransformed = allTransformed.concat(batch);
@@ -487,15 +487,8 @@ exports.getEventById = async (req, res) => {
       });
     }
 
-<<<<<<< HEAD
-    const apiResponse = await linkedEventsService.fetchEventById(
-      id,
-      language
-    );
-=======
     // Fetch from API
     const apiResponse = await eventsService.fetchEventById(id, language);
->>>>>>> 1faa2da6eed7d51870cbf2898051f4b309417f1a
 
     if (!apiResponse.success) {
       return res.status(404).json({
@@ -609,7 +602,7 @@ exports.getCategories = async (req, res) => {
       include: "keywords",
     };
 
-    const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+    const apiResponse = await eventsService.fetchEvents(apiParams);
 
     if (!apiResponse.success || !apiResponse.data) {
       return res.status(500).json({
@@ -631,7 +624,7 @@ exports.getCategories = async (req, res) => {
         });
       }
 
-      const transformedEvent = linkedEventsService.transformEvent(event);
+      const transformedEvent = eventsService.transformEvent(event);
       if (
         transformedEvent.categories &&
         Array.isArray(transformedEvent.categories)

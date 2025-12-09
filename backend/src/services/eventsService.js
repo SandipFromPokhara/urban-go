@@ -1,11 +1,6 @@
 const axios = require("axios");
 
-<<<<<<< HEAD:backend/src/services/linkedEventsService.js
-// Use environment variable for API URL
-const LINKED_EVENTS_BASE_URL = process.env.EVENTS_URL;
-=======
 const EVENTS_BASE_URL = process.env.EVENTS_URL;
->>>>>>> 1faa2da6eed7d51870cbf2898051f4b309417f1a:backend/src/services/eventsService.js
 
 class EventsService {
   /**
