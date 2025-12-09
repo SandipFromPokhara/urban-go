@@ -11,6 +11,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState(false);
@@ -34,9 +35,10 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (token, userData) => {
-    localStorage.setItem("authToken", token);
+  const login = (tokenValue, userData) => {
+    localStorage.setItem("authToken", tokenValue);
     localStorage.setItem("user", JSON.stringify(userData));
+    setToken(tokenValue);
     setUser(userData);
     setIsAuthenticated(true);
     setLoginMessage(userData.firstName);
@@ -59,6 +61,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
+    setToken(null);
     setUser(null);
     setIsAuthenticated(false);
     setLogoutMessage(true);
@@ -71,6 +74,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    token,
     isAuthenticated,
     login,
     logout,
