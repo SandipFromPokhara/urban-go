@@ -468,10 +468,8 @@ export default function UserPanel({ isDarkMode }) {
                               name: fav.title,
                               description:
                                 fav.description?.replace(/<[^>]+>/g, "") || "",
-                              date: new Date(fav.date).toLocaleDateString(),
-                              endDate: new Date(
-                                fav.endDate
-                              ).toLocaleDateString(),
+                              date: fav.date,
+                              endDate: fav.endDate,
                               image: fav.image,
                               category: fav.category,
                               location: fav.location || "TBA",
