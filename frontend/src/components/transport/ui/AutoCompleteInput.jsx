@@ -1,15 +1,18 @@
+// src/components/transport/ui/AutoCompleteInput.jsx
+
 import { useState, useRef, useEffect, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const  AutoCompleteInput = forwardRef(function AutoCompleteInput(
+const AutoCompleteInput = forwardRef(function AutoCompleteInput(
   {
     value,
-    onChange,
     suggestions = [],
     setSelectedGeo,
+    handleManualInput,
     placeholder,
     className,
     onKeyDown,
+    isDarkMode = false,
   },
   inputRef
 ) {
@@ -27,21 +30,22 @@ const  AutoCompleteInput = forwardRef(function AutoCompleteInput(
 
   useEffect(() => {
     setOpen(suggestions.length > 0);
-    setActiveIndex(-1);
   }, [suggestions]);
 
   const selectItem = (item) => {
-    onChange({ target: { value: item.name } }); // match inputProps signature
+    if (!item) return;
     setSelectedGeo(item);
+    handleManualInput(item.name || "");
     setOpen(false);
+    setActiveIndex(-1);
   };
 
   return (
     <div ref={wrapperRef} className="w-full relative">
       <input
-      ref={inputRef}
+        ref={inputRef} 
         value={value}
-        onChange={onChange}
+        onChange={(e) => handleManualInput(e.target.value)}
         placeholder={placeholder}
         className={className}
         onKeyDown={(e) => {
@@ -50,7 +54,9 @@ const  AutoCompleteInput = forwardRef(function AutoCompleteInput(
             setActiveIndex((i) => (i + 1 < suggestions.length ? i + 1 : 0));
           } else if (e.key === "ArrowUp") {
             e.preventDefault();
-            setActiveIndex((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+            setActiveIndex((i) =>
+              i <= 0 ? suggestions.length - 1 : i - 1
+            );
           } else if (e.key === "Enter" && activeIndex >= 0) {
             e.preventDefault();
             selectItem(suggestions[activeIndex]);
@@ -62,13 +68,17 @@ const  AutoCompleteInput = forwardRef(function AutoCompleteInput(
       />
 
       <AnimatePresence>
-        {open && suggestions.length > 0 && (
+        {open && (
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
-            className="absolute left-0 right-0 mt-1 bg-white shadow-md rounded-md max-h-64 overflow-y-auto z-50 border"
-          >
+            className={`absolute left-0 right-0 mt-1 shadow-md rounded-md max-h-64 overflow-y-auto z-50 border ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-700 text-gray-200"
+                : "bg-white border-gray-300 text-gray-900"
+            }`}
+            >
             {suggestions.map((item, i) => (
               <div
                 key={i}

@@ -2,7 +2,7 @@
 
 const express = require("express");
 const router = express.Router();
-const { getRoutes } = require("../services/routingService");
+const { getRoutes } = require("../services/transRoutingService");
 const { geoCode } = require("../services/geoCodeService");
 
 // Capital Region cities

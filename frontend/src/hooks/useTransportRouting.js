@@ -16,23 +16,12 @@ export default function useTransportRouting() {
     return "";
   };
 
-  /**
-   * Search transport routes
-   * @param {Object} fromGeo { lat, lon, name }
-   * @param {Object} toGeo { lat, lon, name }
-   * @param {string|null} dateTime ISO string of date+time
-   */
-  const searchRoute = async (fromGeo, toGeo, dateTime = null) => {
+  const searchRoute = async (fromGeo, toGeo, dateTime = null, options = {}) => {
     setError("");
     setLoading(true);
 
     try {
-      if (
-        !fromGeo?.lat ||
-        !fromGeo?.lon ||
-        !toGeo?.lat ||
-        !toGeo?.lon
-      ) {
+      if (!fromGeo?.lat || !fromGeo?.lon || !toGeo?.lat || !toGeo?.lon) {
         throw new Error("Invalid origin or destination coordinates.");
       }
 
@@ -44,8 +33,9 @@ export default function useTransportRouting() {
       };
 
       if (dateTime) body.dateTime = dateTime;
+      if (options.limit) body.limit = options.limit;
+      if (options.arriveBy) body.arriveBy = options.arriveBy;
 
-      // Use Vite proxy: /api -> http://localhost:5001
       const res = await fetch("/api/search-route", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
