@@ -73,7 +73,6 @@ const EventDetails = ({ isDarkMode }) => {
 
         const apiEvent = result.data;
 
-        // ---------- NORMALIZE TICKET PRICE / URL ----------
         const firstOffer = apiEvent.offers?.[0];
 
         let ticketPrice = firstOffer?.isFree
@@ -83,7 +82,6 @@ const EventDetails = ({ isDarkMode }) => {
         let infoUrl =
           apiEvent.infoUrl?.en || firstOffer?.infoUrl?.en || "";
 
-        // If "price" field is actually a URL, move it into infoUrl
         const looksLikeUrl = ticketPrice && /https?:\/\//i.test(ticketPrice);
         if (looksLikeUrl) {
           if (!infoUrl) infoUrl = ticketPrice.trim();
@@ -93,25 +91,19 @@ const EventDetails = ({ isDarkMode }) => {
         const transformedEvent = {
           id: apiEvent.apiId,
           name: apiEvent.name?.en || apiEvent.name?.fi || "Untitled Event",
-
           description:
             apiEvent.shortDescription?.en || apiEvent.description?.en || "",
-
           longDescription:
             apiEvent.description?.en ||
             apiEvent.shortDescription?.en ||
             "No description available.",
-
           date: apiEvent.startTime,
           endDate: apiEvent.endTime,
-
           time: formatTimeRange(apiEvent.startTime, apiEvent.endTime),
-
           location:
             apiEvent.location?.name?.en ||
             apiEvent.location?.city?.en ||
             "Helsinki",
-
           fullAddress: [
             apiEvent.location?.streetAddress?.en,
             apiEvent.location?.city?.en,
@@ -119,26 +111,19 @@ const EventDetails = ({ isDarkMode }) => {
           ]
             .filter(Boolean)
             .join(", "),
-
           image:
             apiEvent.images?.[0]?.url ||
             "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800",
-
           category:
             apiEvent.categories?.[0] ||
             apiEvent.keywords?.[0]?.name?.en ||
             "",
-
           tags: apiEvent.categories || [],
-
           organizer:
             apiEvent.provider?.en || apiEvent.publisher || "Event Organizer",
-
-          // FIXED — CLEAN TICKET PRICE + URL
           ticketPrice,
           isFree: firstOffer?.isFree || false,
           infoUrl,
-
           keywords:
             apiEvent.keywords?.map((kw) => kw.name?.en).filter(Boolean) || [],
         };
@@ -156,11 +141,72 @@ const EventDetails = ({ isDarkMode }) => {
     fetchEventDetails();
   }, [id]);
 
-  // ---------- HELPERS ----------
+  // SMART DATE CALCULATION for ongoing events
+  const calculateSmartDate = (startDate, endDate) => {
+    if (!startDate) return null;
+
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : null;
+
+    const isOngoing = start < now && (!end || end > now);
+
+    if (isOngoing) {
+      // Calculate next occurrence 
+      const dayOfWeek = start.getDay();
+      const startHour = start.getHours();
+      const startMinute = start.getMinutes();
+
+      const daysUntilNext = (dayOfWeek - now.getDay() + 7) % 7 || 7;
+      
+      const nextOccurrence = new Date(now);
+      nextOccurrence.setDate(now.getDate() + daysUntilNext);
+      nextOccurrence.setHours(startHour, startMinute, 0, 0);
+
+      if (nextOccurrence <= now) {
+        nextOccurrence.setDate(nextOccurrence.getDate() + 7);
+      }
+
+      return nextOccurrence;
+    }
+
+    return start;
+  };
+
   const formatTimeRange = (startTime, endTime) => {
     if (!startTime) return "Time TBA";
 
     const start = new Date(startTime);
+    const startHour = start.getHours();
+    const startMinute = start.getMinutes();
+
+    // Check for common all-day patterns
+    if (!endTime) {
+   
+      if (startHour === 0 && startMinute === 0) {
+        return "All day";
+      }
+    } else {
+      const end = new Date(endTime);
+      const endHour = end.getHours();
+      const endMinute = end.getMinutes();
+      
+      // Pattern 1: 00:00 - 00:00 
+      if (startHour === 0 && startMinute === 0 && endHour === 0 && endMinute === 0) {
+        return "All day";
+      }
+      
+      // Pattern 2: 00:01 - 23:59 
+      if (startHour === 0 && startMinute === 1 && endHour === 23 && endMinute === 59) {
+        return "All day";
+      }
+      
+      // Pattern 3: 00:00 - 23:59
+      if (startHour === 0 && startMinute === 0 && endHour === 23 && endMinute === 59) {
+        return "All day";
+      }
+    }
+
     const startStr = start.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -179,13 +225,29 @@ const EventDetails = ({ isDarkMode }) => {
     return `${startStr} - ${endStr}`;
   };
 
+  // UPDATED: Format date with smart calculation
   const formatDate = (dateString) => {
+    if (!dateString) return "Date TBA";
+    
     return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
+  };
+
+  // Normalize location names
+  const normalizeLocation = (location) => {
+    if (!location) return 'Location TBA';
+    
+    const locationLower = location.toLowerCase().trim();
+    
+    if (locationLower === 'internet') {
+      return 'Online';
+    }
+    
+    return location;
   };
 
   const handleBack = () => navigate(`/events${fromSearch}`);
@@ -223,7 +285,6 @@ const EventDetails = ({ isDarkMode }) => {
     }
   };
 
-  // ---------- LOADING ----------
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
@@ -237,7 +298,6 @@ const EventDetails = ({ isDarkMode }) => {
     );
   }
 
-  // ---------- ERROR ----------
   if (error || !event) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
@@ -254,11 +314,16 @@ const EventDetails = ({ isDarkMode }) => {
   }
   const favorite = isFavorited(event.id);
 
-  // ---------- MAIN UI ----------
+  //Calculate smart dates for display
+  const smartStartDate = calculateSmartDate(event.date, event.endDate);
+  const now = new Date();
+  const start = new Date(event.date);
+  const end = event.endDate ? new Date(event.endDate) : null;
+  const isOngoing = start < now && (!end || end > now);
+
   return (
     <div className={`min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`} style={{ paddingTop: "5rem" }}>
 
-      {/* Header Image */}
       <div className="relative h-96 overflow-hidden">
         <img
           src={event.image}
@@ -267,7 +332,6 @@ const EventDetails = ({ isDarkMode }) => {
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
 
-        {/* Favorite + Share */}
         <div className="absolute top-4 right-4 flex gap-2" style={{ zIndex: 10 }}>
           <motion.button
             onClick={handleFavoriteClick}
@@ -302,11 +366,9 @@ const EventDetails = ({ isDarkMode }) => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* Left Column */}
           <div className="lg:col-span-2">
             <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg shadow-md p-6`}>
 
@@ -329,7 +391,6 @@ const EventDetails = ({ isDarkMode }) => {
                 />
               </div>
 
-              {/* Tags */}
               {event.keywords.length > 0 && (
                 <div className={`border-t pt-6 mt-6 ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
                   <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
@@ -352,7 +413,6 @@ const EventDetails = ({ isDarkMode }) => {
             </div>
           </div>
 
-          {/* Right Column */}
           <div className="lg:col-span-1">
             <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg shadow-md p-6 sticky top-4`}>
               <h3 className={`text-xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
@@ -361,20 +421,16 @@ const EventDetails = ({ isDarkMode }) => {
 
               <div className="space-y-5">
                 
-                {/* Dates */}
+                {/*show the calculated date */}
                 <div className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
                   <div>
                     <p className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                      Dates
+                      Date
                     </p>
                     <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
-                      {formatDate(event.date)} – {formatDate(event.endDate)}
+                      {formatDate(smartStartDate)}
                     </p>
-
-                    {new Date(event.endDate) > new Date() && (
-                      <p className="text-green-500 text-sm font-medium mt-1">Ongoing event</p>
-                    )}
                   </div>
                 </div>
 
@@ -399,7 +455,7 @@ const EventDetails = ({ isDarkMode }) => {
                       Location
                     </p>
                     <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
-                      {event.location}
+                      {normalizeLocation(event.location)}
                     </p>
                     <p className={`text-xs mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
                       {event.fullAddress}
@@ -447,7 +503,6 @@ const EventDetails = ({ isDarkMode }) => {
 
               </div>
 
-              {/* Ticket Price */}
               <div className={`mt-6 pt-6 border-t ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
                 <p className={`text-sm mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                   Ticket Price
@@ -462,10 +517,8 @@ const EventDetails = ({ isDarkMode }) => {
                 {averageRating ? averageRating.toFixed(1) : "No rating yet"}
               </div>
 
-              {/* Action Buttons */}
               <div className="mt-6 space-y-3">
                 
-                {/* Visit Website Button for free events or unknown price */}
                 {(event.isFree || event.ticketPrice === "Check website for pricing") && event.infoUrl && (
                   <button
                     onClick={handleVisitWebsite}
@@ -488,7 +541,6 @@ const EventDetails = ({ isDarkMode }) => {
                   </button>
                 )}
 
-                {/* Buy Ticket Button only for PAID events */}
                 {!event.isFree &&
                   event.ticketPrice !== "Check website for pricing" &&
                   event.infoUrl && (
@@ -513,7 +565,6 @@ const EventDetails = ({ isDarkMode }) => {
                     </button>
                   )}
 
-                {/* Plan Route Button */}
                 <button
                   onClick={handlePlanRoute}
                   className="w-full py-3 rounded-lg transition-colors font-medium"
@@ -539,7 +590,6 @@ const EventDetails = ({ isDarkMode }) => {
         </div>
       </div>
 
-      {/* Back to Events + Comments */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
