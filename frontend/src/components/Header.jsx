@@ -1,11 +1,12 @@
 import { motion, useAnimation, useScroll } from "framer-motion";
-import { CircleUserRound, LogOut, Menu, X, ChevronDown, User, Shield } from "lucide-react";
+import { CircleUserRound, LogOut, Menu, X, User, Shield } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo2 from "../assets/images/Logo2.png";
 import { useAuth } from "../context/AuthContext";
 import useLogout from "../hooks/useLogout";
 import Navbar from "./Navbar";
+import { useMotionValueEvent } from "framer-motion";
 
 function Header() {
   const controls = useAnimation();
@@ -15,7 +16,6 @@ function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const { handleLogout } = useLogout();
-  const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -29,26 +29,24 @@ function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    return scrollY.onChange((currentScrollY) => {
-      const diff = currentScrollY - lastScrollY.current;
+  useMotionValueEvent(scrollY, "change", (currentScrollY) => {
+  const diff = currentScrollY - lastScrollY.current;
 
-      // Only react if scrolled more than 20px
-      if (diff > 20 && currentScrollY > 100) {
-        controls.start({
-          y: "-100%",
-          transition: { duration: 0.3, ease: "easeInOut" },
-        });
-      } else if (diff < -20 || currentScrollY <= 100) {
-        controls.start({
-          y: "0%",
-          transition: { duration: 0.3, ease: "easeInOut" },
-        });
-      }
-
-      lastScrollY.current = currentScrollY;
+  if (diff > 0 && currentScrollY > 0) {
+    controls.start({
+      y: "-100%",
+      transition: { duration: 0.3, ease: "easeInOut" },
     });
-  }, [controls, scrollY]);
+  } else if (diff < -10 || currentScrollY <= 100) {
+    controls.start({
+      y: "0%",
+      transition: { duration: 0.3, ease: "easeInOut" },
+    });
+  }
+
+  lastScrollY.current = currentScrollY;
+});
+
 
   return (
     <motion.header
