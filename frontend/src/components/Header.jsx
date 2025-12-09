@@ -145,7 +145,7 @@ function Header() {
           closed: { opacity: 0, y: "-100%", pointerEvents: "none" },
         }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className="from-gradient-start via-gradient-via to-gradient-end absolute top-20 left-0 z-40 flex w-full flex-col items-center gap-6 rounded-b-2xl bg-linear-to-t py-8 text-white shadow-lg backdrop-blur-sm md:hidden"
+        className="from-[#2c1f5e] via-[#3b2a7a] to-[#1b1f55] absolute top-20 left-0 z-40 flex w-full flex-col items-center gap-6 rounded-b-2xl bg-linear-to-t py-8 text-white shadow-lg backdrop-blur-sm md:hidden"
       >
         <Navbar />
         {isAuthenticated ? (
