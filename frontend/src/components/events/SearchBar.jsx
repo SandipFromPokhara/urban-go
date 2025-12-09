@@ -1,5 +1,7 @@
 import { Search, Filter, X, Calendar, MapPin, Tag } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import { RiRobot3Fill } from "react-icons/ri";
 
 const MAIN_CATEGORIES = [
   'Culture',
@@ -26,6 +28,7 @@ const SearchBar = ({
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm || '');
+  const navigate = useNavigate();
 
   // Autosuggest state
   const [suggestions, setSuggestions] = useState([]);
@@ -376,7 +379,7 @@ const SearchBar = ({
             {/* Search Button */}
             <button
               onClick={handleSearchClick}
-              className="px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap"
+              className="px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap cursor-pointer hover:-translate-y-1"
               style={{
                 backgroundColor: '#2563eb',
                 color: '#ffffff',
@@ -393,7 +396,7 @@ const SearchBar = ({
           {/* Filter Button */}
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center justify-center rounded-lg transition-all duration-200 sm:shrink-0 relative"
+            className="flex items-center justify-center rounded-lg transition-all duration-200 sm:shrink-0 relative cursor-pointer hover:-translate-y-1"
             style={{
               backgroundColor: showFilters || hasActiveFilters
                 ? '#2563eb'
@@ -420,6 +423,25 @@ const SearchBar = ({
                 style={{ backgroundColor: '#ef4444' }}
               />
             )}
+          </button>
+
+          <button
+            className="flex items-center justify-center rounded-lg text-lg transition-all duration-200 sm:shrink-0 relative hover:-translate-y-1 cursor-pointer"
+            style={{
+              backgroundColor: isDarkMode ? '#2563eb' : '#3b82f6', // set your preferred BG
+              color: '#ffffff', // text color
+              padding: '0 12px',
+              height: '38px'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = isDarkMode ? '#1d4ed8' : '#2563eb';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = isDarkMode ? '#2563eb' : '#3b82f6';
+            }}
+            onClick={() => navigate("/ai")}
+          >
+            <RiRobot3Fill className="mr-1" /> AI Mode
           </button>
 
           {/* Clear Filters Button */}

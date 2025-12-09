@@ -13,6 +13,7 @@ const transportRoutes = require("./src/routes/transportRoutes");
 const transAlertRoutes = require("./src/routes/transAlertRoutes");
 const autocompleteRoutes = require("./src/routes/autocompleteRoutes");
 const weatherRoutes = require("./src/routes/weatherRoutes");
+const aiRoutes = require("./src/routes/aiRoutes");
 const userRoutes = require("./src/routes/userRoutes");
 const ratingRoutes = require("./src/routes/ratingRoutes");
 const adminRoutes = require("./src/routes/adminRoutes");
@@ -28,6 +29,7 @@ app.use("/api/search-route", transportRoutes);
 app.use("/api/autocomplete", autocompleteRoutes);
 app.use("/api/weather", weatherRoutes);
 app.use("/api/alerts", transAlertRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Protected route: requires a valid JWT token
 app.get("/api/protectedroute", authMiddleware, (req, res) => {
