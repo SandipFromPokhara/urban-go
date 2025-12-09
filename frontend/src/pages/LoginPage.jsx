@@ -1,26 +1,8 @@
-import { motion, AnimatePresence } from "framer-motion";
 import Login from "../components/signup/Login.jsx";
-import { useAuth } from "../context/AuthContext";
 
 const LoginPage = ({ isDarkMode }) => {
-  const { signupMessage } = useAuth();
-
   return (
     <>
-      {/* Signup Success Message Banner */}
-      <AnimatePresence>
-        {signupMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed top-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-white shadow-lg"
-          >
-            Registration successful! Please login to continue.
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div
         className={`mt-15 flex min-h-[calc(100vh-80px)] items-center justify-center px-4 transition-colors duration-300 sm:px-6 lg:px-8 ${isDarkMode ? "bg-gray-900" : "bg-slate-50"}`}
       >

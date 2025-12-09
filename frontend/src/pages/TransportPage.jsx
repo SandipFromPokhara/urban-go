@@ -4,9 +4,9 @@ import { useState, useRef } from "react";
 import MapSection from "../components/transport/MapSection";
 import HeroSection from "../components/transport/HeroSection";
 import SearchArea from "../components/transport/SearchArea";
-import RouteList from "../components/transport/RouteList";
 import RightPanel from "../components/transport/RightPanel";
-import MapInfoPanel from "../components/transport/MapInfoPanel"; 
+import ServiceDisruption from "../components/transport/ServiceDisruption";
+import { useTransAlerts } from "../hooks/useTransAlerts";
 import "leaflet/dist/leaflet.css";
 
 function TransportPage({ isDarkMode }) {
@@ -20,6 +20,8 @@ function TransportPage({ isDarkMode }) {
   const [activeRouteIndex, setActiveRouteIndex] = useState(null);
   const formRef = useRef(null);
   const formInputRef = useRef(null);
+  const [selectedOrigin, setSelectedOrigin] = useState(null);
+  const {alerts, loading: alertsLoading } = useTransAlerts();
 
   // Swap logic
   const swapLocations = () => {
@@ -31,7 +33,15 @@ function TransportPage({ isDarkMode }) {
   // Geolocation fill
   const fillCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
-      (pos) => setFrom(`${pos.coords.latitude}, ${pos.coords.longitude}`),
+      (pos) => {
+        const geo = {
+          name: "Current location",
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+        };
+        setFrom("Current location");
+        // Pass geo into SearchArea somehow
+      },
       () => alert("Failed to get location")
     );
   };
@@ -46,7 +56,7 @@ function TransportPage({ isDarkMode }) {
       </div>
 
       {/* Main content section */}
-      <section className="relative w-full flex flex-col md:flex-row mt-10 pb-8 gap-14 items-stretch px-4 sm:px-6">
+      <section className="relative w-full flex flex-col md:flex-row mt-10 pb-8 gap-8 items-stretch px-4 sm:px-6">
         
         {/* Left Column: SearchArea + RouteList */}
         <div className="md:w-1/2 flex flex-col gap-6">
@@ -57,11 +67,12 @@ function TransportPage({ isDarkMode }) {
             time={time} setTime={setTime}
             routes={routes} setRoutes={setRoutes}
             isDarkMode={isDarkMode}
-            formInputRef={formInputRef}
+            ref={formInputRef}
             loading={loading} setLoading={setLoading}
             activeRouteIndex={activeRouteIndex} setActiveRouteIndex={setActiveRouteIndex}
             swapLocations={swapLocations}
             fillCurrentLocation={fillCurrentLocation}
+            setSelectedOrigin={setSelectedOrigin}
           />
         </div>
 
@@ -87,12 +98,19 @@ function TransportPage({ isDarkMode }) {
             />
           </div>
 
-          {/* Use the new component here */}
-          <MapInfoPanel isDarkMode={isDarkMode} />
+          <div className="p-4">
+            <ServiceDisruption isDarkMode={isDarkMode} alerts={alerts} />
+            {alertsLoading && <p className="text-sm opacity-70 mt-2">Loading disruptions...</p>}
+          </div>
         </div>
         {/* Right Panel (optional, hidden on mobile) */}
-        <div className="hidden md:flex md:flex-col md:w-1/5">
-          <RightPanel isDarkMode={isDarkMode} />
+        <div className="w-full flex flex-col md:w-1/3">
+          <RightPanel 
+            isDarkMode={isDarkMode}
+            co2={routes[activeRouteIndex]?.co2}
+            ticketInfo={routes[activeRouteIndex]?.ticketInfo}
+            alerts={[]}
+          />
           </div>
       </section>
     </main>

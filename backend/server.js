@@ -10,7 +10,12 @@ const favoritesRoutes = require("./src/routes/favoritesRoutes");
 const commentsRoutes = require("./src/routes/commentsRoutes");
 const eventsRoutes = require("./src/routes/eventsRoutes");
 const transportRoutes = require("./src/routes/transportRoutes");
+const transAlertRoutes = require("./src/routes/transAlertRoutes");
+const autocompleteRoutes = require("./src/routes/autocompleteRoutes");
+const weatherRoutes = require("./src/routes/weatherRoutes");
+const userRoutes = require("./src/routes/userRoutes");
 const ratingRoutes = require("./src/routes/ratingRoutes");
+const adminRoutes = require("./src/routes/adminRoutes");
 
 const app = express();
 
@@ -19,7 +24,10 @@ app.use(express.json());
 app.use(cors());
 
 // Transportation API route
-app.use("/api", transportRoutes);
+app.use("/api/search-route", transportRoutes);
+app.use("/api/autocomplete", autocompleteRoutes);
+app.use("/api/weather", weatherRoutes);
+app.use("/api/alerts", transAlertRoutes);
 
 // Protected route: requires a valid JWT token
 app.get("/api/protectedroute", authMiddleware, (req, res) => {
@@ -34,7 +42,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/favorites", favoritesRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/events", eventsRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/ratings", ratingRoutes);
+app.use("/api/admin", adminRoutes);
 
 // 404 Handler
 app.use((req, res) => {

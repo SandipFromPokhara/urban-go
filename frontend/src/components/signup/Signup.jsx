@@ -88,7 +88,7 @@ const Signup = ({ isDarkMode }) => {
         >
           Sign Up
         </h1>
-        <div className="mt-2 h-1 w-[60px] rounded bg-gradient-to-r from-blue-500 to-purple-600"></div>
+        <div className="mt-2 h-1 w-[60px] rounded bg-linear-to-r from-blue-500 to-purple-600"></div>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -164,6 +164,7 @@ const Signup = ({ isDarkMode }) => {
             value={dateOfBirthField.value}
             onChange={dateOfBirthField.onChange}
             name="dateOfBirth"
+            max={new Date().toISOString().split('T')[0]}
             onFocus={(e) => e.target.showPicker && e.target.showPicker()}
             className={`${inputFieldClass} cursor-pointer ${
               !dateOfBirthField.value ? "opacity-0" : ""
@@ -241,7 +242,7 @@ const Signup = ({ isDarkMode }) => {
 
         <div className="mt-6 mb-3 flex w-full gap-4 md:mt-4 md:mb-2">
           <button
-            className="font-inter flex h-[52px] w-full cursor-pointer items-center justify-center rounded-xl border-none bg-gradient-to-br from-blue-500 to-purple-600 text-base font-semibold text-white shadow-[0_4px_15px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-700 hover:shadow-[0_6px_20px_rgba(59,130,246,0.4)] active:translate-y-0 active:shadow-[0_2px_10px_rgba(59,130,246,0.3)] disabled:cursor-not-allowed disabled:opacity-60 sm:h-12"
+            className="font-inter flex h-[52px] w-full cursor-pointer items-center justify-center rounded-xl border-none bg-linear-to-br from-blue-500 to-purple-600 text-base font-semibold text-white shadow-[0_4px_15px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-linear-to-br hover:from-blue-600 hover:to-purple-700 hover:shadow-[0_6px_20px_rgba(59,130,246,0.4)] active:translate-y-0 active:shadow-[0_2px_10px_rgba(59,130,246,0.3)] disabled:cursor-not-allowed disabled:opacity-60 sm:h-12"
             onClick={handleSignup}
             disabled={loading}
           >

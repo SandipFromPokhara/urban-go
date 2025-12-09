@@ -27,15 +27,27 @@ const register = async (req, res) => {
   }
 
   try {
-    // Ensure email is unique, prevent duplicate accounts.
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use." });
     }
-    // Securely hash password before storing in the database.
+    
     const hashed = await bcrypt.hash(req.body.password, 12);
 
-    // Create and store new user document in MongoDB collection.
+    // Admin Assignment Logic:
+    // 1. Email matches ADMIN_EMAIL in .env = superadmin (highest priority)
+    // 2. First registered user = admin (if not ADMIN_EMAIL)
+    // 3. Otherwise = regular user
+    const userCount = await User.countDocuments();
+    const isAdminEmail = email === process.env.ADMIN_EMAIL;
+    // ADMIN_EMAIL always becomes superadmin, first user becomes admin, others are users
+    let role = "user";
+    if (isAdminEmail) {
+      role = "superadmin";
+    } else if (userCount === 0) {
+      role = "admin";
+    }
+
     const user = await User.create({
       firstName,
       lastName,
@@ -43,16 +55,24 @@ const register = async (req, res) => {
       password: hashed,
       dateOfBirth,
       address,
-      role: "user",
+      role,
     });
+
+    // Generate JWT token for auto-login after registration
+    const payload = { userId: user._id, email: user.email, role: user.role };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "2h" });
+
     // Safe response: never include password or hash.
     res.status(201).json({
       message: "User registered successfully!",
-      userId: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role, 
+      token,
+      user: {
+        userId: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     // Handle and report any server or validation errors

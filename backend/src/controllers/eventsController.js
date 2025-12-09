@@ -1,5 +1,5 @@
 const Event = require("../models/eventModel");
-const linkedEventsService = require("../services/linkedEventsService");
+const eventsService = require("../services/eventsService");
 
 /**
  * Get events with caching and filtering.
@@ -285,7 +285,7 @@ exports.getEvents = async (req, res) => {
         apiParams
       );
 
-      const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+      const apiResponse = await eventsService.fetchEvents(apiParams);
 
       console.log("External Events API Response (simple):", {
         success: apiResponse.success,
@@ -314,7 +314,7 @@ exports.getEvents = async (req, res) => {
       }
 
       let eventsToCache = apiResponse.data.map((event) =>
-        linkedEventsService.transformEvent(event)
+        eventsService.transformEvent(event)
       );
 
       eventsToCache.forEach((event) => {
@@ -487,10 +487,15 @@ exports.getEventById = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     const apiResponse = await linkedEventsService.fetchEventById(
       id,
       language
     );
+=======
+    // Fetch from API
+    const apiResponse = await eventsService.fetchEventById(id, language);
+>>>>>>> 1faa2da6eed7d51870cbf2898051f4b309417f1a
 
     if (!apiResponse.success) {
       return res.status(404).json({
@@ -499,7 +504,8 @@ exports.getEventById = async (req, res) => {
       });
     }
 
-    const transformedEvent = linkedEventsService.transformEvent(
+    // Transform and cache
+    const transformedEvent = eventsService.transformEvent(
       apiResponse.data
     );
 
@@ -544,7 +550,7 @@ exports.refreshEvents = async (req, res) => {
       page_size = 100,
     } = req.query;
 
-    const apiResponse = await linkedEventsService.fetchEvents({
+    const apiResponse = await eventsService.fetchEvents({
       start,
       end,
       language,
@@ -560,7 +566,7 @@ exports.refreshEvents = async (req, res) => {
     }
 
     const eventsToCache = apiResponse.data.map((event) =>
-      linkedEventsService.transformEvent(event)
+      eventsService.transformEvent(event)
     );
 
     const cachePromises = eventsToCache.map((event) =>

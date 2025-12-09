@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 // Add or update a rating
 const rateEvent = async (req, res) => {
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
   const { rating } = req.body;
   const apiId = req.params.apiId;
   const apiIdstr = String(apiId);

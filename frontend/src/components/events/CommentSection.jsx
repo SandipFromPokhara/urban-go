@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { Trash2, Flag } from "lucide-react";
 
-import { getComments, addComment, deleteComment } from "../../hooks/comments";
+import {
+  getComments,
+  addComment,
+  deleteComment,
+  reportComment,
+} from "../../hooks/comments";
 
 function CommentSection({ apiId, currentUser, isDarkMode }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-
+  const [reportedComments, setReportedComments] = useState([]);
   // Load comments
   useEffect(() => {
     const load = async () => {
@@ -37,6 +42,24 @@ function CommentSection({ apiId, currentUser, isDarkMode }) {
     setComments((prev) => prev.filter((c) => c._id !== commentId));
   };
 
+  // Report comment
+  const handleReportComment = async (commentId) => {
+  try {
+    const data = await reportComment(commentId);
+
+    setComments(prev =>
+      prev.map(c =>
+        c._id === commentId
+          ? { ...c, reports: data.reports, isReported: data.isReported }
+          : c
+      )
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
   // Format timestamp
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleString("en-US", {
@@ -48,8 +71,14 @@ function CommentSection({ apiId, currentUser, isDarkMode }) {
     });
 
   return (
-    <div className="mt-8 p-6 rounded-xl shadow-md" style={{ backgroundColor: isDarkMode ? "#1f2937" : "#ffffff" }}>
-      <h3 className="text-xl font-semibold mb-4" style={{ color: isDarkMode ? "#d1d5db" : "#111827" }}>
+    <div
+      className="mt-8 p-6 rounded-xl shadow-md"
+      style={{ backgroundColor: isDarkMode ? "#1f2937" : "#ffffff" }}
+    >
+      <h3
+        className="text-xl font-semibold mb-4"
+        style={{ color: isDarkMode ? "#d1d5db" : "#111827" }}
+      >
         Comments
       </h3>
 
@@ -58,47 +87,75 @@ function CommentSection({ apiId, currentUser, isDarkMode }) {
         {comments.map((c) => (
           <div
             key={c._id}
-            className="border rounded-lg p-4" style={{ backgroundColor: isDarkMode ? "#374151" : "#f9fafb",
-            borderColor: isDarkMode ? "#374151" : "#ffffff"
-             }}
+            className="border rounded-lg p-4"
+            style={{
+              backgroundColor: isDarkMode ? "#374151" : "#f9fafb",
+              borderColor: isDarkMode ? "#374151" : "#ffffff",
+            }}
           >
             <div className="flex justify-between items-start">
               <div>
-                <p className="font-semibold" style={{ color: isDarkMode ? "#ffffff" : "#111827" }}>
+                <p
+                  className="font-semibold"
+                  style={{ color: isDarkMode ? "#ffffff" : "#111827" }}
+                >
                   {c.user
                     ? `${c.user.firstName} ${c.user.lastName}`
                     : "Unknown user"}
                 </p>
-                <p style={{ color: isDarkMode ? "#d1d5db" : "#374151" }}>{c.comment}</p>
+                <p style={{ color: isDarkMode ? "#d1d5db" : "#374151" }}>
+                  {c.comment}
+                </p>
                 <p style={{ color: isDarkMode ? "#9ca3af" : "#6b7280" }}>
                   {formatDate(c.createdAt)}
                 </p>
               </div>
 
               <div className="flex flex-col items-center gap-2 ml-4">
-                {/* Delete button if owner/admin */}
+                {/* Delete button if owner/admin/superadmin */}
                 {currentUser &&
-                  (currentUser.role?.toLowerCase() === "admin" ||
+                  (["admin", "superadmin"].includes(currentUser.role?.toLowerCase()) ||
                     String(currentUser._id || currentUser.userId) ===
                       String(c.user?._id || c.user)) && (
                     <button onClick={() => handleDeleteComment(c._id)}>
-                      <Trash2 className="w-5 h-5 hover:opacity-80" style={{color: isDarkMode ? "#ffffff" : "#111827"
-                      }}/>
+                      <Trash2
+                        className="w-5 h-5 hover:opacity-80"
+                        style={{ color: isDarkMode ? "#ffffff" : "#111827" }}
+                      />
                     </button>
                   )}
 
                 {/* Report button */}
-                <button>
-                  <Flag className="w-5 h-5 hover:opacity-80" style={{color: isDarkMode ? "#ffffff" : "#111827"
-                      }}/>
+                <button onClick={() => handleReportComment(c._id)}>
+                  <Flag
+                    className="w-5 h-5 hover:opacity-80"
+                    style={{
+                      color: c.isReported
+                        ? "red"
+                        : isDarkMode
+                        ? "#ffffff"
+                        : "#111827",
+                    }}
+                  />
                 </button>
+                {currentUser && (currentUser.role?.toLowerCase() === "admin" || currentUser.role?.toLowerCase() === "superadmin") && (
+                  <span
+                    className="text-xs font-semibold px-2 py-1 rounded-full bg-red-600 text-white"
+                    title={`${c.reports || 0} reports`}
+                  >
+                    {c.reports || 0}
+                  </span>
+                )}
               </div>
             </div>
           </div>
         ))}
 
         {comments.length === 0 && (
-          <p style={{ color: isDarkMode ? "#9ca3af" : "#6b7280" }} className="italic">
+          <p
+            style={{ color: isDarkMode ? "#9ca3af" : "#6b7280" }}
+            className="italic"
+          >
             No comments yet. Be the first!
           </p>
         )}
@@ -109,9 +166,11 @@ function CommentSection({ apiId, currentUser, isDarkMode }) {
         <div className="mt-6">
           <textarea
             className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ color: isDarkMode ? "#d1d5db" : "#374151", backgroundColor: isDarkMode ? "#374151" : "#f3f4f6",
-            borderColor: isDarkMode ? "#4b5563" : "#d1d5db"
-             }}
+            style={{
+              color: isDarkMode ? "#d1d5db" : "#374151",
+              backgroundColor: isDarkMode ? "#374151" : "#f3f4f6",
+              borderColor: isDarkMode ? "#4b5563" : "#d1d5db",
+            }}
             placeholder="Write your comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
@@ -125,7 +184,10 @@ function CommentSection({ apiId, currentUser, isDarkMode }) {
           </button>
         </div>
       ) : (
-        <p style={{ color: isDarkMode ? "#9ca3af" : "#6b7280" }} className="mt-4">
+        <p
+          style={{ color: isDarkMode ? "#9ca3af" : "#6b7280" }}
+          className="mt-4"
+        >
           Please <span className="font-semibold">log in</span> to comment.
         </p>
       )}

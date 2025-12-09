@@ -15,10 +15,7 @@ export default function useField(
     let val = (e.target.value || "").toString();
 
     // Apply maxLength
-    if (val.length > maxLength) {
-      val = val.slice(0, maxLength);
-    }
-
+    if (val.length > maxLength) val = val.slice(0, maxLength);
     setValue(val);
     setError(validator(val));
   };
@@ -34,6 +31,6 @@ export default function useField(
     setError("");
   };
 
-  // Only return properties needed for <input>
+  // Return properties for spreading directly on <input>
   return { type, value, onChange, error, validate, reset, setValue };
 }

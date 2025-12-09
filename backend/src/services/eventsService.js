@@ -1,11 +1,15 @@
 const axios = require("axios");
 
+<<<<<<< HEAD:backend/src/services/linkedEventsService.js
 // Use environment variable for API URL
 const LINKED_EVENTS_BASE_URL = process.env.EVENTS_URL;
+=======
+const EVENTS_BASE_URL = process.env.EVENTS_URL;
+>>>>>>> 1faa2da6eed7d51870cbf2898051f4b309417f1a:backend/src/services/eventsService.js
 
 class EventsService {
   /**
-   * Fetch events from external Events API
+   * Fetch events from Events API
    * @param {Object} params - Query parameters
    * @param {string} params.start - Start date (ISO format or 'today')
    * @param {string} params.end - End date (ISO format or 'next_week')
@@ -53,11 +57,11 @@ class EventsService {
       }
 
       console.log('External Events API request:', {
-        url: `${LINKED_EVENTS_BASE_URL}/event/`,
+        url: `${EVENTS_BASE_URL}/event/`,
         params: queryParams
       });
 
-      const response = await axios.get(`${LINKED_EVENTS_BASE_URL}/event/`, {
+      const response = await axios.get(`${EVENTS_BASE_URL}/event/`, {
         params: queryParams,
         timeout: 10000, // 10 second timeout
       });
@@ -138,7 +142,7 @@ class EventsService {
   async fetchEventById(eventId, language = "en") {
     try {
       const response = await axios.get(
-        `${LINKED_EVENTS_BASE_URL}/event/${eventId}/`,
+        `${EVENTS_BASE_URL}/event/${eventId}/`,
         {
           params: {
             language,

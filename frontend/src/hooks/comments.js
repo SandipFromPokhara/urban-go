@@ -35,3 +35,12 @@ export const deleteComment = async (commentId) => {
 
   return res.json();
 };
+
+// Report a comment
+export const reportComment = async (commentId) => {
+  const res = await fetch(`${API_URL}/${commentId}/report`, {
+      method: "POST",
+    });
+
+  return res.json();
+};

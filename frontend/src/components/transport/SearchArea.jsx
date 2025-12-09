@@ -1,146 +1,219 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { FaSearchLocation, FaCloudSun, FaLeaf, FaRoute } from "react-icons/fa";
-import FloatingInput from "./ui/FloatingInput";
+// frontend/src/components/transport/SearchArea.jsx
+
+import { useState, useRef, forwardRef } from "react";
+import { FaSearchLocation, FaMapMarkerAlt, FaFlagCheckered } from "react-icons/fa";
+import AutoCompleteInput from "./ui/AutoCompleteInput";
 import SwapButton from "./ui/SwapButton";
-import RouteList from "./RouteList";
+import RouteTimeline from "./RouteTimeline";
 import useTransportRouting from "../../hooks/useTransportRouting";
 import useField from "../../hooks/useField";
+import useAutoComplete from "../../hooks/useAutoComplete";
+import { createAutoCompleteKeyHandler } from "../../hooks/useAutoCompleteHandlers";
 
-// Safe validator for inputs
-const validateInput = (value) => {
-  const val = (value || "").trim();
-  if (!val) return "This field is required";
-  return "";
-};
+const validateInput = (value) => (!value?.trim() ? "This field is required" : "");
 
-function SearchArea({
-  date, setDate, time, setTime, routes, setRoutes, isDarkMode,
-  formInputRef, activeRouteIndex, setActiveRouteIndex
-}) {
+const SearchArea = forwardRef(function SearchArea(
+  { date, setDate, time, setTime, routes, setRoutes, isDarkMode, activeRouteIndex, setActiveRouteIndex },
+  formInputRef
+) {
   const { loading: routeLoading, searchRoute } = useTransportRouting();
 
   const fromField = useField("text", "", validateInput, 110);
   const toField = useField("text", "", validateInput, 110);
 
-  const MAX_INPUT_LENGTH = 110;
+  const {
+    suggestions: fromSuggestions,
+    selectedGeo: fromSelectedGeo,
+    selectSuggestion: selectFromSuggestion,
+    setSelectedGeo: setFromSelectedGeo,
+    handleManualInput: handleFromInput,
+  } = useAutoComplete(fromField.value, fromField.setValue);
+
+  const {
+    suggestions: toSuggestions,
+    selectedGeo: toSelectedGeo,
+    selectSuggestion: selectToSuggestion,
+    setSelectedGeo: setToSelectedGeo,
+    handleManualInput: handleToInput,
+  } = useAutoComplete(toField.value, toField.setValue);
+
+  const fromWrapperRef = useRef(null);
+  const toWrapperRef = useRef(null);
 
   const inputClass = isDarkMode
-    ? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400"
-    : "bg-gray-50 border-gray-400 focus:ring-blue-500 text-gray-900 placeholder-gray-500";
+    ? "bg-gray-700 border-gray-600 focus:ring-blue-100 text-white placeholder-gray-400 px-4 py-3 rounded-md"
+    : "bg-gray-50 border-gray-400 focus:ring-blue-500 text-gray-900 placeholder-gray-500 px-4 py-3 rounded-md";
 
-  // Swap origin/destination fields
   const handleSwap = () => {
-    const temp = fromField.value;
+    const tempVal = fromField.value;
     fromField.setValue(toField.value);
-    toField.setValue(temp);
+    toField.setValue(tempVal);
+
+    const tempGeo = fromSelectedGeo;
+    selectFromSuggestion(toSelectedGeo || null);
+    selectToSuggestion(tempGeo || null);
+  };
+
+  const resolveInput = async (value, selected, name) => {
+    if (selected?.lat != null && selected?.lon != null) return selected;
+    if (!value.trim()) throw new Error(`Please enter a valid ${name}.`);
+
+    const res = await fetch(`/api/autocomplete?q=${encodeURIComponent(value)}`);
+    if (!res.ok) throw new Error(`Failed to fetch ${name} suggestions.`);
+
+    const json = await res.json();
+    if (!json || !json.length) throw new Error(`No results found for ${name}.`);
+
+    return json[0];
+  };
+
+  const formatRoutes = (itineraries) => {
+    return itineraries.map((itinerary) => {
+      const legs = itinerary.legs || [];
+
+      const steps = legs.map((leg) => {
+        const start = leg.startTime ? new Date(leg.startTime) : null;
+        const end = leg.endTime ? new Date(leg.endTime) : null;
+        const duration = start && end ? Math.round((end - start) / 60000) : 0;
+
+        const intermediateStops = (leg.intermediatePlaces || []).map((ip) => ({
+          name: ip.name || ip.stop?.name || "",
+          code: ip.stop?.code || "",
+          lat: ip.stop?.lat || null,
+          lon: ip.stop?.lon || null,
+          platform: ip.stop?.platformCode || "",
+          zone: ip.stop?.zoneId || null,
+        }));
+
+        // Collect all zones for this leg
+        const legZones = [
+          leg.from?.stop?.zoneId,
+          ...intermediateStops.map((s) => s.zone).filter(Boolean),
+          leg.to?.stop?.zoneId,
+        ].filter(Boolean);
+
+        return {
+          mode: leg.mode?.toLowerCase() || "",
+          from_name: leg.from?.name || fromField.value,
+          to_name: leg.to?.name || toField.value,
+          distance: leg.distance ? (leg.distance / 1000).toFixed(2) : 0,
+          duration,
+          startTime: start ? start.toISOString() : null,
+          endTime: end ? end.toISOString() : null,
+          routeShortName: leg.route?.shortName || "",
+          routeLongName: leg.route?.longName || "",
+          zones: legZones,
+          intermediateStops,
+        };
+      });
+
+      const totalDuration = steps.reduce((sum, s) => sum + s.duration, 0);
+
+      return {
+        origin: steps[0]?.from_name || fromField.value,
+        destination: steps[steps.length - 1]?.to_name || toField.value,
+        duration: totalDuration,
+        modes: steps.map((s) => ({ m: s.mode, duration: s.duration })),
+        steps,
+      };
+    });
   };
 
   const handleSearch = async () => {
-    if (!fromField.validate() || !toField.validate()) return;
-
-    // Validate input length
-    if (fromField.value.length > MAX_INPUT_LENGTH || toField.value.length > MAX_INPUT_LENGTH) {
-      alert("Origin or destination address is too long!");
-      return;
-    }
-
-    // Clear previous results immediately
-    setRoutes([]);
-
     try {
-      const result = await searchRoute(fromField.value, toField.value);
-      if (!result || result.length === 0) {
+      const from = await resolveInput(fromField.value, fromSelectedGeo, "origin");
+      const to = await resolveInput(toField.value, toSelectedGeo, "destination");
+
+      setRoutes([]);
+
+      const dateTime = date && time ? new Date(`${date}T${time}`).toISOString() : null;
+
+      const result = await searchRoute(
+        { lat: from.lat, lon: from.lon, name: from.name },
+        { lat: to.lat, lon: to.lon, name: to.name },
+        dateTime
+      );
+
+      if (!result?.length) {
         alert("No routes found for this query.");
         return;
       }
-      setRoutes(result);
+
+      const formatted = formatRoutes(result);
+      setRoutes(formatted);
+      setActiveRouteIndex(0);
     } catch (err) {
-      console.error("Search route error:", err);
-      alert("Failed to fetch routes. Please try again.");
+      console.error(err);
+      alert(err.message || "Failed to fetch routes.");
     }
   };
 
-  const isSearchDisabled = !!fromField.error || !!toField.error || routeLoading;
+  const isSearchDisabled = fromField.error || toField.error || routeLoading;
+
+  const handleFromKeyDown = createAutoCompleteKeyHandler({
+    suggestions: fromSuggestions,
+    activeIndex: 0,
+    setActiveIndex: () => {},
+    setFieldValue: fromField.setValue,
+    setSelectedGeo: setFromSelectedGeo,
+  });
+
+  const handleToKeyDown = createAutoCompleteKeyHandler({
+    suggestions: toSuggestions,
+    activeIndex: 0,
+    setActiveIndex: () => {},
+    setFieldValue: toField.setValue,
+    setSelectedGeo: setToSelectedGeo,
+  });
 
   return (
-    <div
-      className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-6 ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      }`}
-    >
-
-      {/* Search Inputs Container */}
-      <div className="flex flex-col gap-6">
-
-        {/* Origin + Swap */}
-        <div className="relative w-full max-w-md">
-          <FloatingInput
-            ref={formInputRef}
-            type={fromField.type}
-            icon="start"
-            placeholder="Enter origin"
-            value={fromField.value}
-            onChange={fromField.onChange}
-            className={`${inputClass} w-full`} // input fills container
-            onUseLocation={() => {
-              navigator.geolocation.getCurrentPosition(
-                (pos) => fromField.setValue(`${pos.coords.latitude},${pos.coords.longitude}`),
-                () => alert("Failed to get location")
-              );
-            }}
-          />
-          <motion.div
-            whileHover={{ scale: 1.1, rotate: 15 }}
-            whileTap={{ scale: 0.9, rotate: -15 }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-          >
-            <SwapButton onSwap={handleSwap} />
-          </motion.div>
+    <div className={`p-6 rounded-2xl shadow-lg/30 flex flex-col gap-6 ${isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}>
+      <div ref={fromWrapperRef} className="relative w-full max-w-md">
+        <div className="absolute left-1 top-1/2 -translate-y-1/2 text-gray-500 z-10">
+          <FaMapMarkerAlt className="text-blue-300 text-sm" />
         </div>
-        {fromField.error && <p className="text-red-500 text-sm">{fromField.error}</p>}
-
-        {/* Destination */}
-        <div className="w-full max-w-md">
-          <FloatingInput
-            type={toField.type}
-            icon="end"
-            placeholder="Enter destination"
-            value={toField.value}
-            onChange={toField.onChange}
-            className={`${inputClass} w-full`} // same width as From input
-          />
-        </div>
-        {toField.error && <p className="text-red-500 text-sm">{toField.error}</p>}
-
-        {/* Date & Time */}
-        <div className="flex gap-4 w-full max-w-md">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className={`${inputClass} w-full px-4 py-2 border rounded-md outline-none focus:ring-2`}
-          />
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            className={`${inputClass} w-full px-4 py-2 border rounded-md outline-none focus:ring-2`}
-          />
-        </div>
-
+        <AutoCompleteInput
+          ref={formInputRef}
+          value={fromField.value}
+          suggestions={fromSuggestions}
+          setSelectedGeo={selectFromSuggestion}
+          handleManualInput={handleFromInput}
+          placeholder="Enter origin"
+          className={`${inputClass} pl-7 w-full`}
+          onKeyDown={handleFromKeyDown}
+        />
+        <SwapButton onSwap={handleSwap} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer z-50" />
+        {fromField.error && <p className="text-red-500 text-sm mt-1">{fromField.error}</p>}
       </div>
 
+      <div ref={toWrapperRef} className="relative w-full max-w-md">
+        <div className="absolute left-1 top-1/2 -translate-y-1/2 text-gray-500 z-10">
+          <FaFlagCheckered className="text-red-300 text-sm" />
+        </div>
+        <AutoCompleteInput
+          value={toField.value}
+          suggestions={toSuggestions}
+          setSelectedGeo={selectToSuggestion}
+          handleManualInput={handleToInput}
+          placeholder="Enter destination"
+          className={`${inputClass} pl-7 w-full`}
+          onKeyDown={handleToKeyDown}
+        />
+        {toField.error && <p className="text-red-500 text-sm mt-1">{toField.error}</p>}
+      </div>
 
-      {/* Search Button */}
+      <div className="flex gap-4 w-full max-w-md">
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${inputClass} w-full`} />
+        <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={`${inputClass} w-full`} />
+      </div>
+
       <button
         type="button"
         onClick={handleSearch}
         disabled={isSearchDisabled}
-        className={`w-full max-w-md flex items-center justify-center gap-2 px-5 py-2 rounded-md font-semibold
-            transition-all duration-200 ease-in-out cursor-pointer hover:-translate-y-1
-            ${isSearchDisabled ? "bg-gray-400 cursor-not-allowed"
-                               : "bg-blue-500 hover:bg-blue-600"
-             } text-white`}
+        className={`w-full max-w-md flex items-center justify-center gap-2 px-5 py-3 rounded-md font-semibold transition-all duration-200 ease-in-out cursor-pointer hover:-translate-y-1 ${
+          isSearchDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+        } text-white`}
       >
         {routeLoading ? (
           <svg className="animate-spin h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -155,19 +228,18 @@ function SearchArea({
         )}
       </button>
 
-      {/* Placeholder for API-driven info (weather, CO2, distance) */}
-      
-      {/* Route List */}
       {routes.length > 0 && (
-        <RouteList
+        <RouteTimeline
           routes={routes}
           isDarkMode={isDarkMode}
           activeRouteIndex={activeRouteIndex}
           setActiveRouteIndex={setActiveRouteIndex}
+          fromInput={fromField.value}
+          toInput={toField.value}
         />
       )}
     </div>
   );
-}
+});
 
 export default SearchArea;

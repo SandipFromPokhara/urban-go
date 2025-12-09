@@ -46,7 +46,7 @@ const userSchema = mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "superadmin"],
       default: "user",
     },
 
@@ -54,9 +54,13 @@ const userSchema = mongoose.Schema(
       {
         eventId: { type: String, required: true }, // Linked Events API event ID
         title: String,
+        description: String,
         date: String,
+        endDate: String,
+        location: String,
         image: String,
         category: String, // for preference learning
+        tags: [String],
       },
     ],
 

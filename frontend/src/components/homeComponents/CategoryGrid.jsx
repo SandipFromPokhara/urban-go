@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { events } from "../../data";
+import { useAuth } from "../../context/AuthContext";
 
 import sports from "../../assets/images/Sports.avif";
 import music from "../../assets/images/Music.jpg";
@@ -11,6 +12,7 @@ import food from "../../assets/images/Food.jpg";
 
 export default function CategoryGrid({ isDarkMode }) {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -44,13 +46,25 @@ export default function CategoryGrid({ isDarkMode }) {
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
       variants={fadeUp}
-      className="w-full flex flex-col justify-center p-6 gap-4"
+      className="w-full flex flex-col justify-center gap-4 p-15"
     >
       <div className="flex flex-row justify-between items-start gap-12 mb-16
         max-lg:flex-col max-lg:items-center max-lg:text-center">
-
         {/* LEFT SIDE */}
-        <div className="flex flex-col w-1/2 max-lg:w-full">
+        <div className="flex flex-col w-1/2 max-lg:w-full shadow-lg shadow-[#2c1f5e] rounded-2xl p-6">
+        {isAuthenticated && (
+          <motion.h2
+            variants={fadeUp}
+            className="text-5xl font-bold mb-6
+            bg-linear-to-r from-[#00AEEF] via-[#C084FC] to-[#00E5C2]
+            bg-clip-text text-transparent drop-shadow-lg
+            max-lg:text-4xl"
+          >
+            Good to see you, {JSON.parse(localStorage.getItem("user")).firstName}!
+          </motion.h2>
+
+        )}
+        {!isAuthenticated && (
           <motion.h2
             variants={fadeUp}
             className="text-5xl font-bold mb-6
@@ -60,6 +74,7 @@ export default function CategoryGrid({ isDarkMode }) {
           >
             Getting Started?
           </motion.h2>
+        )}
 
           <motion.p
             variants={fadeUp}

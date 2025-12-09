@@ -11,9 +11,10 @@ import {
   ExternalLink,
   Star,
 } from "lucide-react";
-import { useFavorites } from "../context/FavoritesContext";
+import { useFavorites } from "../context/favoritesContext";
 import CommentSection from "../components/events/CommentSection";
 import { getEventRatings, postRating } from "../hooks/ratings";
+import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 
 const EventDetails = ({ isDarkMode }) => {
@@ -23,7 +24,7 @@ const EventDetails = ({ isDarkMode }) => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorited, add, remove } = useFavorites();
   const [userRating, setUserRating] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
@@ -252,9 +253,17 @@ const EventDetails = ({ isDarkMode }) => {
   const handleBack = () => navigate(`/events${fromSearch}`);
   const handlePlanRoute = () => navigate("/transportation");
 
-  const handleFavoriteClick = (e) => {
+  const handleFavoriteClick = async (e) => {
     e.stopPropagation();
-    toggleFavorite(event);
+    try {
+      if (isFavorited(event.id)) {
+        await remove(event.id);
+      } else {
+        await add(event.id);
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    }
   };
 
   const handleShare = async () => {
@@ -303,6 +312,7 @@ const EventDetails = ({ isDarkMode }) => {
       </div>
     );
   }
+  const favorite = isFavorited(event.id);
 
   //Calculate smart dates for display
   const smartStartDate = calculateSmartDate(event.date, event.endDate);
@@ -323,23 +333,29 @@ const EventDetails = ({ isDarkMode }) => {
         <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
 
         <div className="absolute top-4 right-4 flex gap-2" style={{ zIndex: 10 }}>
-          <button
+          <motion.button
             onClick={handleFavoriteClick}
-            className="p-3 rounded-full shadow-lg"
+            className="p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
             style={{
-              backgroundColor: isFavorite(event.id) ? "#ef4444" : "#ffffff",
-              border: "none",
+              backgroundColor: favorite ? "#ef4444" : "#ffffff",
             }}
           >
-            <Heart
-              style={{
-                color: isFavorite(event.id) ? "#ffffff" : "#374151",
-                fill: isFavorite(event.id) ? "#ffffff" : "none",
-                width: "20px",
-                height: "20px",
+            <motion.div
+              animate={{
+                scale: favorite ? [1, 1.4, 1] : [1, 0.8, 1],
               }}
-            />
-          </button>
+              transition={{
+                duration: 0.3,
+              }}
+            >
+              <Heart
+                style={{
+                  color: favorite ? "#ffffff" : "#374151",
+                  fill: favorite ? "#ffffff" : "none",
+                }}
+              />
+            </motion.div>
+          </motion.button>
 
           <button
             onClick={handleShare}

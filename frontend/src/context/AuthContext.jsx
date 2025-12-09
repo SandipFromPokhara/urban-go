@@ -11,11 +11,12 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState(false);
   const [loginMessage, setLoginMessage] = useState(null);
-  const [signupMessage, setSignupMessage] = useState(false);
+  const [signupMessage, setSignupMessage] = useState(null);
 
   // Check authentication on mount
   useEffect(() => {
@@ -29,14 +30,17 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
       } catch (error) {
         console.error("Error parsing user data:", error);
-        logout();
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        setIsAuthenticated(false);
       }
     }
   }, []);
 
-  const login = (token, userData) => {
-    localStorage.setItem("authToken", token);
+  const login = (tokenValue, userData) => {
+    localStorage.setItem("authToken", tokenValue);
     localStorage.setItem("user", JSON.stringify(userData));
+    setToken(tokenValue);
     setUser(userData);
     setIsAuthenticated(true);
     setLoginMessage(userData.firstName);
@@ -47,18 +51,25 @@ export const AuthProvider = ({ children }) => {
     }, 3000);
   };
 
-  const showSignupSuccess = () => {
-    setSignupMessage(true);
+  const showSignupSuccess = (firstName) => {
+    setSignupMessage(firstName);
 
     // Hide message after 3 seconds
     setTimeout(() => {
-      setSignupMessage(false);
+      setSignupMessage(null);
     }, 3000);
+  };
+
+  const updateUser = (updatedUserData) => {
+    const updatedUser = { ...user, ...updatedUserData };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
   };
 
   const logout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
+    setToken(null);
     setUser(null);
     setIsAuthenticated(false);
     setLogoutMessage(true);
@@ -71,9 +82,11 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    token,
     isAuthenticated,
     login,
     logout,
+    updateUser,
     logoutMessage,
     loginMessage,
     signupMessage,
