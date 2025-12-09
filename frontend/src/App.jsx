@@ -14,6 +14,7 @@ import SignupPage from "./pages/SignupPage";
 import TransportPage from "./pages/TransportPage";
 import UserPanel from "./pages/UserPanel";
 import AdminPanel from "./pages/AdminPanel";
+import AIPage from "./pages/AIPage";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -41,6 +42,7 @@ function App() {
           {/* Use relative paths (no leading /) */}
           <Route path="" element={<Home isDarkMode={isDarkMode} />} />
           <Route path="events" element={<EventsList isDarkMode={isDarkMode} />} />
+          <Route path="ai" element={<AIPage isDarkMode={isDarkMode}/>} />
           <Route path="events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
           <Route path="transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
           <Route path="login" element={<LoginPage isDarkMode={isDarkMode} />} />

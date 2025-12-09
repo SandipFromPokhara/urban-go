@@ -52,7 +52,6 @@ class EventsService {
       }
 
       console.log('External Events API request:', {
-        url: `${EVENTS_BASE_URL}/event/`,
         params: queryParams
       });
 
