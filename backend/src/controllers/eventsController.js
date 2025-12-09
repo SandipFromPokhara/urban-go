@@ -18,10 +18,27 @@ exports.getEvents = async (req, res) => {
       page = 1,
       page_size = 20,
       categoryText,
+      keywords, // from frontend categoryKeywords (CSV)
     } = req.query;
 
     page = parseInt(page, 10) || 1;
     page_size = parseInt(page_size, 10) || 20;
+
+    // Parse CSV keywords -> categoryKeywords array
+    let categoryKeywords = [];
+    if (keywords) {
+      if (Array.isArray(keywords)) {
+        categoryKeywords = keywords
+          .flatMap((k) => k.split(","))
+          .map((k) => k.trim().toLowerCase())
+          .filter(Boolean);
+      } else {
+        categoryKeywords = keywords
+          .split(",")
+          .map((k) => k.trim().toLowerCase())
+          .filter(Boolean);
+      }
+    }
 
     console.log("getEvents called with params:", {
       start,
@@ -34,13 +51,15 @@ exports.getEvents = async (req, res) => {
       page,
       page_size,
       categoryText,
+      categoryKeywords,
     });
 
     const hasStrictDateFilter =
       (start && start !== "today") || (end && end.trim() !== "");
-    
+
     // Check if category filtering is active
-    const hasCategoryFilter = categoryText && categoryText.trim();
+    const hasCategoryFilter =
+      (categoryText && categoryText.trim()) || categoryKeywords.length > 0;
 
     // Helper: build params we send to LinkedEvents
     const buildBaseApiParams = () => {
@@ -64,7 +83,6 @@ exports.getEvents = async (req, res) => {
           helsinki: "helsinki",
           espoo: "espoo",
           vantaa: "vantaa",
-          kauniainen: "kauniainen",
         };
         const divisionName = locationMap[location.toLowerCase().trim()];
         if (divisionName) {
@@ -83,74 +101,95 @@ exports.getEvents = async (req, res) => {
 
     // Helper to escape special regex characters
     const escapeRegex = (str) => {
-      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     };
 
-    // More accurate category filter
-    const applyCategoryFilter = (events, rawCategoryText) => {
-      if (!rawCategoryText || !rawCategoryText.trim()) return events;
+    /**
+     * More accurate category filter:
+     * Uses BOTH categoryText (e.g. "culture") AND categoryKeywords
+     * (e.g. ["culture", "cultural", "heritage", ...]).
+     */
+    const applyCategoryFilter = (events, rawCategoryText, keywordList = []) => {
+      if (
+        (!rawCategoryText || !rawCategoryText.trim()) &&
+        (!keywordList || keywordList.length === 0)
+      ) {
+        return events;
+      }
 
-      const filter = rawCategoryText.trim().toLowerCase();
-      console.log(`🔍 Applying category filter: "${filter}"`);
+      const baseFilters = [];
+      if (rawCategoryText && rawCategoryText.trim()) {
+        baseFilters.push(rawCategoryText.trim().toLowerCase());
+      }
+
+      const allFilters = [
+        ...baseFilters,
+        ...(keywordList || []).map((k) => k.toLowerCase()),
+      ].filter(Boolean);
+
+      console.log("🔍 Applying category filter with filters:", allFilters);
 
       const filtered = events.filter((ev) => {
         const categories = Array.isArray(ev.categories) ? ev.categories : [];
-        const keywords = Array.isArray(ev.keywords) ? ev.keywords : [];
+        const keywordsArr = Array.isArray(ev.keywords) ? ev.keywords : [];
 
-        const matchesCategory = categories.some((c) => {
-          const categoryLower = c.toLowerCase();
-          
-          // EXACT MATCH
-          if (categoryLower === filter) return true;
-          
-          // WORD BOUNDARY MATCH
-          const wordBoundaryRegex = new RegExp(`\\b${escapeRegex(filter)}\\b`, 'i');
-          if (wordBoundaryRegex.test(categoryLower)) return true;
+        const matchesAnyFilter = (value) => {
+          const text = (value || "").toLowerCase();
+          if (!text) return false;
 
-          // SMART PARTIAL MATCH
-          if (filter.length > 4 && categoryLower.includes(filter)) return true;
+          return allFilters.some((filter) => {
+            if (!filter) return false;
 
-          return false;
-        });
+            // EXACT MATCH
+            if (text === filter) return true;
 
-        const matchesKeyword = keywords.some((kw) => {
-          const name = (kw.name?.en || kw.name?.fi || kw.name?.sv || "").toLowerCase();
-          
-          // EXACT MATCH
-          if (name === filter) return true;
-          
-          // WORD BOUNDARY MATCH
-          const wordBoundaryRegex = new RegExp(`\\b${escapeRegex(filter)}\\b`, 'i');
-          if (wordBoundaryRegex.test(name)) return true;
+            // WORD BOUNDARY MATCH
+            const wordBoundaryRegex = new RegExp(
+              `\\b${escapeRegex(filter)}\\b`,
+              "i"
+            );
+            if (wordBoundaryRegex.test(text)) return true;
 
-          // SMART PARTIAL MATCH
-          if (filter.length > 4 && name.includes(filter)) return true;
+            // SMART PARTIAL MATCH
+            if (filter.length > 3 && text.includes(filter)) return true;
 
-          return false;
+            return false;
+          });
+        };
+
+        const matchesCategory = categories.some((c) => matchesAnyFilter(c));
+
+        const matchesKeyword = keywordsArr.some((kw) => {
+          const name =
+            kw.name?.en || kw.name?.fi || kw.name?.sv || "";
+          return matchesAnyFilter(name);
         });
 
         return matchesCategory || matchesKeyword;
       });
 
-      console.log(`🎯 Category filter result: ${filtered.length}/${events.length} events matched`);
+      console.log(
+        `🎯 Category filter result: ${filtered.length}/${events.length} events matched`
+      );
       return filtered;
     };
 
+
     if (!hasStrictDateFilter) {
-      
-      // Fetch multiple pages when category filtering
+      // Category filtering path — fetch multiple pages then filter
       if (hasCategoryFilter) {
-        console.log("📦 Category filter detected - fetching multiple pages...");
-        
+        console.log(
+          "📦 Category filter detected - fetching multiple pages..."
+        );
+
         const FETCH_PAGE_SIZE = 100;
-        const MAX_PAGES = 5; // Fetch up to 500 events total
+        const MAX_PAGES = 5;
         let allEvents = [];
         let currentApiPage = 1;
         let hasMore = true;
 
         const baseParams = buildBaseApiParams();
 
-        // Fetch multiple pages
         while (hasMore && currentApiPage <= MAX_PAGES) {
           const apiParams = {
             ...baseParams,
@@ -158,9 +197,12 @@ exports.getEvents = async (req, res) => {
             page_size: FETCH_PAGE_SIZE,
           };
 
-          console.log(`📥 Fetching page ${currentApiPage}/${MAX_PAGES}...`);
+          console.log(
+            `📥 Fetching page ${currentApiPage}/${MAX_PAGES}...`
+          );
 
-          const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+          const apiResponse =
+            await linkedEventsService.fetchEvents(apiParams);
 
           if (
             !apiResponse.success ||
@@ -168,7 +210,9 @@ exports.getEvents = async (req, res) => {
             !Array.isArray(apiResponse.data) ||
             apiResponse.data.length === 0
           ) {
-            console.log(`⛔ No more data from API at page ${currentApiPage}`);
+            console.log(
+              `No more data from API at page ${currentApiPage}`
+            );
             hasMore = false;
             break;
           }
@@ -179,9 +223,10 @@ exports.getEvents = async (req, res) => {
 
           allEvents = allEvents.concat(transformed);
 
-          console.log(`✅ Fetched ${transformed.length} events (total: ${allEvents.length})`);
+          console.log(
+            `✅ Fetched ${transformed.length} events (total: ${allEvents.length})`
+          );
 
-          // Stop if no more pages
           if (!apiResponse.meta?.next) {
             hasMore = false;
           } else {
@@ -191,19 +236,23 @@ exports.getEvents = async (req, res) => {
 
         console.log(`📊 Total events fetched: ${allEvents.length}`);
 
-        // Apply category filter
-        let filteredEvents = applyCategoryFilter(allEvents, categoryText);
+        // Apply category filter with both categoryText + categoryKeywords
+        let filteredEvents = applyCategoryFilter(
+          allEvents,
+          categoryText,
+          categoryKeywords
+        );
 
-        console.log(`🎯 After category filter: ${filteredEvents.length} events`);
+        console.log(
+          `🎯 After category filter: ${filteredEvents.length} events`
+        );
 
-        // Client-side pagination
         const total = filteredEvents.length;
         const total_pages = Math.ceil(total / page_size);
         const startIndex = (page - 1) * page_size;
         const endIndex = startIndex + page_size;
         const pageEvents = filteredEvents.slice(startIndex, endIndex);
 
-        // Cache in background
         pageEvents.forEach((event) => {
           Event.findOneAndUpdate({ apiId: event.apiId }, event, {
             upsert: true,
@@ -231,7 +280,10 @@ exports.getEvents = async (req, res) => {
         page_size,
       };
 
-      console.log("Calling external Events API (simple) with params:", apiParams);
+      console.log(
+        "Calling external Events API (simple) with params:",
+        apiParams
+      );
 
       const apiResponse = await linkedEventsService.fetchEvents(apiParams);
 
@@ -265,7 +317,6 @@ exports.getEvents = async (req, res) => {
         linkedEventsService.transformEvent(event)
       );
 
-      // Cache in background
       eventsToCache.forEach((event) => {
         Event.findOneAndUpdate({ apiId: event.apiId }, event, {
           upsert: true,
@@ -281,11 +332,13 @@ exports.getEvents = async (req, res) => {
           page,
           page_size,
           total: apiResponse.meta?.count || 0,
-          total_pages: Math.ceil((apiResponse.meta?.count || 0) / page_size),
+          total_pages: Math.ceil(
+            (apiResponse.meta?.count || 0) / page_size
+          ),
         },
       });
     }
-
+    
     console.log("Using STRICT date filtering path");
 
     const uiStartDate =
@@ -295,7 +348,6 @@ exports.getEvents = async (req, res) => {
     console.log("UI dates:", { uiStartDate, uiEndDate });
 
     const baseApiParams = buildBaseApiParams();
-
     const EXTERNAL_PAGE_SIZE = 100;
     const MAX_PAGES = 5;
 
@@ -351,10 +403,13 @@ exports.getEvents = async (req, res) => {
       `Total transformed events BEFORE filters: ${allTransformed.length}`
     );
 
-    // Apply category filter
-    let strictlyFiltered = applyCategoryFilter(allTransformed, categoryText);
+    // Apply category filter (if any)
+    let strictlyFiltered = applyCategoryFilter(
+      allTransformed,
+      categoryText,
+      categoryKeywords
+    );
 
-    // Strict date filtering
     if (uiStartDate instanceof Date && !isNaN(uiStartDate)) {
       strictlyFiltered = strictlyFiltered.filter(
         (ev) => ev.startTime && ev.startTime >= uiStartDate
@@ -372,7 +427,6 @@ exports.getEvents = async (req, res) => {
       `Events AFTER strict date + category filter: ${strictlyFiltered.length}`
     );
 
-    // Sort by start date
     strictlyFiltered.sort((a, b) => {
       const aTime = a.startTime ? a.startTime.getTime() : 0;
       const bTime = b.startTime ? b.startTime.getTime() : 0;
@@ -385,7 +439,6 @@ exports.getEvents = async (req, res) => {
     const endIndex = startIndex + page_size;
     const pageEvents = strictlyFiltered.slice(startIndex, endIndex);
 
-    // Cache what we actually send
     pageEvents.forEach((event) => {
       Event.findOneAndUpdate({ apiId: event.apiId }, event, {
         upsert: true,
@@ -434,7 +487,10 @@ exports.getEventById = async (req, res) => {
       });
     }
 
-    const apiResponse = await linkedEventsService.fetchEventById(id, language);
+    const apiResponse = await linkedEventsService.fetchEventById(
+      id,
+      language
+    );
 
     if (!apiResponse.success) {
       return res.status(404).json({
@@ -460,7 +516,7 @@ exports.getEventById = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in getEventById:", error);
-    
+
     if (error.message === "Event not found") {
       return res.status(404).json({
         success: false,
@@ -537,14 +593,14 @@ exports.refreshEvents = async (req, res) => {
  */
 exports.getCategories = async (req, res) => {
   try {
-    console.log('Fetching unique categories from API...');
+    console.log("Fetching unique categories from API...");
 
     const apiParams = {
       page: 1,
       page_size: 100,
-      language: 'en',
-      start: 'today',
-      include: 'keywords'
+      language: "en",
+      start: "today",
+      include: "keywords",
     };
 
     const apiResponse = await linkedEventsService.fetchEvents(apiParams);
@@ -552,16 +608,17 @@ exports.getCategories = async (req, res) => {
     if (!apiResponse.success || !apiResponse.data) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to fetch events for categories'
+        message: "Failed to fetch events for categories",
       });
     }
 
     const categoriesSet = new Set();
 
-    apiResponse.data.forEach(event => {
+    apiResponse.data.forEach((event) => {
       if (event.keywords && Array.isArray(event.keywords)) {
-        event.keywords.forEach(keyword => {
-          const name = keyword.name?.en || keyword.name?.fi || keyword.name?.sv;
+        event.keywords.forEach((keyword) => {
+          const name =
+            keyword.name?.en || keyword.name?.fi || keyword.name?.sv;
           if (name && name.trim()) {
             categoriesSet.add(name.trim());
           }
@@ -569,8 +626,11 @@ exports.getCategories = async (req, res) => {
       }
 
       const transformedEvent = linkedEventsService.transformEvent(event);
-      if (transformedEvent.categories && Array.isArray(transformedEvent.categories)) {
-        transformedEvent.categories.forEach(cat => {
+      if (
+        transformedEvent.categories &&
+        Array.isArray(transformedEvent.categories)
+      ) {
+        transformedEvent.categories.forEach((cat) => {
           if (cat && cat.trim()) {
             categoriesSet.add(cat.trim());
           }
@@ -586,15 +646,14 @@ exports.getCategories = async (req, res) => {
       success: true,
       data: {
         categories,
-        total: categories.length
-      }
+        total: categories.length,
+      },
     });
-
   } catch (error) {
-    console.error('Error in getCategories:', error);
+    console.error("Error in getCategories:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch categories',
+      message: "Failed to fetch categories",
       error: error.message,
     });
   }

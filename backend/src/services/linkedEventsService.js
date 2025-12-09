@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 // Use environment variable for API URL
-const LINKED_EVENTS_BASE_URL = process.env.EVENTS_URL || "https://api.hel.fi/linkedevents/v1";
+const LINKED_EVENTS_BASE_URL = process.env.EVENTS_URL;
 
 class EventsService {
   /**

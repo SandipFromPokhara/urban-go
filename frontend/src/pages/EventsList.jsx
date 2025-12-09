@@ -8,6 +8,14 @@ import '../styles/events.css';
 
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
 
+//  Helper to remove HTML tags from API descriptions
+const stripHTML = (html) => {
+  if (!html) return '';
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || '';
+};
+
 const EventsList = ({ isDarkMode }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [events, setEvents] = useState([]);
@@ -48,9 +56,9 @@ const EventsList = ({ isDarkMode }) => {
 
       // Dates
       if (filters.startDate) {
-        params.set('start', filters.startDate); // strict start
+        params.set('start', filters.startDate);
       } else {
-        params.set('start', 'today'); // default to today
+        params.set('start', 'today'); 
       }
 
       if (filters.endDate) {
@@ -67,10 +75,15 @@ const EventsList = ({ isDarkMode }) => {
         params.set('categoryText', filters.categoryText);
       }
 
+      // Send category keywords to backend
+      if (filters.categoryKeywords && filters.categoryKeywords.length > 0) {
+        params.set('keywords', filters.categoryKeywords.join(','));
+      }
+
       // User search term
       if (searchTerm.trim()) {
         params.set('text', searchTerm.trim());
-        params.set('search', searchTerm.trim()); // keep in URL as well
+        params.set('search', searchTerm.trim()); 
       }
 
       // Sort
@@ -94,9 +107,13 @@ const EventsList = ({ isDarkMode }) => {
         const transformedEvents = result.data.map((event) => ({
           id: event.apiId,
           name: event.name?.en || event.name?.fi || 'Untitled Event',
-          description: event.shortDescription?.en || event.description?.en || '',
-          longDescription:
-            event.description?.en || event.shortDescription?.en || '',
+      
+          description: stripHTML(
+            event.shortDescription?.en || event.description?.en || ''
+          ),
+          longDescription: stripHTML(
+            event.description?.en || event.shortDescription?.en || ''
+          ),
           date: event.startTime,
           endDate: event.endTime,
           location:
@@ -123,15 +140,38 @@ const EventsList = ({ isDarkMode }) => {
           rawData: event,
         }));
 
-        setEvents(transformedEvents);
-        setTotalEvents(result.pagination?.total || 0);
+        //  De-duplicate by event name + location, keep earliest date
+        const seen = new Map(); // key => event
+
+        for (const ev of transformedEvents) {
+          const key = `${ev.name}__${ev.fullLocation.name || ev.location}`;
+          const existing = seen.get(key);
+
+          if (!existing) {
+            seen.set(key, ev);
+          } else {
+            const evTime = ev.date ? new Date(ev.date).getTime() : 0;
+            const existingTime = existing.date ? new Date(existing.date).getTime() : 0;
+
+            // keep the earliest occurrence
+            if (evTime < existingTime) {
+              seen.set(key, ev);
+            }
+          }
+        }
+
+        const uniqueEvents = Array.from(seen.values());
+
+        setEvents(uniqueEvents);
+        setTotalEvents(result.pagination?.total || uniqueEvents.length);
         setTotalPages(result.pagination?.total_pages || 1);
 
-        console.log('Result summary:', {
+        console.log('Result summary (deduped):', {
           page: result.pagination?.page,
           totalPages: result.pagination?.total_pages,
           totalEvents: result.pagination?.total,
-          eventsOnPage: transformedEvents.length,
+          eventsOnPageBeforeDedup: transformedEvents.length,
+          eventsOnPageAfterDedup: uniqueEvents.length,
         });
       } else {
         setEvents([]);
@@ -152,7 +192,7 @@ const EventsList = ({ isDarkMode }) => {
 
   // Fetch when page / filters / search / sort change
   useEffect(() => {
-    // If search term contains numbers → show no results immediately
+   
     const trimmed = searchTerm.trim();
     const hasNumbers = /\d/.test(trimmed);
 
@@ -167,7 +207,7 @@ const EventsList = ({ isDarkMode }) => {
     }
 
     fetchEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [currentPage, filters, searchTerm, sortBy]);
 
   // Handlers
@@ -235,7 +275,7 @@ const EventsList = ({ isDarkMode }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Initial "big" loading (first page, no filters)
+  // Initial loading (first page, no filters)
   if (
     loading &&
     currentPage === 1 &&
@@ -347,9 +387,9 @@ const EventsList = ({ isDarkMode }) => {
             </div>
           )}
 
-        {/* Events Grid (includes its own "no results" message) */}
+        {/* Events Grid */}
         {!loading && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <EventsGrid events={events} isDarkMode={isDarkMode} />
           </div>
         )}
@@ -375,7 +415,7 @@ const EventsList = ({ isDarkMode }) => {
               }`}
             >
               Showing{' '}
-              {((currentPage - 1) * EVENTS_PER_PAGE) + 1}
+              {(currentPage - 1) * EVENTS_PER_PAGE + 1}
               -
               {Math.min(currentPage * EVENTS_PER_PAGE, totalEvents)} of{' '}
               {totalEvents} events

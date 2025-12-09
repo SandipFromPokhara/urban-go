@@ -33,22 +33,103 @@ const EventCard = ({ event, isDarkMode }) => {
     toggleFavorite(event);
   };
 
-  const formatDateRange = (start, end) => {
-    if (!start) return "Date TBA";
-
-    const opts = { year: "numeric", month: "long", day: "numeric" };
-    const startStr = new Date(start).toLocaleDateString("en-US", opts);
-
-    if (!end) return startStr;
-
-    const endStr = new Date(end).toLocaleDateString("en-US", opts);
-    return `${startStr} – ${endStr}`;
+  //  Normalize location names
+  const normalizeLocation = (location) => {
+    if (!location) return 'Location TBA';
+    
+    const locationLower = location.toLowerCase().trim();
+    
+    if (locationLower === 'internet') {
+      return 'Online';
+    }
+    
+    return location;
   };
+
+  // SMART DATE CALCULATION
+  const calculateSmartDate = (startDate, endDate) => {
+    if (!startDate) return { dateStr: "Date TBA", timeStr: null, isNextOccurrence: false };
+
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : null;
+
+    // Check if event is ongoing 
+    const isOngoing = start < now && (!end || end > now);
+
+    let displayDate = start;
+    let isNextOccurrence = false;
+
+    if (isOngoing) {
+      // Event is ongoing - calculate next occurrence
+      const dayOfWeek = start.getDay();
+      const startHour = start.getHours();
+      const startMinute = start.getMinutes();
+
+      // Find next occurrence of the same day of week
+      const daysUntilNext = (dayOfWeek - now.getDay() + 7) % 7 || 7;
+      
+      const nextOccurrence = new Date(now);
+      nextOccurrence.setDate(now.getDate() + daysUntilNext);
+      nextOccurrence.setHours(startHour, startMinute, 0, 0);
+
+      // If the calculated time already passed today, move to next week
+      if (nextOccurrence <= now) {
+        nextOccurrence.setDate(nextOccurrence.getDate() + 7);
+      }
+
+      displayDate = nextOccurrence;
+      isNextOccurrence = true;
+    }
+
+    // Format the date
+    const dateStr = displayDate.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+
+    // Check if time matches all-day patterns
+    const hour = displayDate.getHours();
+    const minute = displayDate.getMinutes();
+    
+    // Get end time if available
+    let endHour = null;
+    let endMinute = null;
+    if (endDate) {
+      const end = new Date(endDate);
+      endHour = end.getHours();
+      endMinute = end.getMinutes();
+    }
+    
+    // Detect all-day patterns:
+    // Pattern 1: 00:00 (midnight)
+    // Pattern 2: 00:01 - 23:59 (full day)
+    // Pattern 3: 00:00 - 23:59 (midnight to end)
+    const isAllDay = 
+      (hour === 0 && minute === 0) || // 00:00
+      (hour === 0 && minute === 1 && endHour === 23 && endMinute === 59) || // 00:01 - 23:59
+      (hour === 0 && minute === 0 && endHour === 23 && endMinute === 59); // 00:00 - 23:59
+
+    // Show "All day" text for all-day events, otherwise show time
+    const timeStr = isAllDay 
+      ? 'All day' 
+      : displayDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        });
+
+    return { dateStr, timeStr, isNextOccurrence };
+  };
+
+  const { dateStr, timeStr, isNextOccurrence } = calculateSmartDate(event.date, event.endDate);
 
   return (
     <div
       onClick={handleEventClick}
-      className={`${
+      className={`max-w-[480px] w-full mx-auto ${
         isDarkMode ? "bg-gray-800" : "bg-white"
       } rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex flex-col h-full`}
     >
@@ -74,8 +155,12 @@ const EventCard = ({ event, isDarkMode }) => {
           </span>
         )}
 
-        {event.endDate && (
-          <span className="absolute bottom-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+        {/* Only show "Ongoing" badge for truly ongoing events */}
+        {event.endDate && !isNextOccurrence && (
+          <span 
+            className="absolute bottom-3 right-3 text-white px-3 py-1 rounded-full text-xs font-semibold"
+            style={{ backgroundColor: "#10b981" }}
+          >
             Ongoing
           </span>
         )}
@@ -120,6 +205,7 @@ const EventCard = ({ event, isDarkMode }) => {
         </p>
 
         <div className="space-y-2 mb-4">
+          {/* Clean date display - always show date and time */}
           <div
             className={`flex items-center gap-2 ${
               isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -127,7 +213,15 @@ const EventCard = ({ event, isDarkMode }) => {
           >
             <Calendar className="w-4 h-4 text-blue-600" />
             <span className="text-sm">
-              {formatDateRange(event.date, event.endDate)}
+              {dateStr}
+              {timeStr && (
+                <span 
+                  className="ml-2 font-medium" 
+                  style={{ color: timeStr === 'All day' ? '#10b981' : '#2563eb' }}
+                >
+                  {timeStr === 'All day' ? '• All day' : `@ ${timeStr}`}
+                </span>
+              )}
             </span>
           </div>
 
@@ -137,7 +231,7 @@ const EventCard = ({ event, isDarkMode }) => {
             }`}
           >
             <MapPin className="w-4 h-4 text-blue-600" />
-            <span className="text-sm">{event.location}</span>
+            <span className="text-sm">{normalizeLocation(event.location)}</span>
           </div>
         </div>
 
