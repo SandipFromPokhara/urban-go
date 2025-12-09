@@ -128,43 +128,6 @@ const UserDetailsModal = ({ selectedUser, isDarkMode, onClose }) => {
                 {new Date(selectedUser.createdAt).toLocaleTimeString()}
               </p>
             </div>
-
-            {/* Activity Stats */}
-            <div className={`p-4 rounded-lg border ${
-              isDarkMode ? "bg-gray-700 border-gray-600" : "bg-slate-50 border-slate-200"
-            }`}>
-              <p className={`text-sm font-semibold mb-3 ${
-                isDarkMode ? "text-gray-400" : "text-slate-600"
-              }`}>
-                Activity
-              </p>
-              <div className="flex gap-8">
-                <div>
-                  <p className={`text-xl font-bold ${
-                    isDarkMode ? "text-blue-400" : "text-blue-600"
-                  }`}>
-                    {selectedUser.comments?.length || 0}
-                  </p>
-                  <p className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-slate-600"
-                  }`}>
-                    Comments
-                  </p>
-                </div>
-                <div>
-                  <p className={`text-xl font-bold ${
-                    isDarkMode ? "text-purple-400" : "text-purple-600"
-                  }`}>
-                    {selectedUser.favorites?.length || 0}
-                  </p>
-                  <p className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-slate-600"
-                  }`}>
-                    Favorites
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
 
 export default function Home({ isDarkMode }) {
-  const { logoutMessage, loginMessage } = useAuth();
+  const { logoutMessage, loginMessage, signupMessage } = useAuth();
 
   return (
     <div
@@ -33,6 +33,16 @@ export default function Home({ isDarkMode }) {
             className="fixed top-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-white shadow-lg"
           >
             Welcome back, {loginMessage}!
+          </motion.div>
+        )}
+        {signupMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed top-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-white shadow-lg"
+          >
+            Welcome to UrbanGo, {signupMessage}! Your account has been created successfully.
           </motion.div>
         )}
       </AnimatePresence>

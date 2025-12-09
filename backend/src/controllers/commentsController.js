@@ -63,8 +63,10 @@ const deleteComment = async (req, res) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    // Only owner or admin can delete
-    if (comment.user.toString() !== userId && role !== "admin") {
+    // Only owner, admin, or superadmin can delete
+    const isOwner = comment.user.toString() === userId;
+    const isPrivileged = role === "admin" || role === "superadmin";
+    if (!isOwner && !isPrivileged) {
       return res
         .status(403)
         .json({ message: "Not authorized to delete this comment" });
