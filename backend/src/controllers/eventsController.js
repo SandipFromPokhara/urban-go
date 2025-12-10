@@ -336,8 +336,8 @@ exports.getEvents = async (req, res) => {
     console.log("UI dates:", { uiStartDate, uiEndDate });
 
     const baseApiParams = buildBaseApiParams();
-    const EXTERNAL_PAGE_SIZE = 100;
-    const MAX_PAGES = 5;
+    const EXTERNAL_PAGE_SIZE = 50;
+    const MAX_PAGES = 2;
 
     let currentApiPage = 1;
     let allTransformed = [];

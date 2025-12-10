@@ -36,7 +36,7 @@ function LocateButton() {
   };
 
   return (
-    <div className="absolute bottom-30 right-3 z-1000">
+    <div className="absolute bottom-36 right-3 z-1000">
       <button
         onClick={handleLocate}
         className="bg-white hover:bg-blue-100 text-blue-600 w-8 h-8 flex items-center justify-center rounded-sm shadow-lg transition-all duration-200"

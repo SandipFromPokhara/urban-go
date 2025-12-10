@@ -1,6 +1,6 @@
 // frontend/src/components/transport/SearchArea.jsx
 
-import { useState, useRef, forwardRef } from "react";
+import { useRef, forwardRef } from "react";
 import { FaSearchLocation, FaMapMarkerAlt, FaFlagCheckered } from "react-icons/fa";
 import AutoCompleteInput from "./ui/AutoCompleteInput";
 import SwapButton from "./ui/SwapButton";
@@ -8,6 +8,7 @@ import RouteTimeline from "./RouteTimeline";
 import useTransportRouting from "../../hooks/useTransportRouting";
 import useField from "../../hooks/useField";
 import useAutoComplete from "../../hooks/useAutoComplete";
+import polyline from "@mapbox/polyline";
 import { createAutoCompleteKeyHandler } from "../../hooks/useAutoCompleteHandlers";
 
 const validateInput = (value) => (!value?.trim() ? "This field is required" : "");
@@ -70,11 +71,25 @@ const SearchArea = forwardRef(function SearchArea(
   const formatRoutes = (itineraries) => {
     return itineraries.map((itinerary) => {
       const legs = itinerary.legs || [];
+      const routePolylines = [];
+      let startPoint = null;
 
       const steps = legs.map((leg) => {
         const start = leg.startTime ? new Date(leg.startTime) : null;
         const end = leg.endTime ? new Date(leg.endTime) : null;
         const duration = start && end ? Math.round((end - start) / 60000) : 0;
+
+        // Decode polyline
+        let decodedPolyline = [];
+        if (leg.legGeometry?.points) {
+          decodedPolyline = polyline.decode(leg.legGeometry.points).map(([lat, lng]) => ({ lat, lng }));
+          routePolylines.push(...decodedPolyline);
+        }
+
+        // Capture start point
+        if (!startPoint && leg.from?.lat && leg.from?.lon) {
+          startPoint = { lat: leg.from.lat, lng: leg.from.lon };
+        }
 
         const intermediateStops = (leg.intermediatePlaces || []).map((ip) => ({
           name: ip.name || ip.stop?.name || "",
@@ -104,6 +119,7 @@ const SearchArea = forwardRef(function SearchArea(
           routeLongName: leg.route?.longName || "",
           zones: legZones,
           intermediateStops,
+          stepPolyline: decodedPolyline
         };
       });
 
@@ -115,6 +131,8 @@ const SearchArea = forwardRef(function SearchArea(
         duration: totalDuration,
         modes: steps.map((s) => ({ m: s.mode, duration: s.duration })),
         steps,
+        polyline: routePolylines, // <-- used by MapSection
+        position: startPoint
       };
     });
   };

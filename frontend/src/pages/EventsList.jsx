@@ -106,9 +106,13 @@ const EventsList = ({ isDarkMode }) => {
 
       console.log('Fetching events with params:', Object.fromEntries(params));
 
+<<<<<<< HEAD
       const response = await fetch(`/api/events?${params}`, {
         signal: abortControllerRef.current.signal
       });
+=======
+      const response = await fetch(`/api/events?${params}`);
+>>>>>>> a9a9f1c59d121ed308f430c8c93aed2eac0e3092
 
       if (!response.ok) {
         const errorText = await response.text();
