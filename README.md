@@ -31,7 +31,7 @@ The platform aims to enhance city life by combining **event discovery** with **l
 - 🔍 **Event Discovery** – Browse upcoming city events with filters  
 - 🗺️ **Transport Planner** – Get real-time routes 
 - ⭐ **Favorites** – Save events to revisit later (Sprint 2+)
-- 🔔 **Subscribe** – Follow categories or venues to get personalized updates  
+- 🔔 **AI** – AI mode integrated for event suggestions  
 - ⚡ **Modular Structure** – Scalable Node.js and REST API-based architecture  
 
 ---
@@ -43,9 +43,10 @@ The platform aims to enhance city life by combining **event discovery** with **l
 | **Frontend**        | HTML, CSS, Tailwind CSS, JavaScript, React |
 | **Backend**         | Node.js, Express.js     |
 | **Database**        | MongoDB (Mongoose ODM)  |
-| **API Integration** | HSL API (public transport data), Linked Events API (event data), OpenWeather API |
+| **API Integration** | Public transport API, Public events API, Finnish meteorological institute |
 | **Version Control** | Git & GitHub |
 | **Design Tools**    | Figma (for prototype and presentation) |
+| **Deployment**    | Render |
 
 ---
 
@@ -54,28 +55,28 @@ The platform aims to enhance city life by combining **event discovery** with **l
 The **Minimum Viable Product (MVP)** will include:
 1. **User Panel (Frontend – React)**  
    - Registration, login, and authentication  
-   - Browse and search events from Linked Events API  
+   - Browse and search events
    - Save and manage favorite events  
-   - View personalized event recommendations (basic logic-based version)  
+   - View personalized event recommendations (AI mode)  
 
 2. **Admin Panel (Backend + React Dashboard)**  
    - Admin authentication and role-based access  
    - Manage user accounts and moderate reviews   
    - View analytics and user activity summary
-   - Admins have read-only access to Linked Events data (cannot edit or delete external events) 
+   - Admins have read-only access to Events data (cannot edit or delete external events) 
 
 3. **Backend (Node.js + Express)**  
    - RESTful API handling for CRUD operations  
    - MongoDB integration for persistent data storage  
    - Secure JWT authentication and role management  
-   - Integration with Linked Events, HSL and OpenWeather APIs  
+   - Integration with AI and Events, Transport, Weather APIs  
 
 4. **Database (MongoDB)**  
    - Collections: `users`, `favorites`, `events`, `reviews`  
    - Data persistence for user profiles, saved items, and admin data  
 
-5. **Future Extension (AI Component)**  
-   - Smart Recommendation Engine using user behavior and event metadata  
+5. **AI Component**  
+   - Smart Recommendation Engine for event metadata  
 
 ---
 
@@ -131,12 +132,12 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
     │       MONGODB          |       │   EXTERNAL APIs        │
     │ (Persistent Database)  |       │ (Real-time City Data)  │
     │                        │       │                        │
-    │ - Stores user profiles │       │ - Linked Events API:   │
+    │ - Stores user profiles │       │ - Public Events API:   │
     │ - Saves favorites      │       │   City events          │
-    │ - Stores custom events │       │ - OpenWeather API:     │
+    │ - Stores custom events │       │ - FMI API:             │
     │ - Keeps reviews        │       │   Weather info         │
     │                        │       │ - HSL API:             │
-    │                        │       │   Public transit info  │
+    │                        │       │   Public route info    │
     └───────────────┬────────┘       └───────────────┬────────┘
                     │                                │
                     └───────────────┬────────────────┘
@@ -271,34 +272,40 @@ External APIs:
 ```
 urban-go/
 │
-├── frontend/                 # React + Vite app (client-side)
+├── frontend/                 # React + Vite app + AI integration
 │   ├── public/
 │   ├── src/
+|   |   ├── assets/
 │   │   ├── components/
-│   │   ├── pages/
+|   |   ├── context/
 │   │   ├── hooks/
-│   │   ├── context/
-│   │   ├── assets/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── styles/
+│   │   ├── utils/
+│   │   ├── App.css
 │   │   ├── App.jsx
 │   │   ├── main.jsx
-│   │   └── index.css
+│   ├── eslint.config.js
+│   ├── index.html
 │   ├── tailwind.config.js
-│   ├── postcss.config.js
 │   ├── vite.config.js
+│   ├── package-lock.json
 │   └── package.json
 │
-├── backend/                  # Node + Express server (API + DB)
+├── backend/                  # Node + Express server (API + DB + AI integration)
 │   ├── src/
 │   │   ├── config/
-│   │   │   ├── db.js         # MongoDB connection
 │   │   ├── controllers/
+│   │   ├── middlewares/
 │   │   ├── models/
 │   │   ├── routes/
-│   │   ├── middlewares/
 │   │   ├── services/
 │   │   ├── utils/
-│   │   └── server.js
-│   ├── .env.example
+│   ├── tests/
+│   ├── app.js
+│   ├── index.js
+│   ├── package-lock.json
 │   └── package.json    
 |
 └── README.md
@@ -313,7 +320,7 @@ urban-go/
 |:--------|:-------|:-------------|
 | **Sprint 1** | Design & Planning | Figma prototype, Trello backlog, presentation |
 | **Sprint 2** | Frontend & Backend Development | Static pages with navigation and basic interactivity |
-| **Sprint 3** | Frontend, Backend & Integration | HSL API setup, user login system, database, and final presentation |
+| **Sprint 3** | Frontend, Backend & Integration | Events, Transport, Weather, Service disruption and OpenStreetMap API setup, AI integration, user registration system, database, and final presentation |
 
 ---
 
@@ -321,10 +328,10 @@ urban-go/
 
 | Member | Role |
 |:--------|:------|
-| **Sandip** | Product Owner + Frontend + Backend Developer|
-| **Sailesh** | Scrum Master + Frontend + Backend Developer |
+| **Sandip** | Product Owner + Sprint 1 Scrum Master + Frontend + Backend Developer|
+| **Sailesh** | Sprint 2 Scrum Master + Frontend + Backend Developer |
 | **Olga** | Frontend + Backend Developer |
-| **Gam** | Frontend + Backend Developer | 
+| **Gam** | Sprint 3 Scrum Master + Frontend + Backend Developer | 
 | **Dinal** | Frontend + Backend Developer |
 
 ---
@@ -382,3 +389,5 @@ npm run dev    # Runs Vite dev server
 This project is developed for academic purposes as part of Metropolia University of Applied Science course on Web Development.
 
 © 2025 UrbanGo Team
+
+# This branch is ready for production and deployment

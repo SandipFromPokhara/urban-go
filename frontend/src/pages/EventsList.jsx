@@ -9,7 +9,7 @@ import '../styles/events.css';
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
 const DEBOUNCE_DELAY = 500; // 500ms debounce for filter changes
 
-//  Helper to remove HTML tags from API descriptions
+//  Helper to remove HTML tags from API description
 const stripHTML = (html) => {
   if (!html) return '';
   const temp = document.createElement('div');
