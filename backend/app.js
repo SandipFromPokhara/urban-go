@@ -1,9 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require('path');
 
 // Import routes
 const connectDB = require("./src/config/db");
+const { unknownEndpoint,errorHandler } = require("./src/middlewares/customMiddleware");
 const authMiddleware = require("./src/middlewares/authMiddleware");
 const authRoutes = require("./src/routes/authRoutes");
 const favoritesRoutes = require("./src/routes/favoritesRoutes");
@@ -23,6 +25,10 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'view')));
+
+// Connect to database
+connectDB();
 
 // Transportation API route
 app.use("/api/search-route", transportRoutes);
@@ -48,15 +54,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/admin", adminRoutes);
 
-// 404 Handler
+app.use("/api", unknownEndpoint);
+app.use(errorHandler);
+
 app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
+  res.sendFile(path.join(__dirname, 'view', 'index.html'));
 });
 
-// Connect to database
-connectDB();
-
-// const PORT = process.env.TEST_PORT || 5001;
-// app.listen(PORT, () => {
-//   console.log(`Test server listening on port ${PORT}`);
-// });
+module.exports = app;

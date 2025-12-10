@@ -1,4 +1,4 @@
-import { useState } from "react"; 
+import { useState, useRef, useEffect } from "react"; 
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
@@ -6,7 +6,15 @@ export default function AIPage({ isDarkMode }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const scrollRef = useRef(null);
 
+  // Auto scroll on new messages
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+  
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -67,7 +75,16 @@ export default function AIPage({ isDarkMode }) {
       {/* AI Chat Card */}
       <div
         className={`relative z-10 flex flex-col w-full max-w-3xl rounded-2xl p-6 mt-16 shadow-2xl ${isDarkMode ? "bg-gray-900 text-gray-200" : "bg-white text-gray-900"}`}
-        style={{ minHeight: "calc(100vh - 300px)", boxShadow: isDarkMode ? "0 0 40px rgba(99,102,241,0.5), 0 0 80px rgba(56,189,248,0.3)" : "0 0 40px rgba(59,130,246,0.3), 0 0 80px rgba(14,165,233,0.2)" }}
+        style={{
+        minHeight: "calc(100vh - 300px)",
+        background: isDarkMode
+          ? "rgba(17,24,39,0.8)" // slightly darker semi-transparent
+          : "linear-gradient(135deg, #E0F7FA, #FFFFFF)", // soft tech gradient
+        backdropFilter: "blur(15px)",
+        boxShadow: isDarkMode
+          ? "0 0 40px rgba(99,102,241,0.5), 0 0 80px rgba(56,189,248,0.3)"
+          : "0 0 20px rgba(14,165,233,0.2), 0 0 40px rgba(59,130,246,0.2)",
+      }}
       >
         <h2 className="text-4xl font-extrabold m-6 text-center" style={{
             textShadow: isDarkMode ? "0 0 20px #0ff, 0 0 40px #0ff" : "0 0 10px #3b82f6, 0 0 20px #3b82f6"
@@ -76,15 +93,45 @@ export default function AIPage({ isDarkMode }) {
         </h2>
 
         {/* Chat messages */}
-        <div className="flex-1 overflow-y-auto space-y-3 mb-4 p-2">
-          {messages.map((msg, idx) => (
-            <motion.div
-              key={idx}
-              className={`max-w-xl p-3 rounded-xl wrap-break-word shadow-md transform transition-transform duration-150 ${msg.role === "user" ? "bg-blue-500 text-white self-end" : isDarkMode ? "bg-gray-800 text-cyan-200 self-start" : "bg-gray-100 text-gray-900 self-start"}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <ReactMarkdown>{msg.text}</ReactMarkdown>
+        <div
+          ref={scrollRef}
+          className="flex-1 flex flex-col overflow-y-auto space-y-3 mb-4 p-2"
+          style={{ scrollbarWidth: "thin", scrollbarColor: "#6366f1 #1e3a8a" }}
+        >
+        {messages.map((msg, idx) => (
+        <motion.div
+          key={idx}
+          className={`max-w-xl p-4 rounded-xl wrap-break-word shadow-md transform transition-transform duration-150 flex flex-col gap-4 ${
+            msg.role === "user"
+              ? "bg-blue-500 text-white self-end"
+              : isDarkMode
+              ? "bg-gray-800 text-cyan-200 self-start"
+              : "bg-gray-100 text-gray-900 self-start"
+          }`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <ReactMarkdown
+                components={{
+                  li: ({ children }) => (
+                    <li className="ml-4 list-disc text-sm md:text-base hover:bg-blue-50/20 p-1 rounded">{children}</li>
+                  ),
+                  strong: ({ children }) => (
+                    <span className="font-bold text-blue-600 dark:text-cyan-300">{children}</span>
+                  ),
+                  h1: ({ children }) => (
+                    <h1 className="text-xl font-bold text-blue-700 dark:text-cyan-400 mb-2">{children}</h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-lg font-semibold text-blue-600 dark:text-cyan-300 mb-1">{children}</h2>
+                  ),
+                  p: ({ children }) => (
+                    <p className="text-sm md:text-base">{children}</p>
+                  ),
+                }}
+              >
+                {msg.text}
+              </ReactMarkdown>
             </motion.div>
           ))}
           {loading && <p className="text-sm text-gray-400 italic">AI is typing...</p>}

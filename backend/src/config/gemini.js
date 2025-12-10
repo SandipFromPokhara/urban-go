@@ -6,7 +6,8 @@ const { GoogleGenAI } = require('@google/genai');
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
 
 // GoogleGenerativeAI setup
-const MODEL_NAME = "models/gemini-2.5-flash-lite";
+// const MODEL_NAME = "models/gemini-2.5-flash-lite";
+const MODEL_NAME = "models/gemini-2.5-pro";
 
 async function model(prompt) {
   const response = await genAI.models.generateContent({
