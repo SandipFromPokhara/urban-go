@@ -27,48 +27,20 @@ const getRoutes = async (fromCoords, toCoords, dateTime) => {
           endTime
           realTime
 
-          from {
-            name
-            lat
-            lon
-            stop {
-              code
-              name
-              platformCode
-              zoneId
-              lat
-              lon
-            }
+          from { 
+            name lat lon stop { code name platformCode zoneId lat lon }
           }
           to {
-            name
-            lat
-            lon
-            stop {
-              code
-              name
-              platformCode
-              zoneId
-              lat
-              lon
-            }
+            name lat lon stop { code name platformCode zoneId lat lon }
           }
 
-          route {
-            shortName
-            longName
-          }
+          route {  shortName longName }
 
           intermediatePlaces {
-            name
-            stop {
-              name
-              code
-              lat
-              lon
-              platformCode
-            }
+            name stop { name code lat lon platformCode }
           }
+
+          legGeometry { points }
         }
       }
     }

@@ -1,6 +1,6 @@
 /* App.jsx */
 import { useEffect, useState } from "react";
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { AuthProvider } from "./context/AuthContext";
@@ -36,23 +36,23 @@ function App() {
   return (
     <AuthProvider>
     <FavoritesProvider>
-      <HashRouter>
+      <BrowserRouter>
         <Header />
         <Routes>
           {/* Use relative paths (no leading /) */}
-          <Route path="" element={<Home isDarkMode={isDarkMode} />} />
-          <Route path="events" element={<EventsList isDarkMode={isDarkMode} />} />
-          <Route path="ai" element={<AIPage isDarkMode={isDarkMode}/>} />
-          <Route path="events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
-          <Route path="transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
-          <Route path="login" element={<LoginPage isDarkMode={isDarkMode} />} />
-          <Route path="signup" element={<SignupPage isDarkMode={isDarkMode} />} />
-          <Route path="user-panel" element={<UserPanel isDarkMode={isDarkMode} />} />
-          <Route path="admin" element={<AdminPanel isDarkMode={isDarkMode} />} />
+          <Route path="/" element={<Home isDarkMode={isDarkMode} />} />
+          <Route path="/events" element={<EventsList isDarkMode={isDarkMode} />} />
+          <Route path="/ai" element={<AIPage isDarkMode={isDarkMode}/>} />
+          <Route path="/events/:id" element={<EventDetails isDarkMode={isDarkMode} />} />
+          <Route path="/transportation" element={<TransportPage isDarkMode={isDarkMode} />} />
+          <Route path="/login" element={<LoginPage isDarkMode={isDarkMode} />} />
+          <Route path="/signup" element={<SignupPage isDarkMode={isDarkMode} />} />
+          <Route path="/user-panel" element={<UserPanel isDarkMode={isDarkMode} />} />
+          <Route path="/admin" element={<AdminPanel isDarkMode={isDarkMode} />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Footer isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-      </HashRouter>
+      </BrowserRouter>
     </FavoritesProvider>
     </AuthProvider>
   );
