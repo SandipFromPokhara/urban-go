@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5001/api/comments";
+const API_URL = "/api/comments";
 
 // Get all comments for an event
 export const getComments = async (apiId) => {

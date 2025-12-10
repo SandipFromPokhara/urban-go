@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5001/api/ratings';
+const BASE_URL = '/api/ratings';
 
 export const getEventRatings = async (apiId, token) => {
   try {
