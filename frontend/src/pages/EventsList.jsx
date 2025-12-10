@@ -93,7 +93,7 @@ const EventsList = ({ isDarkMode }) => {
 
       console.log('Fetching events with params:', Object.fromEntries(params));
 
-      const response = await fetch(`http://localhost:5001/api/events?${params}`);
+      const response = await fetch(`/api/events?${params}`);
 
       if (!response.ok) {
         const errorText = await response.text();
