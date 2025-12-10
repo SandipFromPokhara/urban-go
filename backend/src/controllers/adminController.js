@@ -157,8 +157,14 @@ const updateUserRole = async (req, res) => {
 
     // Only superadmin can modify admin/superadmin roles
     if ((targetUser.role === "superadmin" || role === "superadmin") && req.user.role !== "superadmin") {
-      res.status(403);
+      res.status(400);
       throw new Error("Only super admin can modify superadmin roles");
+    }
+
+    // Regular admins cannot modify other admins
+    if (targetUser.role === "admin" && req.user.role !== "superadmin") {
+      res.status(400);
+      throw new Error("Only super admin can modify admin users");
     }
 
     // Update the role
