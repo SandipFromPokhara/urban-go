@@ -9,7 +9,7 @@ import '../styles/events.css';
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
 const DEBOUNCE_DELAY = 500; // 500ms debounce for filter changes
 
-//  Helper to remove HTML tags from API descriptions
+//  Helper to remove HTML tags from API description
 const stripHTML = (html) => {
   if (!html) return '';
   const temp = document.createElement('div');
@@ -106,13 +106,9 @@ const EventsList = ({ isDarkMode }) => {
 
       console.log('Fetching events with params:', Object.fromEntries(params));
 
-<<<<<<< HEAD
       const response = await fetch(`/api/events?${params}`, {
         signal: abortControllerRef.current.signal
       });
-=======
-      const response = await fetch(`/api/events?${params}`);
->>>>>>> a9a9f1c59d121ed308f430c8c93aed2eac0e3092
 
       if (!response.ok) {
         const errorText = await response.text();
