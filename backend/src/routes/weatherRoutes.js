@@ -5,6 +5,50 @@ const { getWeather } = require("../services/weatherService");
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Weather
+ *   description: Current weather for a coordinate
+ */
+
+/**
+ * @swagger
+ * /api/weather:
+ *   get:
+ *     summary: Get current weather for given coordinates
+ *     tags: [Weather]
+ *     parameters:
+ *       - in: query
+ *         name: lat
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: Latitude of the location
+ *       - in: query
+ *         name: lon
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: Longitude of the location
+ *     responses:
+ *       200:
+ *         description: Weather data from the external API
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               description: Raw or slightly transformed weather response
+ *             example:
+ *               temperature: 3.5
+ *               feelsLike: 0.8
+ *               description: "Light rain"
+ *               icon: "10d"
+ *       400:
+ *         description: Missing coordinates
+ *       500:
+ *         description: Weather fetch failed
+ */
 router.get("/", async (req, res) => {
     const { lat, lon } = req.query;
     if (!lat || !lon) {

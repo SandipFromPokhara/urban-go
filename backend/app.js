@@ -3,6 +3,10 @@ const express = require("express");
 const cors = require("cors");
 const path = require('path');
 
+// NEW: Swagger imports
+const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
 // Import routes
 const connectDB = require("./src/config/db");
 const { unknownEndpoint,errorHandler } = require("./src/middlewares/customMiddleware");
@@ -29,6 +33,35 @@ app.use(express.static(path.join(__dirname, 'view')));
 
 // Connect to database
 connectDB();
+
+// NEW: Swagger config (before routes)
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "UrbanGo API",
+      version: "1.0.0",
+      description: "API documentation for UrbanGo backend",
+    },
+    servers: [
+      { url: "http://localhost:5001", description: "Local dev" },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+  },
+  // scan all route files for JSDoc annotations
+  apis: ["./src/routes/*.js"],
+};
+
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Transportation API route
 app.use("/api/search-route", transportRoutes);

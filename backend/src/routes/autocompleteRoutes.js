@@ -1,4 +1,5 @@
 // backend/src/routes/autocompleteRoutes.js
+
 const express = require("express");
 const router = express.Router();
 const { autoSuggest } = require("../services/geoCodeService");
