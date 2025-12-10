@@ -170,7 +170,7 @@ const SearchBar = ({
         params.set('sort', 'name');
         params.set('text', term);
 
-        const res = await fetch(`http://localhost:5001/api/events?${params.toString()}`);
+        const res = await fetch(`/api/events?${params.toString()}`);
         if (!res.ok) {
           throw new Error('Failed to fetch suggestions');
         }
