@@ -1,4 +1,5 @@
 import Signup from "../components/signup/Signup.jsx";
+import { Link } from "react-router-dom";
 
 const SignupPage = ({ isDarkMode }) => {
   return (
@@ -14,12 +15,12 @@ const SignupPage = ({ isDarkMode }) => {
         >
           <span>
             Already have an account?{" "}
-            <a
-              href="#/login"
+            <Link
+              to="/login"
               className={`cursor-pointer font-semibold underline transition-colors duration-200 ${isDarkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"}`}
             >
               Press here to login
-            </a>
+            </Link>
           </span>
         </div>
       </div>
