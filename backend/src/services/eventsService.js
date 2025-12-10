@@ -2,6 +2,10 @@ const axios = require("axios");
 
 const EVENTS_BASE_URL = process.env.EVENTS_URL;
 
+// Simple in-memory cache with 5-minute expiry
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 class EventsService {
   /**
    * Fetch events from Events API
@@ -28,6 +32,15 @@ class EventsService {
         page_size: params.page_size || 50,
         page: params.page || 1,
       };
+
+      // Generate cache key from query params
+      const cacheKey = JSON.stringify(queryParams);
+      const cachedData = cache.get(cacheKey);
+      
+      if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+        console.log('Returning cached events data');
+        return cachedData.data;
+      }
 
       // Add optional filters (only if they have values)
       if (params.end) {
@@ -66,7 +79,7 @@ class EventsService {
         totalCount: response.data.meta?.count
       });
 
-      return {
+      const result = {
         success: true,
         data: response.data.data || [],
         meta: {
@@ -75,6 +88,17 @@ class EventsService {
           previous: response.data.meta?.previous || null,
         },
       };
+
+      // Cache the result
+      cache.set(cacheKey, { data: result, timestamp: Date.now() });
+      
+      // Clean up old cache entries (keep cache size reasonable)
+      if (cache.size > 50) {
+        const firstKey = cache.keys().next().value;
+        cache.delete(firstKey);
+      }
+
+      return result;
     } catch (error) {
       console.error("External Events API Error:", error.message);
       

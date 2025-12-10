@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SearchBar from '../components/events/SearchBar';
 import EventsGrid from '../components/events/EventsGrid';
@@ -7,6 +7,7 @@ import Pagination from '../components/events/Pagination';
 import '../styles/events.css';
 
 const EVENTS_PER_PAGE = 6; // Show 6 events per page
+const DEBOUNCE_DELAY = 500; // 500ms debounce for filter changes
 
 //  Helper to remove HTML tags from API descriptions
 const stripHTML = (html) => {
@@ -24,6 +25,10 @@ const EventsList = ({ isDarkMode }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalEvents, setTotalEvents] = useState(0);
   const [loading, setLoading] = useState(true);
+  
+  // Refs for debouncing and request control
+  const debounceTimerRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   // Get current page from URL, default to 1
   const currentPage = parseInt(searchParams.get('page')) || 1;
@@ -45,6 +50,14 @@ const EventsList = ({ isDarkMode }) => {
   // Fetch events from backend
   const fetchEvents = async () => {
     try {
+      // Cancel any pending request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      
+      // Create new abort controller for this request
+      abortControllerRef.current = new AbortController();
+      
       setLoading(true);
       setError(null);
 
@@ -93,7 +106,9 @@ const EventsList = ({ isDarkMode }) => {
 
       console.log('Fetching events with params:', Object.fromEntries(params));
 
-      const response = await fetch(`http://localhost:5001/api/events?${params}`);
+      const response = await fetch(`/api/events?${params}`, {
+        signal: abortControllerRef.current.signal
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -140,38 +155,15 @@ const EventsList = ({ isDarkMode }) => {
           rawData: event,
         }));
 
-        //  De-duplicate by event name + location, keep earliest date
-        const seen = new Map(); // key => event
-
-        for (const ev of transformedEvents) {
-          const key = `${ev.name}__${ev.fullLocation.name || ev.location}`;
-          const existing = seen.get(key);
-
-          if (!existing) {
-            seen.set(key, ev);
-          } else {
-            const evTime = ev.date ? new Date(ev.date).getTime() : 0;
-            const existingTime = existing.date ? new Date(existing.date).getTime() : 0;
-
-            // keep the earliest occurrence
-            if (evTime < existingTime) {
-              seen.set(key, ev);
-            }
-          }
-        }
-
-        const uniqueEvents = Array.from(seen.values());
-
-        setEvents(uniqueEvents);
-        setTotalEvents(result.pagination?.total || uniqueEvents.length);
+        setEvents(transformedEvents);
+        setTotalEvents(result.pagination?.total || transformedEvents.length);
         setTotalPages(result.pagination?.total_pages || 1);
 
-        console.log('Result summary (deduped):', {
+        console.log('Result summary:', {
           page: result.pagination?.page,
           totalPages: result.pagination?.total_pages,
           totalEvents: result.pagination?.total,
-          eventsOnPageBeforeDedup: transformedEvents.length,
-          eventsOnPageAfterDedup: uniqueEvents.length,
+          eventsOnPage: transformedEvents.length,
         });
       } else {
         setEvents([]);
@@ -179,6 +171,12 @@ const EventsList = ({ isDarkMode }) => {
         setTotalPages(1);
       }
     } catch (err) {
+      // Ignore abort errors (they're expected when cancelling requests)
+      if (err.name === 'AbortError') {
+        console.log('Request cancelled');
+        return;
+      }
+      
       console.error('Error fetching events:', err);
       setError(err.message);
       setEvents([]);
@@ -190,9 +188,8 @@ const EventsList = ({ isDarkMode }) => {
     }
   };
 
-  // Fetch when page / filters / search / sort change
+  // Fetch when page / filters / search / sort change with debouncing
   useEffect(() => {
-   
     const trimmed = searchTerm.trim();
     const hasNumbers = /\d/.test(trimmed);
 
@@ -206,8 +203,28 @@ const EventsList = ({ isDarkMode }) => {
       return;
     }
 
-    fetchEvents();
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
 
+    // For page changes, fetch immediately. For filters, debounce.
+    const isPageChange = searchParams.get('page') !== '1';
+    const delay = isPageChange ? 0 : DEBOUNCE_DELAY;
+
+    debounceTimerRef.current = setTimeout(() => {
+      fetchEvents();
+    }, delay);
+
+    // Cleanup function
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [currentPage, filters, searchTerm, sortBy]);
 
   // Handlers

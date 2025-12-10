@@ -16,7 +16,7 @@ function RightPanel({ isDarkMode, ticketInfo }) {
   const weather = useWeather(CAPITAL_REGION_COORDS);
 
   return (
-    <aside className="flex flex-col w-full gap-4 overflow-y-auto max-h-screen sm:px-4">
+    <aside className="flex flex-col w-full gap-6 overflow-y-auto max-h-screen sm:px-4">
 
       {/* 🌦 Weather */}
       <div className={`rounded-xl shadow-lg ${panelClass}`}>

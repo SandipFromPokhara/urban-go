@@ -1,4 +1,5 @@
 // backend/services/aiService.js
+
 const model = require("../config/gemini");
 
 const CAPITAL_REGION_CITIES = [
@@ -11,16 +12,19 @@ const CAPITAL_REGION_CITIES = [
 function inferCity(text) {
   const lower = text.toLowerCase();
   const found = CAPITAL_REGION_CITIES.find(city => lower.includes(city));
-  return found ? found.charAt(0).toUpperCase() + found.slice(1) : "Capital Region";
+  return found
+    ? found.charAt(0).toUpperCase() + found.slice(1)
+    : "Capital Region";
 }
 
 function inferStructuredData(message) {
   const text = message.toLowerCase();
 
   return {
-    intent: text.includes("route") || text.includes("transport")
-      ? "find_routes"
-      : "find_events",
+    intent:
+      text.includes("route") || text.includes("transport")
+        ? "find_routes"
+        : "find_events",
     params: {
       city: inferCity(text),
       time: text.includes("today")
@@ -30,11 +34,26 @@ function inferStructuredData(message) {
         : text.includes("weekend")
         ? "weekend"
         : "unspecified",
-      categories: text.includes("music") ? ["music"] : [],
+      categories: text.includes("music")
+        ? ["music"]
+        : text.includes("sports")
+        ? ["sports"]
+        : [],
       popular: false,
       include_routes: false,
     },
   };
+}
+
+function extractGeminiText(result) {
+  if (!result) return "Sorry, no response from AI.";
+
+  if (typeof result === "string") return result;
+
+  return (
+    result?.text?.candidates?.[0]?.content?.parts?.[0]?.text ||
+    "Sorry, I couldn’t generate a response right now."
+  );
 }
 
 async function generateEventRecommendation(userMessage) {
@@ -59,12 +78,22 @@ User request:
 "${userMessage}"
 `;
 
-  const aiReply = await model(prompt);
+  try {
+    const aiResult = await model(prompt);
+    const text = extractGeminiText(aiResult);
 
-  return {
-    text: aiReply,
-    structured,
-  };
+    return {
+      text,
+      structured,
+    };
+  } catch (err) {
+    console.error("❌ AI service error:", err);
+
+    return {
+      text: "Sorry, I’m having trouble right now. Please try again in a moment.",
+      structured,
+    };
+  }
 }
 
 module.exports = generateEventRecommendation;

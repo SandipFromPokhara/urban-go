@@ -140,20 +140,8 @@ exports.getEvents = async (req, res) => {
           return allFilters.some((filter) => {
             if (!filter) return false;
 
-            // EXACT MATCH
-            if (text === filter) return true;
-
-            // WORD BOUNDARY MATCH
-            const wordBoundaryRegex = new RegExp(
-              `\\b${escapeRegex(filter)}\\b`,
-              "i"
-            );
-            if (wordBoundaryRegex.test(text)) return true;
-
-            // SMART PARTIAL MATCH
-            if (filter.length > 3 && text.includes(filter)) return true;
-
-            return false;
+            // EXACT MATCH or CONTAINS (simplified for speed)
+            return text === filter || text.includes(filter);
           });
         };
 
@@ -182,8 +170,8 @@ exports.getEvents = async (req, res) => {
           "📦 Category filter detected - fetching multiple pages..."
         );
 
-        const FETCH_PAGE_SIZE = 100;
-        const MAX_PAGES = 5;
+        const FETCH_PAGE_SIZE = 50;
+        const MAX_PAGES = 2;
         let allEvents = [];
         let currentApiPage = 1;
         let hasMore = true;
@@ -202,7 +190,7 @@ exports.getEvents = async (req, res) => {
           );
 
           const apiResponse =
-            await linkedEventsService.fetchEvents(apiParams);
+            await eventsService.fetchEvents(apiParams);
 
           if (
             !apiResponse.success ||
@@ -218,7 +206,7 @@ exports.getEvents = async (req, res) => {
           }
 
           const transformed = apiResponse.data.map((event) =>
-            linkedEventsService.transformEvent(event)
+            eventsService.transformEvent(event)
           );
 
           allEvents = allEvents.concat(transformed);
@@ -348,8 +336,8 @@ exports.getEvents = async (req, res) => {
     console.log("UI dates:", { uiStartDate, uiEndDate });
 
     const baseApiParams = buildBaseApiParams();
-    const EXTERNAL_PAGE_SIZE = 100;
-    const MAX_PAGES = 5;
+    const EXTERNAL_PAGE_SIZE = 50;
+    const MAX_PAGES = 2;
 
     let currentApiPage = 1;
     let allTransformed = [];
@@ -367,7 +355,7 @@ exports.getEvents = async (req, res) => {
         apiParams
       );
 
-      const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+      const apiResponse = await eventsService.fetchEvents(apiParams);
 
       if (
         !apiResponse.success ||
@@ -383,7 +371,7 @@ exports.getEvents = async (req, res) => {
       }
 
       const batch = apiResponse.data.map((event) =>
-        linkedEventsService.transformEvent(event)
+        eventsService.transformEvent(event)
       );
 
       allTransformed = allTransformed.concat(batch);
@@ -602,7 +590,7 @@ exports.getCategories = async (req, res) => {
       include: "keywords",
     };
 
-    const apiResponse = await linkedEventsService.fetchEvents(apiParams);
+    const apiResponse = await eventsService.fetchEvents(apiParams);
 
     if (!apiResponse.success || !apiResponse.data) {
       return res.status(500).json({
@@ -624,7 +612,7 @@ exports.getCategories = async (req, res) => {
         });
       }
 
-      const transformedEvent = linkedEventsService.transformEvent(event);
+      const transformedEvent = eventsService.transformEvent(event);
       if (
         transformedEvent.categories &&
         Array.isArray(transformedEvent.categories)

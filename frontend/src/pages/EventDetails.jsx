@@ -12,10 +12,10 @@ import {
   Star,
 } from "lucide-react";
 import { useFavorites } from "../context/favoritesContext";
+import { useAuth } from "../context/AuthContext";
 import CommentSection from "../components/events/CommentSection";
 import { getEventRatings, postRating } from "../hooks/ratings";
 import { motion } from "framer-motion";
-import { jwtDecode } from "jwt-decode";
 
 const EventDetails = ({ isDarkMode }) => {
   const { id } = useParams();
@@ -25,21 +25,12 @@ const EventDetails = ({ isDarkMode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isFavorited, add, remove } = useFavorites();
+  const { user, token } = useAuth();
   const [userRating, setUserRating] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
 
   const fromSearch = location.state?.fromSearch || "?page=1";
-  const token = localStorage.getItem("authToken");
-
-  let loggedIn = null;
-  if (token) {
-    try {
-      loggedIn = jwtDecode(token);
-    } catch (error) {
-      console.error("Token decode error:", error);
-    }
-  }
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -65,7 +56,7 @@ const EventDetails = ({ isDarkMode }) => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`http://localhost:5001/api/events/${id}?language=en`);
+        const response = await fetch(`/api/events/${id}?language=en`);
         if (!response.ok) throw new Error("Event not found");
 
         const result = await response.json();
@@ -603,7 +594,7 @@ const EventDetails = ({ isDarkMode }) => {
 
             <CommentSection
               apiId={event.id}
-              currentUser={loggedIn}
+              currentUser={user}
               isDarkMode={isDarkMode}
             />
           </div>

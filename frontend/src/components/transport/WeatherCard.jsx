@@ -23,7 +23,7 @@ export default function WeatherCard({ weather, isDarkMode }) {
   // Background gradient by weather type
   const bgGradient = {
     sunny: "bg-gradient-to-r from-yellow-400 via-orange-300 to-yellow-200",
-    cloudy: "bg-gradient-to-r from-gray-400 via-gray-500 to-gray-300",
+    cloudy: "bg-gradient-to-r from-gray-500 via-gray-400 to-gray-600",
     rain: "bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300",
     snow: "bg-gradient-to-r from-white via-blue-100 to-blue-200",
   }[condition] || (isDarkMode ? "bg-gray-700" : "bg-white");
@@ -34,20 +34,20 @@ export default function WeatherCard({ weather, isDarkMode }) {
         isDarkMode ? "text-gray-100" : "text-gray-900"
       } transform transition-transform duration-300 hover:scale-105`}
     >
-      <h3 className="text-center font-bold mb-4 text-xl drop-shadow-lg">
+      <h3 className="text-center font-bold mb-4 text-3xl drop-shadow-lg">
         Current Weather
       </h3>
 
-      <div className="flex flex-col items-center relative z-10 gap-3">
+      <div className="flex flex-col items-center relative z-10 gap-2">
         {/* Icon with animated glow */}
         <div className="relative w-24 h-24 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-white/20 blur-xl animate-pulse" />
-          <div className="flex items-center justify-center w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm shadow-md z-10">
+          <div className="absolute inset-0 rounded-full bg-sky-700 blur-xl animate-pulse" />
+          <div className="flex items-center justify-center w-24 h-24 rounded-full backdrop-blur-sm shadow-md z-10">
             {IconComponent()}
           </div>
         </div>
 
-        <p className="capitalize">{condition}</p>
+        <p className="capitalize pt-3 font-semibold text-lg">{condition}</p>
 
         {/* Temperature */}
         <p className="text-3xl font-extrabold drop-shadow-sm">{Math.round(temp)}°C</p>

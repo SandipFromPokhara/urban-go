@@ -170,7 +170,7 @@ const SearchBar = ({
         params.set('sort', 'name');
         params.set('text', term);
 
-        const res = await fetch(`http://localhost:5001/api/events?${params.toString()}`);
+        const res = await fetch(`/api/events?${params.toString()}`);
         if (!res.ok) {
           throw new Error('Failed to fetch suggestions');
         }
@@ -425,12 +425,23 @@ const SearchBar = ({
             )}
           </button>
 
-          <button 
+          <button
             className="flex items-center justify-center rounded-lg text-lg transition-all duration-200 sm:shrink-0 relative hover:-translate-y-1 cursor-pointer"
-            style={{ color: showFilters || hasActiveFilters ? '#ffffff' : (isDarkMode ? '#3b82f6' : '#574199') }} 
+            style={{
+              backgroundColor: isDarkMode ? '#2563eb' : '#3b82f6', // set your preferred BG
+              color: '#ffffff', // text color
+              padding: '0 12px',
+              height: '38px'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = isDarkMode ? '#1d4ed8' : '#2563eb';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = isDarkMode ? '#2563eb' : '#3b82f6';
+            }}
             onClick={() => navigate("/ai")}
           >
-            <RiRobot3Fill />AI Mode
+            <RiRobot3Fill className="mr-1" /> AI Mode
           </button>
 
           {/* Clear Filters Button */}
