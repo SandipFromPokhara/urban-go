@@ -140,20 +140,8 @@ exports.getEvents = async (req, res) => {
           return allFilters.some((filter) => {
             if (!filter) return false;
 
-            // EXACT MATCH
-            if (text === filter) return true;
-
-            // WORD BOUNDARY MATCH
-            const wordBoundaryRegex = new RegExp(
-              `\\b${escapeRegex(filter)}\\b`,
-              "i"
-            );
-            if (wordBoundaryRegex.test(text)) return true;
-
-            // SMART PARTIAL MATCH
-            if (filter.length > 3 && text.includes(filter)) return true;
-
-            return false;
+            // EXACT MATCH or CONTAINS (simplified for speed)
+            return text === filter || text.includes(filter);
           });
         };
 
@@ -182,8 +170,8 @@ exports.getEvents = async (req, res) => {
           "📦 Category filter detected - fetching multiple pages..."
         );
 
-        const FETCH_PAGE_SIZE = 100;
-        const MAX_PAGES = 5;
+        const FETCH_PAGE_SIZE = 50;
+        const MAX_PAGES = 2;
         let allEvents = [];
         let currentApiPage = 1;
         let hasMore = true;
