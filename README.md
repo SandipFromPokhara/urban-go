@@ -389,3 +389,5 @@ npm run dev    # Runs Vite dev server
 This project is developed for academic purposes as part of Metropolia University of Applied Science course on Web Development.
 
 © 2025 UrbanGo Team
+
+# This branch is ready for production and deployment

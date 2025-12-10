@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Zoom buttons: lifted above OSM attribution */
+.leaflet-bottom.leaflet-right > .leaflet-control-zoom {
+  margin-bottom: 15%; /* moves zoom buttons up */
+}
+
+/* Keep attribution at bottom */
+.leaflet-control-attribution.leaflet-bottom.leaflet-right {
+  bottom: 0;
+  right: 0;
+}
+
+/* Global body styling */
+body {
+  @apply bg-gray-50 text-gray-800 antialiased;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hero Section Background Grid */
+.grid-background {
+  background-color: #0f1a3e; /* Deep Indigo/Navy */
+  width: 200%;
+  height: 200%;
+  background-image: 
+    linear-gradient(0deg, transparent 90%, rgba(255, 255, 255, 0.1) 100%), 
+    linear-gradient(90deg, transparent 90%, rgba(255,255,255,0.1) 100%);
+  background-size: 20px 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: moveGrid 60s linear infinite;
+}
+
+@keyframes moveGrid {
+  from { transform: translate(0,0); }
+  to { transform: translate(-50%, -50%); }
+}
+
+/* Radial Glow Overlay */
+.radial-overlay {
+  background: radial-gradient(circle at center, rgba(0,122,201,0.4) 0%, transparent 70%);
+}
+
+/* Vehicles */
+.vehicle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ffc72c; /* yellow */
+  opacity: 0.9;
+  box-shadow: 0 0 5px #ffc72c;
+}
+
+/* Vehicle animations */
+.vehicle-1 { top: 10%; left: -25px; animation: move1 12s linear infinite; }
+.vehicle-2 { top: 30%; left: -30px; animation: move2 15s linear infinite; }
+.vehicle-3 { top: 50%; left: -25px; animation: move3 18s linear infinite; }
+
+@keyframes move1 { from { transform: translateX(0); } to { transform: translateX(120vw); } }
+@keyframes move2 { from { transform: translateX(0); } to { transform: translateX(130vw); } }
+@keyframes move3 { from { transform: translateX(0); } to { transform: translateX(125vw); } }

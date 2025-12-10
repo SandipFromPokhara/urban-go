@@ -47,6 +47,9 @@ backend/coverage/
 # Local environment overrides
 *.local
 
+# Admin documentation (internal use only)
+ADMIN_PANEL.md
+
 # =============================
 # Editor & OS specific
 # =============================
@@ -107,3 +110,17 @@ pids/
 .yarn/
 .pnp.*
 eslintcache
+
+# Extra folders
+backend/AI2/
+backend/mocks/
+backend/self-assessment/
+
+
+frontend/self-assessment/
+frontend/src/components/SignupPage/
+frontend/src/api/
+
+# Personal documentation (not to be shared)
+AUTH_IMPLEMENTATION_SUMMARY.md
+
