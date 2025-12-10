@@ -1,105 +1,80 @@
-# Self-Assessment  
+# Self-Assessment
 
-- **Member name:** *Gam Aung*  
-- **Contribution area:** *Frontend authentication components (Signup/Login pages and forms) and complete Admin Panel implementation (both frontend and backend). Developed custom hooks for authentication flows, admin dashboard with statistics, user management with role-based access control, and comprehensive testing suite for auth and admin features.*
+- **Member name:** *Dinal Maha Vidanelage*
+- **Contribution area:** *EventsList and EventDetails pages, event cards and filtering UX, eventsController/eventsRoutes, eventModel/eventsService, and performance/accuracy improvements to category filtering and multi-page fetching.*
 
 ---
 
 ### 1. Functionality
 - **Does the code meet the requirements?**
   - [Y] Does it implement all specified features you were responsible for?  
-    - Implemented complete signup and login pages with form validation using custom hooks (useSignup, useLogin, useFormValidation).
-    - Built full Admin Panel with three-tier role hierarchy (user → admin → superadmin) including dashboard statistics, user management, role updates, and review moderation.
-    - Created comprehensive test suites (55 passing tests) covering authentication flows and admin RBAC.
+    - Implemented all assigned event features (list, detail, filtering, transport to detail view).
+    - Completed backend endpoints in eventsController/eventsRoutes wired to eventsService and eventModel.
   - [Y] Are edge cases handled (e.g., invalid data, duplicates)?  
-    - Signup validates email format, password strength, and address completeness.
-    - Admin panel prevents privilege escalation (regular admins cannot modify other admins or promote to superadmin).
-    - Authentication handles missing tokens, expired tokens, and invalid credentials properly.
+    - Category filter matches both keywords and text tokens, validates date ranges and skips invalid inputs.
+    - Detail view copes with missing images/description and shows fallback labels.
+    - Filtering debounced on the client to avoid noisy API calls.
   - [N] Are there any bugs or unexpected behaviors?  
-    - No critical bugs. Favorites tests were skipped due to external API dependency (documented with TODO for mocking).
+    - No blocking bugs.
 
 - **Integration**
-  - [Y] Does your code work correctly with other parts of the application?  
-    - Auth hooks integrate seamlessly with AuthContext for global state management.
-    - Admin panel works with existing user and comment models, respecting the established JWT middleware pattern.
-    - Fixed production deployment issues by converting hardcoded localhost URLs to relative /api paths.
+  - [Y] Does your code work correctly with other parts of the application?
+    - Frontend uses the backend /api/events contract for pagination, filters, and event IDs.
   - [Y] Are inputs and outputs managed appropriately?  
-    - Forms provide real-time validation feedback with clear error messages.
-    - Admin actions return appropriate success/error responses with user-friendly messages.
+    - Inputs/outputs aligned: filters accept text/category/date, responses include normalized times, keywords, and pagination metadata.
 
 ---
 
 ### 2. Code Quality
 - **Readability**
-  - [Y] Is your code easy to understand for other developers?  
-    - Custom hooks (useSignup, useLogin, useFormValidation) encapsulate complex logic with clear naming.
-    - Admin controller functions are well-documented with JSDoc comments explaining access levels and business logic.
-  - [Y] Are variable and function names descriptive and meaningful?  
-    - Function names clearly indicate purpose: `updateUserRole`, `deleteUser`, `getAdminStats`, `validateSignup`.
-    - State variables follow consistent naming: `isLoading`, `errorMessage`, `adminToken`, `superAdminToken`.
+  - [Y] Is your code easy to understand for other developers?
+    - Components and services use descriptive names (formatDateRange, applyCategoryFilter, transformEvent).
+  - [Y] Are variable and function names descriptive and meaningful?
+    - Complex blocks (multi-page fetch + filter) are commented and split into helpers for clarity.
 
 - **Reusability**
   - [Y] Can your code or parts of it be reused elsewhere in the application?  
-    - `useFormValidation` hook is generic and reusable for any form validation needs.
-    - Admin middleware pattern can be extended for additional protected routes.
-    - Test setup (beforeEach cleanup, token generation) serves as template for future tests.
-  - [Y] Is logic modular and separated from unrelated concerns?  
-    - Authentication logic separated into dedicated hooks (useSignup, useLogin, useLogout).
-    - Admin features modularized into separate components (StatsTab, UsersTab, ReviewsTab).
-    - Backend controllers separated by domain (authController, adminController, userController).
+    - eventsService.transformEvent centralizes normalization for list/detail/favorites reuse.
+  - [Y] Is logic modular and separated from unrelated concerns? 
+    - Category filter helper takes both categoryText and keyword arrays so UI can evolve without backend rewrites.
 
 - **Comments and Documentation**
-  - [Y] Are there comments explaining complex logic?  
-    - Admin controller includes detailed comments on role hierarchy and permission checks.
-    - Test files include comments explaining skipped tests and mocking requirements.
-    - Authentication flow documented with inline comments for JWT token handling.
+  - [Y] Are there comments explaining complex logic?
+    - Inline notes on fetching strategy, caching, and why multi-page fetch is needed for accurate category results.
   - [Y] Is there documentation for how to use your code unit?  
-    - Created comprehensive test README documenting how to run tests, expected results, and troubleshooting.
-    - JSDoc comments on controller functions describe parameters, responses, and access requirements.
+    - Prop-driven filters documented in the components to guide future contributors.
 
 ---
 
 ### 3. Performance
 - **Efficiency**
-  - [Y] Are there any unnecessary operations or performance bottlenecks?  
-    - Admin dashboard aggregates statistics efficiently with Promise.all for parallel database queries.
-    - Form validation debounces input to avoid excessive re-renders.
-    - Tests run with --runInBand to prevent database race conditions.
-  - [Y] Is the code optimized for larger datasets or high traffic (if applicable)?  
-    - Admin user list could benefit from pagination for large user bases (documented as future improvement).
-    - Database queries use lean() where appropriate to reduce memory overhead.
-    - JWT tokens expire after 2 hours to balance security and user experience.
+  - [N] Are there any unnecessary operations or performance bottlenecks?  
+    - Implemented cache-first reads in eventsController to avoid repeated external API hits.
+    - Reduced category fetch volume from 5 pages (500 events) to 2 pages (200) to lower latency while keeping accuracy.
+    - Debounced search/filter inputs on the client to cut redundant calls.
+  - [ ] Is the code optimized for larger datasets or high traffic (if applicable)? 
 
 ---
 
 ### 4. Overall Assessment
-- **Strengths**  
-  - Delivered complete authentication flow from frontend forms to backend JWT validation with comprehensive error handling.
-  - Implemented sophisticated three-tier RBAC system with proper permission boundaries preventing privilege escalation.
-  - Created extensive test coverage (55 tests) ensuring authentication and admin features work correctly before/after auth.
-  - Fixed critical production deployment issue by identifying and resolving hardcoded localhost URLs across 9 files.
-  - Modular architecture with reusable hooks and components that follow React best practices.
-  - Strong documentation including test README, JSDoc comments, and inline explanations of complex logic.
+- **Strengths**
+  - Delivered full event browsing flow with clear date/venue presentation and fallbacks.
+  - Built robust category filtering that combines keywords and text tokens and supports multi-page aggregation.
+  - Improved performance by trimming external fetch pages and adding cache-first logic.
 
-- **Areas for Improvement**  
-  - Add pagination to admin user list for better scalability with large datasets.
-  - Mock external API calls in favorites tests to enable full test coverage.
-  - Implement rate limiting on authentication endpoints to prevent brute force attacks.
-  - Add loading states and optimistic UI updates for admin actions (delete, role updates).
-  - Consider adding audit logs for admin actions (who changed what, when).
+- **Areas for Improvement**
+  - Add loading/progress indicators for category fetches to set user expectations on slower networks.
+  - Consider background prefetch and cache warming for popular categories.
+  - Add unit/integration tests for applyCategoryFilter and date formatting edge cases.
 
-- **Action Plan**  
-  - Implement pagination component for admin user list with skip/limit query parameters.
-  - Create mock service for EventsService.fetchEventById() to enable favorites tests.
-  - Add express-rate-limit middleware to auth routes with configurable limits.
-  - Use React Query or SWR for better loading/error states and automatic cache invalidation.
-  - Design and implement audit log table tracking admin actions with timestamp and actor information.
+- **Action Plan**
+  - Implement a parallel-fetch with early stop option guarded by config flag to further reduce wait time.
+  - Add Jest tests for category filtering and date rendering (upcoming/ongoing/past).
+  - Create a maxPages config env for tuning fetch volume per environment.
 
 ---
 
 ### 5. Additional Notes
-- Successfully debugged and resolved production deployment issues by systematically identifying hardcoded URLs using grep search.
-- Collaborated with team to ensure consistent API response formats and error handling patterns.
-- Increased test timeout to 10 seconds to accommodate slower bcrypt operations during test setup.
-- Fixed admin token issue in tests by re-logging in after role updates to ensure JWT contains correct role.
-- Used Git branches effectively (feature-admin-panel) and resolved merge conflicts when integrating with production fixes.  
+- Worked with backend to make sure categoryText and categoryKeywords are sent correctly from SearchBar to the API.
+- Explained why Linked Events has no built-in category filters, so we need multi-page fetch and local filtering.
+- Improved date display so users can easily tell if events are upcoming, ongoing, or already finished
