@@ -21,8 +21,6 @@ const SearchBar = ({
   searching = false,
   onFilterChange,
   filters = {},
-  sortBy,
-  onSortChange
 }) => {
   const [isInputHovered, setIsInputHovered] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -428,7 +426,7 @@ const SearchBar = ({
           <button
             className="flex items-center justify-center rounded-lg text-lg transition-all duration-200 sm:shrink-0 relative hover:-translate-y-1 cursor-pointer"
             style={{
-              backgroundColor: isDarkMode ? '#2563eb' : '#3b82f6', // set your preferred BG
+              backgroundColor: isDarkMode ? '#2563eb' : '#3b82f6', 
               color: '#ffffff', // text color
               padding: '0 12px',
               height: '38px'
