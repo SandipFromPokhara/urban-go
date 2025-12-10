@@ -271,34 +271,40 @@ External APIs:
 ```
 urban-go/
 │
-├── frontend/                 # React + Vite app (client-side)
+├── frontend/                 # React + Vite app + AI integration
 │   ├── public/
 │   ├── src/
+|   |   ├── assets/
 │   │   ├── components/
-│   │   ├── pages/
+|   |   ├── context/
 │   │   ├── hooks/
-│   │   ├── context/
-│   │   ├── assets/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── styles/
+│   │   ├── utils/
+│   │   ├── App.css
 │   │   ├── App.jsx
 │   │   ├── main.jsx
-│   │   └── index.css
+│   ├── eslint.config.js
+│   ├── index.html
 │   ├── tailwind.config.js
-│   ├── postcss.config.js
 │   ├── vite.config.js
+│   ├── package-lock.json
 │   └── package.json
 │
-├── backend/                  # Node + Express server (API + DB)
+├── backend/                  # Node + Express server (API + DB + AI integration)
 │   ├── src/
 │   │   ├── config/
-│   │   │   ├── db.js         # MongoDB connection
 │   │   ├── controllers/
+│   │   ├── middlewares/
 │   │   ├── models/
 │   │   ├── routes/
-│   │   ├── middlewares/
 │   │   ├── services/
 │   │   ├── utils/
-│   │   └── server.js
-│   ├── .env.example
+│   ├── tests/
+│   ├── app.js
+│   ├── index.js
+│   ├── package-lock.json
 │   └── package.json    
 |
 └── README.md
@@ -313,7 +319,7 @@ urban-go/
 |:--------|:-------|:-------------|
 | **Sprint 1** | Design & Planning | Figma prototype, Trello backlog, presentation |
 | **Sprint 2** | Frontend & Backend Development | Static pages with navigation and basic interactivity |
-| **Sprint 3** | Frontend, Backend & Integration | HSL API setup, user login system, database, and final presentation |
+| **Sprint 3** | Frontend, Backend & Integration | Events, Transport, Weather, Service disruption and OpenStreetMap API setup, AI integration, user registration system, database, and final presentation |
 
 ---
 
@@ -321,10 +327,10 @@ urban-go/
 
 | Member | Role |
 |:--------|:------|
-| **Sandip** | Product Owner + Frontend + Backend Developer|
-| **Sailesh** | Scrum Master + Frontend + Backend Developer |
+| **Sandip** | Product Owner + Sprint 1 Scrum Master + Frontend + Backend Developer|
+| **Sailesh** | Sprint 2 Scrum Master + Frontend + Backend Developer |
 | **Olga** | Frontend + Backend Developer |
-| **Gam** | Frontend + Backend Developer | 
+| **Gam** | Sprint 3 Scrum Master + Frontend + Backend Developer | 
 | **Dinal** | Frontend + Backend Developer |
 
 ---
@@ -382,3 +388,5 @@ npm run dev    # Runs Vite dev server
 This project is developed for academic purposes as part of Metropolia University of Applied Science course on Web Development.
 
 © 2025 UrbanGo Team
+
+# This branch is ready for production and deployment
