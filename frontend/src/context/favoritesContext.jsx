@@ -19,7 +19,7 @@ export const FavoritesProvider = ({ children }) => {
 
     (async () => {
       try {
-        const res = await axios.get("http://localhost:5001/api/favorites", {
+        const res = await axios.get("/api/favorites", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFavorites(res.data.favorites || []);
@@ -35,7 +35,7 @@ export const FavoritesProvider = ({ children }) => {
     if (!token) return console.error("User not authenticated");
     try {
       const res = await axios.post(
-        `http://localhost:5001/api/favorites/${eventId}`,
+        `/api/favorites/${eventId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -49,7 +49,7 @@ export const FavoritesProvider = ({ children }) => {
     if (!token) return console.error("User not authenticated");
     try {
       const res = await axios.delete(
-        `http://localhost:5001/api/favorites/${eventId}`,
+        `/api/favorites/${eventId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

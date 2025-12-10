@@ -18,7 +18,7 @@ export const useCategories = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch('http://localhost:5001/api/events/meta/categories');
+        const response = await fetch('/api/events/meta/categories');
         
         if (!response.ok) {
           throw new Error('Failed to fetch categories');

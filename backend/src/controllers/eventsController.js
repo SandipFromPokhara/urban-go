@@ -140,20 +140,8 @@ exports.getEvents = async (req, res) => {
           return allFilters.some((filter) => {
             if (!filter) return false;
 
-            // EXACT MATCH
-            if (text === filter) return true;
-
-            // WORD BOUNDARY MATCH
-            const wordBoundaryRegex = new RegExp(
-              `\\b${escapeRegex(filter)}\\b`,
-              "i"
-            );
-            if (wordBoundaryRegex.test(text)) return true;
-
-            // SMART PARTIAL MATCH
-            if (filter.length > 3 && text.includes(filter)) return true;
-
-            return false;
+            // EXACT MATCH or CONTAINS (simplified for speed)
+            return text === filter || text.includes(filter);
           });
         };
 
