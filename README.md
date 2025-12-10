@@ -31,7 +31,7 @@ The platform aims to enhance city life by combining **event discovery** with **l
 - 🔍 **Event Discovery** – Browse upcoming city events with filters  
 - 🗺️ **Transport Planner** – Get real-time routes 
 - ⭐ **Favorites** – Save events to revisit later (Sprint 2+)
-- 🔔 **Subscribe** – Follow categories or venues to get personalized updates  
+- 🔔 **AI** – AI mode integrated for event suggestions  
 - ⚡ **Modular Structure** – Scalable Node.js and REST API-based architecture  
 
 ---
@@ -43,83 +43,41 @@ The platform aims to enhance city life by combining **event discovery** with **l
 | **Frontend**        | HTML, CSS, Tailwind CSS, JavaScript, React |
 | **Backend**         | Node.js, Express.js     |
 | **Database**        | MongoDB (Mongoose ODM)  |
-| **API Integration** | HSL API (public transport data), Linked Events API (event data), OpenWeather API |
+| **API Integration** | Public transport API, Public events API, Finnish meteorological institute |
 | **Version Control** | Git & GitHub |
 | **Design Tools**    | Figma (for prototype and presentation) |
+| **Deployment**    | Render |
 
 ---
 
 ## 🧩 System Components / Scope
 
 The **Minimum Viable Product (MVP)** will include:
-1. **User & Admin Panel (Frontend – React)**
+1. **User Panel (Frontend – React)**  
+   - Registration, login, and authentication  
+   - Browse and search events
+   - Save and manage favorite events  
+   - View personalized event recommendations (AI mode)  
 
-   - Single React frontend for both roles
+2. **Admin Panel (Backend + React Dashboard)**  
+   - Admin authentication and role-based access  
+   - Manage user accounts and moderate reviews   
+   - View analytics and user activity summary
+   - Admins have read-only access to Events data (cannot edit or delete external events) 
 
-   - User functionality: registration/login, browse/search events, save favorites, write reviews, subscribe to categories/venues, view basic recommendations
+3. **Backend (Node.js + Express)**  
+   - RESTful API handling for CRUD operations  
+   - MongoDB integration for persistent data storage  
+   - Secure JWT authentication and role management  
+   - Integration with AI and Events, Transport, Weather APIs  
 
-   - Admin functionality (conditionally rendered): view all users, moderate reviews, monitor subscriptions, view analytics
+4. **Database (MongoDB)**  
+   - Collections: `users`, `favorites`, `events`, `reviews`  
+   - Data persistence for user profiles, saved items, and admin data  
 
-   - Admins cannot edit Linked Events API data (read-only)
+5. **AI Component**  
+   - Smart Recommendation Engine for event metadata  
 
-2. **Backend (Node.js + Express)**
-
-   - RESTful API handling for CRUD operations on internal data (users, favorites, reviews, subscriptions)
-
-   - MongoDB integration for persistent storage
-
-   - Secure JWT authentication and role-based access control
-
-   - Integration with Linked Events, HSL, and OpenWeather APIs
-
-3. **Database (MongoDB)**
-
-   - Collections: users, favorites, events, reviews, subscriptions
-
-   - Data persistence for user profiles, saved items, reviews, subscriptions, and admin data
-
-4. **Future Extension (AI Component)**
-
-   - Smart Recommendation Engine using user behavior and event metadata 
-
-```
-                           ┌───────────────────────────────┐
-                           │          USER / ADMIN         │
-                           │ (Single React Frontend UI)    │
-                           └───────────────┬───────────────┘
-                                           │
-                                           │ 1️⃣ User/Admin interacts with UI
-                                           ▼
-                     ┌─────────────────────────────────────────┐
-                     │          AUTHENTICATION & ROLE CHECK    │
-                     │  - Login/register with JWT token        │
-                     │  - Determine role: user or admin        │
-                     └─────────────────────┬───────────────────┘
-                                           │
-                           ┌───────────────┴───────────────┐
-                           │                               │
-                           ▼                               ▼
-            ┌───────────────────────────┐       ┌───────────────────────────┐
-            │         USER PANEL        │       │       ADMIN CONTROLS      │
-            │ (Visible for all users)   │       │ (Visible only to admins)  │
-            └──────────────┬────────────┘       └──────────────┬────────────┘
-                           │                                   │
-                           ▼                                   ▼
- ┌────────────────────────────────────┐         ┌──────────────────────────────────┐
- │          USER CRUD ACTIONS         │         │         ADMIN CRUD ACTIONS       │
- │ - Browse events                    │         │ - View all users                 │
- │ - Add/remove favorites             │         │ - Moderate reviews               │
- │ - Post/edit/delete own reviews     │         │ - Monitor subscriptions          │
- │ - Subscribe/unsubscribe categories │         │ - Read-only external events      │
- └────────────────────────────────────┘         └──────────────────────────────────┘
-                  │                              
-                  ▼                       
-      ┌─────────────────────────┐
-      │       MongoDB           │               
-      │ (users, favorites,      │                  
-      │ reviews, subscriptions) │                         
-      └─────────────────────────┘       
-```
 ---
 
 ## 💡 Why UrbanGo?
@@ -174,12 +132,12 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
     │       MONGODB          |       │   EXTERNAL APIs        │
     │ (Persistent Database)  |       │ (Real-time City Data)  │
     │                        │       │                        │
-    │ - Stores user profiles │       │ - Linked Events API:   │
+    │ - Stores user profiles │       │ - Public Events API:   │
     │ - Saves favorites      │       │   City events          │
-    │ - Stores custom events │       │ - OpenWeather API:     │
+    │ - Stores custom events │       │ - FMI API:             │
     │ - Keeps reviews        │       │   Weather info         │
     │                        │       │ - HSL API:             │
-    │                        │       │   Public transit info  │
+    │                        │       │   Public route info    │
     └───────────────┬────────┘       └───────────────┬────────┘
                     │                                │
                     └───────────────┬────────────────┘
@@ -314,34 +272,40 @@ External APIs:
 ```
 urban-go/
 │
-├── frontend/                 # React + Vite app (client-side)
+├── frontend/                 # React + Vite app + AI integration
 │   ├── public/
 │   ├── src/
+|   |   ├── assets/
 │   │   ├── components/
-│   │   ├── pages/
+|   |   ├── context/
 │   │   ├── hooks/
-│   │   ├── context/
-│   │   ├── assets/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── styles/
+│   │   ├── utils/
+│   │   ├── App.css
 │   │   ├── App.jsx
 │   │   ├── main.jsx
-│   │   └── index.css
+│   ├── eslint.config.js
+│   ├── index.html
 │   ├── tailwind.config.js
-│   ├── postcss.config.js
 │   ├── vite.config.js
+│   ├── package-lock.json
 │   └── package.json
 │
-├── backend/                  # Node + Express server (API + DB)
+├── backend/                  # Node + Express server (API + DB + AI integration)
 │   ├── src/
 │   │   ├── config/
-│   │   │   ├── db.js         # MongoDB connection
 │   │   ├── controllers/
+│   │   ├── middlewares/
 │   │   ├── models/
 │   │   ├── routes/
-│   │   ├── middlewares/
 │   │   ├── services/
 │   │   ├── utils/
-│   │   └── server.js
-│   ├── .env.example
+│   ├── tests/
+│   ├── app.js
+│   ├── index.js
+│   ├── package-lock.json
 │   └── package.json    
 |
 └── README.md
@@ -356,7 +320,7 @@ urban-go/
 |:--------|:-------|:-------------|
 | **Sprint 1** | Design & Planning | Figma prototype, Trello backlog, presentation |
 | **Sprint 2** | Frontend & Backend Development | Static pages with navigation and basic interactivity |
-| **Sprint 3** | Frontend, Backend & Integration | HSL API setup, user login system, database, and final presentation |
+| **Sprint 3** | Frontend, Backend & Integration | Events, Transport, Weather, Service disruption and OpenStreetMap API setup, AI integration, user registration system, database, and final presentation |
 
 ---
 
@@ -364,25 +328,11 @@ urban-go/
 
 | Member | Role |
 |:--------|:------|
-| **Sandip Ranjit** | Product Owner + Frontend + Backend Developer |
-| **Sailesh Karki** | Scrum Master (Sprint 2) + Frontend + Backend Developer |
-| **Olga Chitembo** | Frontend + Backend Developer |
-| **Twe He Gam Aung** | Frontend + Backend Developer |
-| **Dinal Maha Vidanelage** | Frontend + Backend Developer |
-
----
-
-## 👥 Team Members & Feature Branches
-Below is the list of team members and the feature branches they are responsible for:
-
-| Member | GitHub | Assigned Branch |
-|--------|--------|-----------------|
-| Sandip Ranjit | @sandip | `feature-transportation` |
-| Sailesh Karki | @sailesh | `feature-user-schema-model` |
-| Olga Chitembo | @olga | `feature-home` |
-| Twe He Gam Aung | @gam | `feature-registration` |
-| Dinal Maha Vidanelage | @dinal | `feature-eventlist` |
-
+| **Sandip** | Product Owner + Sprint 1 Scrum Master + Frontend + Backend Developer|
+| **Sailesh** | Sprint 2 Scrum Master + Frontend + Backend Developer |
+| **Olga** | Frontend + Backend Developer |
+| **Gam** | Sprint 3 Scrum Master + Frontend + Backend Developer | 
+| **Dinal** | Frontend + Backend Developer |
 
 ---
 
