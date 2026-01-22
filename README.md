@@ -107,7 +107,7 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                    REACT FRONTEND (UI)                                      │
 │                                                                             │
-│ - Renders pages: Home, Events, Favorites, Transportation, Admin Dashboard   │
+│ - Renders pages: Home, Events, Transportation, Admin Dashboard              │
 │ - Handles user interactions (clicks, forms, filters)                        │
 │ - Sends HTTP requests to the backend (CRUD operations)                      │
 │ - Receives JSON responses and updates the UI dynamically                    │
@@ -122,8 +122,7 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
 │ - Authenticates users (JWT tokens)                          │
 │ - Checks user roles (regular user vs admin)                 │
 │ - Performs CRUD operations on database                      │
-│ - Calls external APIs if needed (Linked Events, MyHelsinki) │
-│ - Combines local + external data                            │
+│ - Calls external APIs if needed                             │
 └───────────────┬─────────────────────────────┬───────────────┘
                 │                             │
                 │                             │
@@ -165,10 +164,10 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
 │                       USER SEES RESULT                       │
 │                                                              │
 │ - User can view saved favorites, upcoming events             │
-│ - User can explore city map with attractions & routes        │
+│ - User can explore city map with events & routes             │
 │ - Admin can see dashboard with user stats & event management |
-| - Admin can view all users, favorites, reviews, and          |
-|   subscriptions (read/update/delete only local data)         |
+| - Admin can view all users, favorites, and reviews           |
+|  (read/update/delete only local data)                        |
 | - Linked Events API data is read-only                        │
 └──────────────────────────────────────────────────────────────┘
 
@@ -180,6 +179,7 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
 ──────────────────────────────────────────────
 - Opens UrbanGo app
 - Browses events and categories
+- Browses transport routes, public transport disrution information and live weather
 - Clicks "Login" to access personalized features
           │
           ▼
@@ -191,7 +191,6 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
 - Allows user interactions:
     • Save favorites
     • Review on events
-    • Subscribe to categories, venues, or events
           │
           ▼
 ⚡ Node.js + Express Backend
@@ -206,7 +205,7 @@ In the future, UrbanGo aims to evolve into a **fully intelligent digital city co
           ▼
 🔑 JWT Token (Frontend)
 ──────────────────────────────────────────────
-- Stored in localStorage or memory
+- Stored in localStorage
 - Sent in Authorization header for all protected requests:
   Authorization: Bearer <JWT_TOKEN>
           │
@@ -223,18 +222,13 @@ Review Flow:
 - User types review → POST /api/reviews
 - Backend verifies JWT → saves in MongoDB
 - GET /api/reviews?eventId=12345 fetches all reviews
-- PATCH/DELETE allowed only for review owner
-
-Subscribe Flow:
-- User clicks "Subscribe" → POST /api/subscriptions
-- Backend verifies JWT → saves subscription in MongoDB
-- GET /api/subscriptions lists all subscriptions
-- DELETE /api/subscriptions/:id unsubscribes
+- UPDATE/DELETE allowed only for review owner
 
 External APIs:
 - Linked Events API: city events
-- OpenWeather API: weather info
 - HSL API: public transport info
+- OpenStreetMap API
+- Finnish Meteorological Institute: weather info
           │
           ▼
 💾 MongoDB & Data Aggregation
@@ -243,7 +237,6 @@ External APIs:
     • users
     • favorites
     • reviews
-    • subscriptions
     • events
 - Backend aggregates MongoDB + API data
 - Sends structured JSON responses to frontend
@@ -254,8 +247,8 @@ External APIs:
 - Updates pages dynamically:
     • Favorites list
     • Reviews section
-    • Subscriptions status
-    • Event details, maps, weather
+    • Event details, maps
+    • Live weather
 - Ensures only authenticated users can perform actions
           │
           ▼
@@ -263,7 +256,6 @@ External APIs:
 ──────────────────────────────────────────────
 - Favorites appear instantly
 - Reviews appear in real time
-- Subscribed categories/events show as active
 - Admin sees dashboard with user stats, subscriptions, and event management
 ```
 ---
@@ -303,11 +295,17 @@ urban-go/
 │   │   ├── services/
 │   │   ├── utils/
 │   ├── tests/
+│   │   ├── mock.test.js
+│   │   ├── seedUser.js
+│   ├── view/
+│   │   ├── assets/
 │   ├── app.js
 │   ├── index.js
 │   ├── package-lock.json
 │   └── package.json    
 |
+├── .gitignore
+│ 
 └── README.md
 
 ```
@@ -318,9 +316,9 @@ urban-go/
 
 | Sprint | Focus | Deliverables |
 |:--------|:-------|:-------------|
-| **Sprint 1** | Design & Planning | Figma prototype, Trello backlog, presentation |
-| **Sprint 2** | Frontend & Backend Development | Static pages with navigation and basic interactivity |
-| **Sprint 3** | Frontend, Backend & Integration | Events, Transport, Weather, Service disruption and OpenStreetMap API setup, AI integration, user registration system, database, and final presentation |
+| **Sprint 1** | Design & Planning | Figma prototype, Trello backlog, sprint review |
+| **Sprint 2** | Frontend & Backend Development | Static pages with navigation and basic interactivity, sprint review |
+| **Sprint 3** | Frontend, Backend & Integration | Events, Transport, Weather, Service disruption and OpenStreetMap API setup, AI integration, user registration system, database, deployment and app demonstration |
 
 ---
 
@@ -328,11 +326,11 @@ urban-go/
 
 | Member | Role |
 |:--------|:------|
-| **Sandip** | Product Owner + Sprint 1 Scrum Master + Frontend + Backend Developer|
-| **Sailesh** | Sprint 2 Scrum Master + Frontend + Backend Developer |
-| **Olga** | Frontend + Backend Developer |
-| **Gam** | Sprint 3 Scrum Master + Frontend + Backend Developer | 
-| **Dinal** | Frontend + Backend Developer |
+| **Sandip** | Product Owner + Sprint 1 Scrum Master + Full-Stack Developer|
+| **Sailesh** | Sprint 2 Scrum Master + Full-Stack Developer |
+| **Gam** | Sprint 3 Scrum Master + Full-Stack Developer | 
+| **Olga** | Full-Stack Developer |
+| **Dinal** | Full-Stack Developer |
 
 ---
 
@@ -389,5 +387,3 @@ npm run dev    # Runs Vite dev server
 This project is developed for academic purposes as part of Metropolia University of Applied Science course on Web Development.
 
 © 2025 UrbanGo Team
-
-# This branch is ready for production and deployment
