@@ -1,8 +1,12 @@
+/* App.css */
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .logo {
@@ -39,4 +43,43 @@
 
 .read-the-docs {
   color: #888;
+}
+
+
+input[type="text"],
+input[type="search"] {
+  color: #111827 !important;
+}
+
+input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: #9ca3af !important;
+}
+
+::-ms-input-placeholder {
+  color: #9ca3af !important;
+}
+
+button {
+  color: inherit;
+}
+
+.text-gray-900 {
+  color: #111827 !important;
+}
+
+.text-gray-700 {
+  color: #374151 !important;
+}
+
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+#root > div {
+  text-align: left;
 }
